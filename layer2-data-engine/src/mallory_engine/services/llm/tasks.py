@@ -148,6 +148,89 @@ class OllamaTasksProvider:
         )
         return (out.get("lens") or "").strip()[:40] or None
 
+    def extract_records(self, *, title: str, text: str, entities_detected: list,
+                        tables: list) -> dict:
+        """Fast-model structured extraction of typed records from one page.
+
+        Returns {} on any failure ⇒ caller falls back to regex. competitor_id must be one
+        the crawler already resolved (passed in the hint) or null — the deterministic
+        validator drops hallucinated ids.
+        """
+        known_ids = sorted({
+            e.get("resolved_id") for e in (entities_detected or [])
+            if e.get("resolved_id") and e.get("type") in ("competitor", "anchor")
+        })
+        ents_hint = ", ".join(known_ids) or "(none resolved)"
+        body = (text or "")[:6000]  # cap context; a page's lede carries the record
+        return self._run_structured(
+            task="extract_records", model=self._s.ollama_model_fast,
+            schema_model=schemas.ExtractOut, json_schema=schemas.EXTRACT_SCHEMA,
+            system=(
+                f"You are {ANCHOR}'s intake analyst. Extract the typed intelligence records from "
+                "this page. EVERY page yields exactly one `signal`. Add `tender`, `partnership`, "
+                "`geo`, or `event` ONLY if the page clearly reports one; otherwise leave them null. "
+                "For competitor_id use ONLY an id from this resolved list (or null — never invent "
+                f"one): [{ents_hint}]. `stream` is 'competitive' for a competitor action, 'market' "
+                "for a tender/demand/budget item, 'technology' for a capability/R&D item. Copy "
+                "deal values verbatim as written (e.g. '$254M', '₹4,500 cr'). Use only facts on "
+                "the page; invent nothing. The `summary` must be the single most newsworthy "
+                "defence event ON the page (a real headline) — NEVER describe the page itself "
+                "(e.g. never 'this is a search-results page'); if the page has no concrete event, "
+                "summarise its lead story."),
+            user=f"Title: {title}\n\n{body}",
+            evidence_text=f"{title} {body}",
+            extra_validate=lambda d: self._valid_competitor_ids(d, set(known_ids)),
+            fallback=dict,
+        )
+
+    def _valid_competitor_ids(self, d: dict, known: set[str]) -> list[str]:
+        """Every competitor_id in the output must be in the resolved set (or null)."""
+        problems: list[str] = []
+        for rec in (d.get("signal"), d.get("tender"), d.get("partnership"),
+                    d.get("geo"), d.get("event")):
+            if isinstance(rec, dict):
+                cid = rec.get("competitor_id")
+                if cid and cid not in known:
+                    problems.append(f"unknown competitor_id {cid!r}")
+        return problems
+
+    def caption_image(self, *, image_uri: str, context: str) -> dict:
+        """Vision-model caption + recognised labels for one image. {} if vision disabled."""
+        if not self._s.ollama_model_vision:
+            return {}
+        req = ChatRequest(
+            system=(f"You are {ANCHOR}'s imagery analyst. Caption this defence-industry image in "
+                    "one sentence and list any weapon systems, vehicles, or companies you can "
+                    'identify. If unsure, say so — do not guess. Return JSON '
+                    '{"caption":"...","labels":["..."]}.'),
+            user=f"Context: {context}", model=self._s.ollama_model_vision,
+            images=[image_uri], json_schema=schemas.CAPTION_SCHEMA, json_mode=True,
+            max_tokens=512, num_ctx=self._s.llm_num_ctx,
+        )
+        raw = self._t.complete(req)
+        data = _extract_json(raw) if raw else None
+        if not data:
+            return {}
+        try:
+            return schemas.CaptionOut.model_validate(data).model_dump()
+        except ValidationError:
+            return {}
+
+    def extract_specs(self, *, pdf_text: str) -> dict:
+        """Pull {label,value} spec rows a PDF's prose/tables carry (fast model). {} on failure."""
+        return self._run_structured(
+            task="extract_specs", model=self._s.ollama_model_fast,
+            schema_model=schemas.ExtractSpecsOut, json_schema=schemas.EXTRACT_SPECS_SCHEMA,
+            system=("Extract technical specification rows from this document as {label, value} "
+                    "pairs — e.g. range/weight/calibre/crew/speed. Copy numbers and units "
+                    "verbatim. Only rows explicitly stated; invent nothing. Return "
+                    '{"specs":[{"label":"...","value":"..."}]}.'),
+            user=(pdf_text or "")[:6000],
+            evidence_text=pdf_text or "",
+            extra_validate=lambda d: [],
+            fallback=dict,
+        )
+
     def enrich_signal(self, *, stream: str, event_summary: str, company: str | None,
                       dir: str, facts: list[list[str]]) -> dict:
         fact_text = "; ".join(f"{k}: {v}" for k, v in facts)

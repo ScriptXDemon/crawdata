@@ -137,10 +137,38 @@ def _first_assignee(rec: dict):
 
 def _fetch(query_terms: list[str], size: int, settings) -> list[dict]:
     """Dispatch: USPTO when a key is set, else Google Patents fallback."""
+    if settings.serpapi_key:
+        return _fetch_serpapi(query_terms, settings.serpapi_key, size=size)
     if settings.uspto_api_key:
         return _fetch_uspto(query_terms, settings.uspto_api_key, settings.uspto_base_url, size=size)
     google_query = " OR ".join(f'"{t}"' for t in query_terms)
     return _fetch_google(google_query, size=size)
+
+
+def _fetch_serpapi(query_terms: list[str], api_key: str, size: int = 8,
+                   timeout: int = 30) -> list[dict]:
+    """SerpApi Google Patents (engine=google_patents). Reliable, no throttle. Common shape."""
+    # assignee filter: comma-separated; wrap names containing commas in parens
+    assignees = ",".join(f"({t})" if "," in t else t for t in query_terms)
+    params = urllib.parse.urlencode({
+        "engine": "google_patents", "assignee": assignees, "sort": "new",
+        "num": size, "api_key": api_key,
+    })
+    url = f"https://serpapi.com/search?{params}"
+    req = urllib.request.Request(url, headers={"User-Agent": _UA, "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        data = json.load(r)
+    out = []
+    for rec in data.get("organic_results") or []:
+        out.append({
+            "publication_number": rec.get("publication_number") or rec.get("patent_id"),
+            "title": rec.get("title"),
+            "assignee": rec.get("assignee") or (query_terms[0] if query_terms else None),
+            "filing_date": rec.get("filing_date"),
+            "priority_date": rec.get("priority_date"),
+            "snippet": rec.get("snippet") or "",
+        })
+    return [o for o in out if o.get("publication_number")]
 
 
 def _tech_domain(db: Session, text: str) -> str | None:
@@ -162,7 +190,9 @@ def sync_patents(db: Session, per_competitor: int = 6, delay_s: float = 2.0) -> 
     Returns {competitors, fetched, upserted, errors}. Idempotent: upsert by patent id.
     """
     settings = get_settings()
-    source = "USPTO ODP" if settings.uspto_api_key else "Google Patents (keyless)"
+    source = ("SerpApi Google Patents" if settings.serpapi_key
+              else "USPTO ODP" if settings.uspto_api_key
+              else "Google Patents (keyless)")
     print(f"patent source: {source}")
     counts = {"competitors": 0, "fetched": 0, "upserted": 0, "errors": 0}
     # only competitors we have real assignee names for

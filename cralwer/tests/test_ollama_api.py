@@ -12,6 +12,7 @@ import time
 import httpx
 
 BASE_URL = os.environ.get("OLLAMA_BASE_URL", "https://ollama.i3softlab.com")
+# Never hardcode the key — export OLLAMA_API_KEY to run this connectivity check.
 API_KEY = os.environ.get("OLLAMA_API_KEY", "")
 MODEL = os.environ.get("OLLAMA_MODEL", "text-model")
 

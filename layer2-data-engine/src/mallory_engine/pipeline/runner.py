@@ -36,10 +36,13 @@ class PipelineResult:
 
 
 def process_pending(db: Session, llm: LLMProvider | None = None) -> PipelineResult:
-    llm = llm or get_llm()
+    # db-bound so the cache + llm_runs ledger record every call (the scheduler/ops path
+    # previously passed no db-bound llm → no ledger; this fixes it).
+    llm = llm or get_llm(db=db)
 
     # ST-1 extraction: bare documents (the crawler's normal mode) → typed staging records.
-    extraction.extract_pending(db)
+    # LLM-primary (fast model) with regex fallback; stub/offline ⇒ pure regex, unchanged.
+    extraction.extract_pending(db, llm)
     db.flush()
 
     # Corroboration counts across ALL signals (not just this batch) — a claim's independent-

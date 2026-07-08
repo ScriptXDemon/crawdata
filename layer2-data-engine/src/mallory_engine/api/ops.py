@@ -16,6 +16,7 @@ from ..services import (
     graph_analytics,
     graph_builder,
     matchup_synthesis,
+    multimodal,
 )
 from ..services.llm import get_llm
 
@@ -65,6 +66,12 @@ def refresh_patterns(db: Session = Depends(get_db)) -> dict:
     result = field_patterns.refresh_field_patterns(db, get_llm(db=db))
     db.commit()
     return result
+
+
+@router.post("/analyze-assets", summary="Multimodal: caption images + extract PDF specs (vision swaps in)")
+def analyze_assets(db: Session = Depends(get_db)) -> dict:
+    # opt-in because the vision model must swap into VRAM; keep it off the hot path.
+    return multimodal.analyze_pending_assets(db, get_llm(db=db))
 
 
 @router.get("/status", summary="Processing-state counts (feeds the monitor view)")

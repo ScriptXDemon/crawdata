@@ -34,6 +34,78 @@ class TenderVerdictOut(BaseModel):
     lean_text: str
 
 
+# ── Extraction (replaces regex; 7b fast model) ──
+
+
+class ExtractSignal(BaseModel):
+    """The one signal every kept page yields. stream + summary always present."""
+
+    stream: str = Field(pattern="^(competitive|market|technology)$")
+    competitor_id: str | None = None   # a KNOWN ref id or null — never invent one
+    products: list[str] = Field(default_factory=list)
+    country: str | None = None
+    tech_domain: str | None = None
+    summary: str                        # one-line event summary (the signal title)
+    deal_value: str | None = None       # raw string as written, e.g. "$254M", "₹4,500 cr"
+
+
+class ExtractTender(BaseModel):
+    title: str
+    country: str | None = None
+    category: str | None = None
+    value: str | None = None
+    deadline_days: int | None = None    # "closing in N days" → N, else null
+
+
+class ExtractPartnership(BaseModel):
+    competitor_id: str | None = None
+    partner_name: str
+    rel_type: str | None = None         # jv|license|mou|supply|investment
+    value: str | None = None
+
+
+class ExtractGeo(BaseModel):
+    competitor_id: str | None = None
+    country: str
+    product: str | None = None
+    value: str | None = None
+    stage: str | None = None            # Contracted|Offered
+
+
+class ExtractEvent(BaseModel):
+    competitor_id: str | None = None
+    event_type: str | None = None       # acquisition|investment|leadership
+    headline: str
+    value: str | None = None
+
+
+class ExtractOut(BaseModel):
+    """One page → its typed records. signal always; the rest only when the page supports them."""
+
+    signal: ExtractSignal
+    tender: ExtractTender | None = None
+    partnership: ExtractPartnership | None = None
+    geo: ExtractGeo | None = None
+    event: ExtractEvent | None = None
+
+
+# ── Multimodal (Phase B; vision + fast models) ──
+
+
+class CaptionOut(BaseModel):
+    caption: str = Field(max_length=400)
+    labels: list[str] = Field(default_factory=list)  # recognised systems/entities; [] if unsure
+
+
+class SpecRow(BaseModel):
+    label: str
+    value: str
+
+
+class ExtractSpecsOut(BaseModel):
+    specs: list[SpecRow] = Field(default_factory=list)
+
+
 # ── Synthesis engines (S-22/23/24) ──
 
 
@@ -86,3 +158,6 @@ TENDER_VERDICT_SCHEMA = _schema(TenderVerdictOut)
 SYNTHESIS_SCHEMA = _schema(SynthesisOut)
 MATCHUP_VERDICT_SCHEMA = _schema(MatchupVerdictOut)
 FIELD_PATTERNS_SCHEMA = _schema(FieldPatternsOut)
+EXTRACT_SCHEMA = _schema(ExtractOut)
+CAPTION_SCHEMA = _schema(CaptionOut)
+EXTRACT_SPECS_SCHEMA = _schema(ExtractSpecsOut)

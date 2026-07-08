@@ -30,6 +30,15 @@ FIXTURES_DIR = PROJECT_ROOT / "tests" / "fixtures"
 # contract's s3://mallory-raw/... layout so Layer 2 sees familiar paths.
 STORAGE_URI_PREFIX = "s3://mallory-raw"
 
+# --- MinIO / S3 object store (optional; falls back to local disk) ---------
+# Set MINIO_ENDPOINT (host:port, no scheme) to write blobs to MinIO instead of
+# STORAGE_DIR. The s3://mallory-raw/<kind>/<sha>.<ext> URI stays identical.
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "")          # e.g. "localhost:9000"
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "mallory")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "mallory123")
+MINIO_BUCKET = os.environ.get("MINIO_BUCKET", "mallory-raw")
+MINIO_SECURE = os.environ.get("MINIO_SECURE", "0") == "1"
+
 # --- Ingest API ----------------------------------------------------------
 INGEST_BASE_URL = os.environ.get("INGEST_BASE_URL", "http://127.0.0.1:9090")
 INGEST_API_PREFIX = "/ingest/v1"

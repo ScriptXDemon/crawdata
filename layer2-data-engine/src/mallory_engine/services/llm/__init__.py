@@ -37,6 +37,16 @@ class LLMProvider(Protocol):
     def chat(self, *, system: str, context: str, message: str) -> str:
         """Answer a Mallory question grounded in the provided serving context."""
 
+    def extract_records(self, *, title: str, text: str, entities_detected: list,
+                        tables: list) -> dict:
+        """Extract typed records from one page. {} ⇒ caller uses regex fallback."""
+
+    def caption_image(self, *, image_uri: str, context: str) -> dict:
+        """Vision caption + labels for one image (data: URI). {} if vision disabled."""
+
+    def extract_specs(self, *, pdf_text: str) -> dict:
+        """Extract {label,value} spec rows from PDF text. {} on failure."""
+
 
 def get_llm(settings: Settings | None = None, *, db=None) -> LLMProvider:
     """Resolve the configured provider. Pass ``db`` to enable the cache + llm_runs ledger."""

@@ -54,3 +54,7 @@ Thumbs.db
 
 # neutralized nested repo (monorepo consolidation)
 **/.git_DISABLED_for_monorepo/
+
+# SQLite runtime artifacts
+*.db-shm
+*.db-wal

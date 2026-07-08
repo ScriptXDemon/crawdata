@@ -23,14 +23,18 @@ class Settings(BaseSettings):
     openrouter_model: str = "google/gemini-2.5-flash"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
 
-    # Ollama (OpenAI-compatible). Local by default; flip base_url to the remote door
-    # (https://ollama.i3softlab.com/v1) + set ollama_api_key when it opens.
+    # Ollama (OpenAI-compatible). Local by default; flip base_url to the remote farm
+    # (https://ollama.i3softlab.com/v1) + set ollama_api_key. Farm models: text-model, vlm-model.
     ollama_base_url: str = "http://localhost:11434/v1"
-    ollama_api_key: str = ""  # blank for local; set for the remote door
-    ollama_model_fast: str = "qwen2.5:14b"   # classify / judge / extract
-    ollama_model_deep: str = "qwen2.5:14b"   # synthesis / verdicts / reports
-    ollama_model_vision: str = ""            # empty ⇒ vision tasks disabled (fallback)
-    ollama_model_embed: str = ""             # empty ⇒ embedding retrieval disabled
+    ollama_api_key: str = ""  # blank for local; the sk-farm-... key for the remote farm
+    ollama_model_fast: str = "qwen2.5:7b"      # extract / classify / captions-judge — high volume
+    ollama_model_deep: str = "qwen2.5:14b"     # synthesis / verdicts / reports — heavy reasoning
+    ollama_model_vision: str = "qwen2.5vl:7b"  # image captions / equipment recognition
+    # Embeddings run on their OWN endpoint (the farm has no embed model, so embed stays local
+    # even when chat/vision point at the farm). Blank base_url ⇒ reuse ollama_base_url.
+    ollama_embed_base_url: str = "http://localhost:11434/v1"
+    ollama_embed_api_key: str = ""
+    ollama_model_embed: str = "nomic-embed-text"  # semantic dedup / retrieval (Phase C)
     llm_timeout_s: int = 120                 # a 14b on GPU is slower than a hosted API
     llm_num_ctx: int = 8192
     llm_cache_enabled: bool = True
@@ -43,13 +47,20 @@ class Settings(BaseSettings):
     scheduler_enabled: bool = False
     scheduler_interval_s: int = 120
 
-    # Crawler Ingest API base URL (for proxying asset requests).
-    # Set to http://<crawler-ip>:8077 when L2 is on a different machine.
+    # Crawler Ingest API base URL (fallback asset proxy when MinIO isn't configured).
     crawler_ingest_url: str = "http://localhost:9090"
 
-    # Patent source. USPTO Open Data Portal (api.uspto.gov) is the real free API — it
-    # replaced PatentsView (retired 2025). Get a free key at data.uspto.gov (My ODP →
-    # API keys). Blank ⇒ connector falls back to keyless Google Patents (throttled).
+    # MinIO / S3 object store — where the crawler wrote the blobs. When set, L2 reads
+    # asset bytes straight from MinIO by the s3://mallory-raw/... URI (no crawler proxy).
+    minio_endpoint: str = ""              # e.g. "localhost:9000"; blank ⇒ proxy via crawler
+    minio_access_key: str = "mallory"
+    minio_secret_key: str = "mallory123"
+    minio_bucket: str = "mallory-raw"
+    minio_secure: bool = False
+
+    # Patent source, tried in order: SerpApi (engine=google_patents, reliable, needs a key)
+    # → USPTO ODP (free key) → keyless Google Patents (throttled). Set whichever you have.
+    serpapi_key: str = ""
     uspto_api_key: str = ""
     uspto_base_url: str = "https://api.uspto.gov"
 

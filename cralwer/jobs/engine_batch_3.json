@@ -1,0 +1,60 @@
+[
+  {
+    "job_id": "job_news_BAE",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=BAE+Systems+Archer+M777+artillery"
+    ],
+    "keywords": [
+      "BAE Systems",
+      "Archer",
+      "M777",
+      "artillery"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Elbit+ATMOS+PULS+artillery"
+    ],
+    "keywords": [
+      "Elbit",
+      "ATMOS",
+      "PULS",
+      "artillery"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

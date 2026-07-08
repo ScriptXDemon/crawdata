@@ -1,0 +1,60 @@
+[
+  {
+    "job_id": "job_news_RHEIN",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Rheinmetall+155mm+artillery"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "155mm",
+      "artillery",
+      "ammunition"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=KNDS+Nexter+Caesar+howitzer"
+    ],
+    "keywords": [
+      "KNDS",
+      "Nexter",
+      "Caesar",
+      "howitzer"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

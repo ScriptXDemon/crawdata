@@ -1,0 +1,60 @@
+[
+  {
+    "job_id": "job_news_HANWHA",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Hanwha+K9+howitzer"
+    ],
+    "keywords": [
+      "Hanwha",
+      "K9",
+      "howitzer",
+      "artillery"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_LT",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=L%26T+Defence+K9+Vajra+artillery"
+    ],
+    "keywords": [
+      "L&T",
+      "K9 Vajra",
+      "artillery",
+      "howitzer"
+    ],
+    "target_entity": "LT",
+    "max_pages": 25,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text",
+      "images"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

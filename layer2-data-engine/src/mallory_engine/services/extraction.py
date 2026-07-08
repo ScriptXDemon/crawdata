@@ -2,9 +2,16 @@
 
 The crawler sends ONE bare page bundle per kept page ("L1 sends exactly one bundle; L2 does
 its own deep processing"). This stage derives the typed staging records from a stored
-document, deterministically: the crawler's own ``entities_detected`` (already resolved
-against the watchlist) first, keyword patterns second. LLM refinement can layer on later —
-extraction itself stays rule-based so ingestion never depends on a model.
+document.
+
+Two extractors, LLM-primary / regex-fallback:
+  * ``extract_document`` asks the fast LLM (``llm.extract_records``) to read the page and
+    return typed records. On empty/invalid output (or stub/offline) it falls back to
+    ``_regex_extract_document`` — the original deterministic keyword+pattern extractor —
+    so ingestion NEVER depends on a model being up. Stub mode ⇒ regex always ⇒ output is
+    byte-identical to before.
+  * The LLM calls are fanned out over a thread pool (httpx is threadsafe, Ollama serves
+    parallel); ALL db writes stay on the calling thread to avoid session threading issues.
 
 Idempotent: a document is extracted once (``extracted_at``); documents that arrived WITH
 crawler-supplied records (mock feeder, tests) are stamped and skipped.
@@ -14,10 +21,12 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+from concurrent.futures import ThreadPoolExecutor
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..models.reference import RefCompetitor
 from ..models.staging import (
     StgCompanyEvent,
     StgDocument,
@@ -78,8 +87,8 @@ def _tech_domain(db: Session, text: str) -> str | None:
     return None
 
 
-def extract_document(db: Session, doc: StgDocument) -> dict[str, int]:
-    """Derive typed records for one document. Returns counts per record type."""
+def _regex_extract_document(db: Session, doc: StgDocument) -> dict[str, int]:
+    """Deterministic keyword/pattern extraction (the fallback path). Returns counts."""
     text = f"{doc.title or ''}. {doc.main_text_en or doc.main_text or ''}"
     ents = _entities(doc)
     competitor = next((e.get("resolved_id") for e in ents.get("competitor", [])
@@ -158,16 +167,122 @@ def extract_document(db: Session, doc: StgDocument) -> dict[str, int]:
         ))
         counts["events"] = 1
 
+    return counts
+
+
+# ── LLM-primary path ──────────────────────────────────────────────────────────
+
+_VALID_STREAMS = {"competitive", "market", "technology"}
+
+
+def _apply_llm_records(db: Session, doc: StgDocument, out: dict,
+                       known_ids: set[str]) -> dict[str, int]:
+    """Map an ``ExtractOut`` dict onto Stg* rows — same fields the regex path writes.
+
+    Returns counts, or an empty dict if the payload has no usable signal (caller then
+    falls back to regex). competitor_id is trusted only when in ``known_ids``.
+    """
+    sig = out.get("signal") or {}
+    stream = sig.get("stream")
+    summary = (sig.get("summary") or doc.title or "").strip()
+    if stream not in _VALID_STREAMS or not summary:
+        return {}  # unusable → let the caller fall back to regex
+
+    def _cid(rec: dict) -> str | None:
+        cid = rec.get("competitor_id")
+        return cid if cid in known_ids else None
+
+    counts = {"signals": 0, "tenders": 0, "partnerships": 0, "geo": 0, "events": 0}
+    db.add(StgSignal(
+        document_id=doc.id, stream=stream, competitor_id=_cid(sig),
+        detected_products=sig.get("products") or None, detected_country=sig.get("country"),
+        tech_domain=sig.get("tech_domain"), event_summary=summary,
+        deal_value_raw=sig.get("deal_value"), published_at=doc.published_at,
+        proc_status="received",
+    ))
+    counts["signals"] = 1
+
+    if t := out.get("tender"):
+        dl = t.get("deadline_days")
+        # bound it: an LLM can emit a giant/negative day count → timedelta(days=huge) overflows.
+        deadline = (dt.date.today() + dt.timedelta(days=int(dl))
+                    if isinstance(dl, int) and 0 <= dl <= 3650 else None)
+        db.add(StgTender(
+            document_id=doc.id, title=(t.get("title") or summary), issuer=doc.source_id,
+            country=t.get("country"), category_hint=t.get("category"), value_raw=t.get("value"),
+            deadline_date=deadline,
+            requirement_text=(doc.summary or doc.main_text or "")[:500],
+            requirement_fields=_table_fields(doc), proc_status="received",
+        ))
+        counts["tenders"] = 1
+
+    if (p := out.get("partnership")) and p.get("partner_name") and _cid(p):
+        db.add(StgPartnership(
+            document_id=doc.id, competitor_id=_cid(p), partner_name=p["partner_name"],
+            rel_type=p.get("rel_type"), deal_value_raw=p.get("value"),
+            date_announced=doc.published_at.date() if doc.published_at else None,
+            description=doc.title, proc_status="received",
+        ))
+        counts["partnerships"] = 1
+
+    if (g := out.get("geo")) and g.get("country") and _cid(g):
+        db.add(StgGeo(
+            document_id=doc.id, competitor_id=_cid(g), country=g["country"],
+            product_name=g.get("product"), contract_value_raw=g.get("value"),
+            stage=g.get("stage") or "Offered", confidence="medium", proc_status="received",
+        ))
+        counts["geo"] = 1
+
+    if (e := out.get("event")) and e.get("headline") and _cid(e):
+        db.add(StgCompanyEvent(
+            document_id=doc.id, competitor_id=_cid(e),
+            event_type=e.get("event_type") or "event", headline=e["headline"],
+            deal_value_raw=e.get("value"),
+            date_of_event=doc.published_at.date() if doc.published_at else None,
+            description=doc.summary, proc_status="received",
+        ))
+        counts["events"] = 1
+
+    return counts
+
+
+def _table_fields(doc: StgDocument) -> list[dict]:
+    return [
+        {"label": r.get("label", ""), "value": r.get("value", "")}
+        for t in (doc.tables or []) for r in t.get("rows", [])
+        if isinstance(r, dict) and r.get("label")
+    ]
+
+
+def extract_document(db: Session, doc: StgDocument, llm, known_ids: set[str]) -> dict[str, int]:
+    """LLM-primary extraction with regex fallback. Stamps extracted_at. Returns counts.
+
+    The LLM call is expected to have already run (fanned out in extract_pending); pass its
+    result via ``doc`` context is avoided — instead extract_pending precomputes and calls
+    ``_apply_llm_records`` directly. This wrapper is kept for single-doc/test use.
+    """
+    out = llm.extract_records(
+        title=doc.title or "", text=doc.main_text_en or doc.main_text or "",
+        entities_detected=doc.entities_detected or [], tables=doc.tables or [],
+    ) if llm is not None else {}
+    counts = _apply_llm_records(db, doc, out, known_ids) if out else {}
+    if not counts:  # LLM empty/invalid/offline → deterministic regex fallback
+        counts = _regex_extract_document(db, doc)
     doc.extracted_at = dt.datetime.now(dt.timezone.utc)
     return counts
 
 
-def extract_pending(db: Session) -> dict[str, int]:
-    """Extract every un-extracted document that arrived without crawler-supplied records."""
+def extract_pending(db: Session, llm=None) -> dict[str, int]:
+    """Extract every un-extracted document that arrived without crawler-supplied records.
+
+    LLM extraction is fanned out over a thread pool (I/O-bound HTTP); all DB writes happen
+    serially on this thread afterwards. ``llm=None`` (or stub) ⇒ pure regex, byte-identical
+    to the pre-LLM behaviour.
+    """
     totals = {"docs": 0, "signals": 0, "tenders": 0, "partnerships": 0, "geo": 0, "events": 0}
-    docs = db.scalars(
-        select(StgDocument).where(StgDocument.extracted_at.is_(None))
-    ).all()
+    docs = db.scalars(select(StgDocument).where(StgDocument.extracted_at.is_(None))).all()
+
+    pending: list[StgDocument] = []
     for doc in docs:
         has_children = db.scalar(
             select(StgSignal.id).where(StgSignal.document_id == doc.id).limit(1)
@@ -177,7 +292,32 @@ def extract_pending(db: Session) -> dict[str, int]:
         if has_children:  # records were supplied at ingest — nothing to derive
             doc.extracted_at = dt.datetime.now(dt.timezone.utc)
             continue
-        counts = extract_document(db, doc)
+        pending.append(doc)
+
+    known_ids = {c.id for c in db.scalars(select(RefCompetitor)).all()}
+
+    # Fan out the LLM extraction (pure HTTP → dict); no DB access inside workers.
+    outputs: dict[str, dict] = {}
+    if llm is not None and pending:
+        def _call(doc: StgDocument) -> tuple[str, dict]:
+            try:
+                return doc.id, llm.extract_records(
+                    title=doc.title or "", text=doc.main_text_en or doc.main_text or "",
+                    entities_detected=doc.entities_detected or [], tables=doc.tables or [],
+                )
+            except Exception:
+                return doc.id, {}
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for doc_id, out in pool.map(_call, pending):
+                outputs[doc_id] = out
+
+    # Apply serially on this thread (LLM records → fallback to regex when empty).
+    for doc in pending:
+        out = outputs.get(doc.id) or {}
+        counts = _apply_llm_records(db, doc, out, known_ids) if out else {}
+        if not counts:
+            counts = _regex_extract_document(db, doc)
+        doc.extracted_at = dt.datetime.now(dt.timezone.utc)
         totals["docs"] += 1
         for k, v in counts.items():
             totals[k] += v

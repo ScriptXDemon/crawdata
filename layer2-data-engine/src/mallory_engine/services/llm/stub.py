@@ -85,6 +85,18 @@ class StubLLMProvider:
             "lean_text": f"<b>{head}</b> Best {ANCHOR} match scores {best_fit_pct}%. {match_summary}",
         }
 
+    # ── Extraction + multimodal: stub returns {} so the caller uses its deterministic
+    # fallback (regex extraction / skip). Keeps LLM_PROVIDER=stub fully offline & unchanged.
+    def extract_records(self, *, title: str, text: str, entities_detected: list,
+                        tables: list) -> dict:
+        return {}
+
+    def caption_image(self, *, image_uri: str, context: str) -> dict:
+        return {}
+
+    def extract_specs(self, *, pdf_text: str) -> dict:
+        return {}
+
     def chat(self, *, system: str, context: str, message: str) -> str:
         # Deterministic, grounded fallback: surface the scoped context honestly.
         if not context.strip():

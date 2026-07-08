@@ -151,6 +151,30 @@ class StgInnovation(Base):
     proc_status: Mapped[str] = mapped_column(String, default="received", index=True)
 
 
+class StgAssetAnalysis(Base):
+    """Multimodal analysis of a document's captured assets (images/PDFs/screenshots).
+
+    One row per analyzed asset. ``method`` records how it was produced (vision_llm caption,
+    pdf_text spec extraction) so /explain stays honest about model-vs-rule provenance.
+    """
+
+    __tablename__ = "stg_asset_analysis"
+    id: Mapped[int] = mapped_column(
+        BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True
+    )
+    document_id: Mapped[str] = mapped_column(ForeignKey("stg_documents.id"), index=True)
+    asset_kind: Mapped[str] = mapped_column(String)  # image|pdf|screenshot
+    asset_index: Mapped[int] = mapped_column(Integer, default=0)  # nth asset of its kind
+    storage_path: Mapped[str | None] = mapped_column(String, nullable=True)
+    method: Mapped[str] = mapped_column(String)  # vision_llm|pdf_text
+    caption: Mapped[str | None] = mapped_column(Text, nullable=True)
+    labels: Mapped[list | None] = mapped_column(JSONB, nullable=True)  # recognised systems/entities
+    extracted_specs: Mapped[list | None] = mapped_column(JSONB, nullable=True)  # [{label,value}]
+    status: Mapped[str] = mapped_column(String, default="ok")  # ok|empty|error
+    llm_run_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class StgCompanyEvent(Base):
     __tablename__ = "stg_company_events"
     id: Mapped[int] = mapped_column(  # BigInteger→INTEGER on SQLite so autoincrement works
