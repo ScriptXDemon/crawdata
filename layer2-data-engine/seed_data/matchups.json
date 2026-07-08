@@ -1,0 +1,104 @@
+{
+  "_note": "Positioning matchups (static/admin-curated). Specs are ILLUSTRATIVE — replace with verified values. edge_score + per-spec leader are computed by the loader's builder from the numeric specs.",
+  "matchups": [
+    {
+      "kssl_id": "ATAGS", "kssl_name": "ATAGS / Bharat 52", "category": "artillery",
+      "comp_name": "CAESAR 6x6", "comp_by": "KNDS", "country": "France",
+      "specs": [
+        { "label": "Calibre", "kssl": "155/52", "comp": "155/52" },
+        { "label": "Max range", "kssl": "48 km", "comp": "42 km", "kssl_num": 48, "comp_num": 42, "better": "high" },
+        { "label": "Weight", "kssl": "18 t", "comp": "18 t" },
+        { "label": "Rate of fire", "kssl": "5 rpm", "comp": "6 rpm", "kssl_num": 5, "comp_num": 6, "better": "high" }
+      ],
+      "adv_kssl": ["Indigenous IP + forged barrel; made-in-India", "Leads on range (48 km)"],
+      "adv_comp": ["Established maker in this class", "Faster shoot-and-scoot"],
+      "verdict": "Near-parity on measured specs. KSSL leads on range and indigenous content; CAESAR on export record and into-action time."
+    },
+    {
+      "kssl_id": "MARG155", "kssl_name": "MArG 155", "category": "artillery",
+      "comp_name": "RCH-155", "comp_by": "KNDS", "country": "Germany",
+      "specs": [
+        { "label": "Calibre", "kssl": "155/52", "comp": "155/52" },
+        { "label": "Max range", "kssl": "40 km", "comp": "54 km", "kssl_num": 40, "comp_num": 54, "better": "high" },
+        { "label": "Fire-on-move", "kssl": "No", "comp": "Yes" },
+        { "label": "Crew", "kssl": "4-5", "comp": "2", "kssl_num": 5, "comp_num": 2, "better": "low" }
+      ],
+      "adv_kssl": ["Lower unit cost", "Indigenous content"],
+      "adv_comp": ["Fire-on-the-move autonomy", "Longer reach", "Smaller crew"],
+      "verdict": "RCH-155 is a generation ahead on automation and reach. KSSL competes on cost and indigenisation, not parity of features."
+    },
+    {
+      "kssl_id": "BHARATULH", "kssl_name": "Bharat ULH", "category": "artillery",
+      "comp_name": "M777", "comp_by": "BAE Systems", "country": "UK",
+      "specs": [
+        { "label": "Calibre", "kssl": "155/39", "comp": "155/39" },
+        { "label": "Max range", "kssl": "30 km", "comp": "30 km", "kssl_num": 30, "comp_num": 30, "better": "high" },
+        { "label": "Weight", "kssl": "4.5 t", "comp": "4.2 t", "kssl_num": 4.5, "comp_num": 4.2, "better": "low" },
+        { "label": "Helo-liftable", "kssl": "Yes", "comp": "Yes" }
+      ],
+      "adv_kssl": ["Indigenous ULH programme", "Titanium-class forging base"],
+      "adv_comp": ["Combat-proven, widely fielded", "Marginally lighter"],
+      "verdict": "Direct ultralight-howitzer rival. Near-parity; M777's edge is its in-service record, KSSL's is indigenous supply security."
+    },
+    {
+      "kssl_id": "CQBC", "kssl_name": "CQB Carbine", "category": "small_arms",
+      "comp_name": "Adani JEET (Tavor X95)", "comp_by": "Adani Defence", "country": "Israel",
+      "specs": [
+        { "label": "Calibre", "kssl": "5.56x45", "comp": "5.56x45" },
+        { "label": "Design origin", "kssl": "DRDO indigenous", "comp": "IWI-derived" },
+        { "label": "Programme result", "kssl": "L1", "comp": "L2" },
+        { "label": "Indigenous content", "kssl": "High", "comp": "Lower", "kssl_num": 80, "comp_num": 50, "better": "high" }
+      ],
+      "adv_kssl": ["L1 on the Armed Forces carbine programme", "Indigenous DRDO design + cost base"],
+      "adv_comp": ["Marketing reach", "Mature foreign platform"],
+      "verdict": "KSSL already beat this rival head-to-head (L1 vs L2) on price and indigeneity — the strongest single data point in the field."
+    },
+    {
+      "kssl_id": "SPIKEKRAS", "kssl_name": "Spike (KRAS)", "category": "missiles_ad",
+      "comp_name": "Nag ATGM (Prospina)", "comp_by": "Bharat Dynamics", "country": "India",
+      "specs": [
+        { "label": "Type", "kssl": "Spike LR (ToT)", "comp": "Indigenous fire-and-forget" },
+        { "label": "Range", "kssl": "4 km", "comp": "4 km", "kssl_num": 4, "comp_num": 4, "better": "high" },
+        { "label": "Seeker", "kssl": "EO/IIR", "comp": "IIR" }
+      ],
+      "adv_kssl": ["KRAS JV production scale", "Proven Spike lineage"],
+      "adv_comp": ["Fully indigenous IP", "DRDO programme backing"],
+      "verdict": "Adjacent overlap in anti-tank. BDL's Nag is indigenous; KRAS Spike is licensed — competition turns on indigenisation scoring."
+    },
+    {
+      "kssl_id": "M4", "kssl_name": "Kalyani M4", "category": "armoured",
+      "comp_name": "WhAP 8x8", "comp_by": "Tata Advanced Systems", "country": "India",
+      "specs": [
+        { "label": "Class", "kssl": "MRAP 4x4", "comp": "ICV 8x8" },
+        { "label": "Protection", "kssl": "STANAG 4569 L4", "comp": "STANAG L4" },
+        { "label": "In service", "kssl": "Yes (incl. LAC)", "comp": "Inducting" }
+      ],
+      "adv_kssl": ["Fielded incl. high-altitude (LAC)", "Forging-grade armour"],
+      "adv_comp": ["8x8 amphibious platform", "Larger troop capacity"],
+      "verdict": "Different classes (MRAP vs ICV). KSSL leads on proven high-altitude deployment; Tata on platform breadth."
+    },
+    {
+      "kssl_id": "BHARAT150", "kssl_name": "Bharat 150", "category": "uav",
+      "comp_name": "Drishti-10 Starliner", "comp_by": "Adani Defence", "country": "Israel",
+      "specs": [
+        { "label": "Class", "kssl": "MALE UAV", "comp": "MALE UAV" },
+        { "label": "Origin", "kssl": "Indigenous + KGT engine", "comp": "Hermes 900 licensed" },
+        { "label": "Endurance", "kssl": "~30 h", "comp": "36 h", "kssl_num": 30, "comp_num": 36, "better": "high" }
+      ],
+      "adv_kssl": ["Indigenous engine (KGT-45) ambition", "Sovereign IP path"],
+      "adv_comp": ["Already fielded (<3 yrs)", "Longer endurance"],
+      "verdict": "Adani fields a licensed Hermes today; KSSL's edge is the indigenous-engine roadmap, not current fielding."
+    },
+    {
+      "kssl_id": "AUV", "kssl_name": "AUV / Underwater systems", "category": "naval",
+      "comp_name": "GRSE Neerakshi", "comp_by": "GRSE", "country": "India",
+      "specs": [
+        { "label": "Type", "kssl": "AUV (Navy fast-track)", "comp": "Mine-detection AUV" },
+        { "label": "Stage", "kssl": "In delivery", "comp": "Trials" }
+      ],
+      "adv_kssl": ["Navy fast-track contract in delivery", "Forging + systems integration"],
+      "adv_comp": ["Shipyard integration", "Naval pedigree"],
+      "verdict": "Emerging naval-autonomy overlap. KSSL is ahead on contracted delivery timing."
+    }
+  ]
+}

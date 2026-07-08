@@ -1,0 +1,357 @@
+[
+  {
+    "job_id": "job_2026-06-29_LT_news_01",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/lt-k9-vajra-followon/"
+    ],
+    "keywords": [
+      "L&T",
+      "Larsen & Toubro",
+      "K9 Vajra",
+      "artillery",
+      "howitzer"
+    ],
+    "target_entity": "LT",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_ADANI_news_02",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/news/defence/adani-acquires-general-aeronautics/"
+    ],
+    "keywords": [
+      "Adani",
+      "Adani Defence",
+      "acquisition",
+      "UAV",
+      "drone",
+      "Drishti"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "company_event",
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_KNDS_news_03",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/global/2026/06/27/knds-caesar-nigeria/"
+    ],
+    "keywords": [
+      "KNDS",
+      "Nexter",
+      "CAESAR",
+      "155",
+      "artillery",
+      "Nigeria"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_MOD_tender_04",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://mod.gov.in/tenders/mgs-155mm"
+    ],
+    "keywords": [
+      "155mm",
+      "mounted gun system",
+      "RFP",
+      "tender",
+      "artillery",
+      "52 calibre"
+    ],
+    "target_entity": null,
+    "max_pages": 15,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_SAMGOV_tender_05",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://sam.gov/opp/155mm-towed-howitzer/view"
+    ],
+    "keywords": [
+      "155mm",
+      "towed howitzer",
+      "light field gun",
+      "tender",
+      "solicitation"
+    ],
+    "target_entity": null,
+    "max_pages": 15,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_NIBE_profile_06",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.nibe.co.in/news/nibe-sig-sauer-license/"
+    ],
+    "keywords": [
+      "NIBE",
+      "Sig Sauer",
+      "licen",
+      "agreement",
+      "rifle",
+      "small arms",
+      "partnership"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_SOLAR_profile_07",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.solargroup.com/news/nagastra-armenia-export/"
+    ],
+    "keywords": [
+      "Solar Industries",
+      "Nagastra",
+      "loitering munition",
+      "Armenia",
+      "export",
+      "MoU",
+      "EDGE"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_CAESAR_spec_08",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/caesar-6x6-specs"
+    ],
+    "keywords": [
+      "CAESAR",
+      "155mm",
+      "52 calibre",
+      "howitzer",
+      "self-propelled"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 5,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_market_09",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/global/2026/06/19/armenia-artillery-tender/"
+    ],
+    "keywords": [
+      "Armenia",
+      "artillery",
+      "155mm",
+      "howitzer",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_market_10",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/asia-pacific/2026/06/17/india-defence-budget/"
+    ],
+    "keywords": [
+      "India",
+      "defence budget",
+      "capital outlay",
+      "procurement",
+      "artillery"
+    ],
+    "target_entity": null,
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_tech_11",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/news/ramjet-155mm-rheinmetall/"
+    ],
+    "keywords": [
+      "ramjet",
+      "155mm",
+      "Rheinmetall",
+      "artillery",
+      "range",
+      "projectile"
+    ],
+    "target_entity": null,
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "innovation"
+    ]
+  },
+  {
+    "job_id": "job_2026-06-29_tech_12",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/news/loitering-munition-trends/"
+    ],
+    "keywords": [
+      "loitering munition",
+      "kamikaze drone",
+      "UAV",
+      "one-way attack",
+      "SkyStriker",
+      "Nagastra"
+    ],
+    "target_entity": null,
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "innovation"
+    ]
+  }
+]

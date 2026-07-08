@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mallory — Orchestrator Admin</title>
+<style>
+  :root{--bg:#161618;--b1:#1c1c1f;--b2:#212125;--b3:#2a2a2f;--line:#323237;--line2:#46464d;
+    --tx:#f5f5f4;--tx2:#bdbdbb;--tx3:#908f8c;--tx4:#65656a;--t1:#b5341f;--t2:#9a6a08;--t3:#65656a;--ok:#1f6e45;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;--sans:'Archivo',system-ui,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px}
+  .top{display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 22px;border-bottom:1px solid var(--line)}
+  .wm{font-weight:800;font-size:20px;letter-spacing:-.02em}.wm span{font-weight:500;color:var(--tx2)}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--tx3)}
+  .wrap{padding:22px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .card{background:var(--b1);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+  .card .v{font-family:var(--mono);font-size:24px;font-weight:500}.card .l{font-size:11px;color:var(--tx3);margin-top:3px}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx);background:var(--b3);border:1px solid var(--line2);padding:8px 14px;cursor:pointer}
+  .btn:hover{border-color:var(--tx4)}.btn.primary{background:rgba(31,110,69,.15);border-color:var(--ok);color:#7fd0a5}
+  .bar{display:flex;gap:8px;align-items:center;background:var(--b1);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:6px;flex-wrap:wrap}
+  .bar input,.bar select{background:var(--bg);border:1px solid var(--line2);color:var(--tx);padding:8px 10px;font-family:var(--sans);font-size:13px;outline:none}
+  .bar .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx4)}
+  .only{font-size:11px;color:#6ea8ff;margin:6px 2px 16px}
+  h2{font-size:13px;font-weight:600;margin:20px 0 10px;letter-spacing:.02em}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:8px;border-bottom:1px solid var(--line)}
+  td{padding:8px;border-bottom:1px solid var(--line);color:var(--tx2)}
+  td.mono{font-family:var(--mono);color:var(--tx)}
+  .pill{font-family:var(--mono);font-size:10px;padding:2px 7px;border:1px solid}
+  .p1{color:#f0593c;border-color:rgba(240,89,60,.5)}.p2{color:#e0a020;border-color:rgba(224,160,32,.5)}.p3{color:var(--tx3);border-color:var(--line2)}
+  .auto{font-size:9px;color:var(--tx4);border:1px solid var(--line2);padding:1px 5px;margin-left:6px}
+  .muted{color:var(--tx4)}.log{font-family:var(--mono);font-size:11px;color:var(--tx3);margin-top:8px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="wm">MALLORY <span>Orchestrator</span></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="runDue()">Run due jobs</button>
+      <button class="btn primary" onclick="runTest()">Run offline test batch</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+
+    <div class="eyebrow">Add source — the only human inputs</div>
+    <div class="bar" style="margin-top:8px">
+      <span class="lbl">URL</span>
+      <input id="u" style="flex:2;min-width:240px" placeholder="https://example-defence-news.com" />
+      <span class="lbl">Frequency</span>
+      <select id="f"><option>daily</option><option>6h</option><option>weekly</option></select>
+      <span class="lbl">Category</span>
+      <select id="c">
+        <option value="">(auto-classify)</option>
+        <option>gov_primary</option><option>manufacturer_ir</option><option>defence_org</option>
+        <option>tender_portal</option><option>trade_press</option><option>think_tank</option>
+        <option>business_press</option><option>aggregator</option>
+      </select>
+      <button class="btn" onclick="addSource()">+ Add</button>
+    </div>
+    <div class="only">↑ URL · frequency · category. Everything below (source_id, tier, coverage) is automatic. Tier ≠ relevance.</div>
+
+    <h2>Sources <span class="muted" id="matrix"></span></h2>
+    <table><thead><tr><th>Domain</th><th>Category</th><th>Freq</th><th>source_id</th><th>Tier</th><th>Known</th><th>By</th><th>Last crawl</th></tr></thead>
+    <tbody id="sources"></tbody></table>
+
+    <h2>Recent jobs</h2>
+    <table><thead><tr><th>Job</th><th>Entity</th><th>Fetched</th><th>Kept</th><th>Records</th><th>→L2</th><th>Status</th></tr></thead>
+    <tbody id="jobs"></tbody></table>
+    <div class="log" id="log"></div>
+  </div>
+
+<script>
+const $=id=>document.getElementById(id);
+async function j(url,opt){const r=await fetch(url,opt);return r.json();}
+function tierPill(t){return `<span class="pill p${t}">${t}</span>`;}
+async function load(){
+  const cov=await j('/api/coverage');
+  $('cards').innerHTML=[
+    ['sources',cov.sources],['coverage cells',cov.coverage_cells],['fresh',cov.fresh],
+    ['gaps (never/stale)',cov.gaps],['auto-discovered',cov.auto_discovered]
+  ].map(([l,v])=>`<div class="card"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  const m=await j('/api/matrix');
+  $('matrix').textContent=`· job matrix: ${m.total_jobs} jobs (${Object.entries(m.by_type).map(([k,v])=>k+':'+v).join(', ')})`;
+  const s=await j('/api/sources');
+  $('sources').innerHTML=s.map(x=>`<tr>
+    <td class="mono">${x.domain}${x.added_by==='auto'?'<span class="auto">discovered</span>':''}</td>
+    <td>${x.category}</td><td>${x.frequency}</td><td class="mono">${x.source_id}</td>
+    <td>${tierPill(x.tier)}</td><td>${x.source_known?'✓':'<span class="muted">auto</span>'}</td>
+    <td class="muted">${x.tier_origin}</td><td class="muted">${x.last_crawled?new Date(x.last_crawled).toLocaleTimeString():'—'}</td></tr>`).join('');
+  const jb=await j('/api/jobs');
+  $('jobs').innerHTML=jb.map(r=>`<tr><td class="mono">${r.job_id}</td><td>${r.entity||'—'}</td>
+    <td>${r.fetched}</td><td>${r.kept}</td><td>${r.records}</td><td>${r.l2_accepted}/${r.forwarded}</td>
+    <td>${r.status==='ok'?'✓':'<span style="color:#f0593c">'+r.status+'</span>'}</td></tr>`).join('') || '<tr><td class="muted" colspan=7>No jobs run yet.</td></tr>';
+}
+async function addSource(){
+  const url=$('u').value.trim(); if(!url)return;
+  await j('/api/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,frequency:$('f').value,category:$('c').value||null})});
+  $('u').value=''; load();
+}
+async function runTest(){$('log').textContent='Running offline test batch (crawler → L2)…';
+  const r=await j('/api/run/test',{method:'POST'}); $('log').textContent='Test batch: '+JSON.stringify(r,null,1); load();}
+async function runDue(){$('log').textContent='Dispatching due jobs…';
+  const r=await j('/api/run',{method:'POST'}); $('log').textContent='Run: '+JSON.stringify(r,null,1); load();}
+load();
+</script>
+</body>
+</html>

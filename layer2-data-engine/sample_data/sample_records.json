@@ -1,0 +1,319 @@
+[
+  {
+    "document": {
+      "url": "https://example.test/lt-k9-followon",
+      "content_hash": "sha256:lt-k9-0001",
+      "fetched_at": "2026-06-28T09:00:00Z",
+      "source_id": "JANES",
+      "source_tier": 1,
+      "title": "L&T secures K9 Vajra follow-on order",
+      "published_at": "2026-06-28T00:00:00Z",
+      "language": "en",
+      "main_text": "The Ministry of Defence has placed a follow-on order with Larsen & Toubro for 100 additional K9 Vajra-T 155mm self-propelled howitzers, valued at about 4500 crore. Deliveries from L&T's Hazira complex.",
+      "entities_detected": [
+        {"surface": "Larsen & Toubro", "resolved_id": "LT", "type": "competitor", "confidence": 0.98},
+        {"surface": "K9 Vajra", "resolved_id": null, "type": "product", "confidence": 0.9},
+        {"surface": "India", "resolved_id": "india", "type": "country", "confidence": 0.99}
+      ]
+    },
+    "signals": [
+      {
+        "stream": "competitive", "competitor_id": "LT", "detected_country": "India",
+        "tech_domain": "artillery", "detected_products": ["K9 Vajra-T"],
+        "event_summary": "L&T won ₹4,500 cr follow-on for 100 K9 Vajra self-propelled howitzers",
+        "deal_value_raw": "₹4,500 cr", "deal_value_num": 45000000000, "deal_currency": "INR",
+        "published_at": "2026-06-28T00:00:00Z"
+      }
+    ],
+    "geo": [
+      {
+        "competitor_id": "LT", "country": "India", "product_name": "K9 Vajra-T",
+        "product_category": "artillery", "contract_value_raw": "₹4,500 cr", "qty_raw": "100 units",
+        "since_year": "2026", "stage": "Contracted", "confidence": "high"
+      }
+    ],
+    "company_events": [
+      {
+        "competitor_id": "LT", "event_type": "contract_win",
+        "headline": "L&T wins K9 Vajra follow-on", "deal_value_raw": "₹4,500 cr",
+        "date_of_event": "2026-06-28", "detected_lines": ["artillery"]
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/adani-carbine-l2",
+      "content_hash": "sha256:adani-0001",
+      "fetched_at": "2026-06-25T09:00:00Z",
+      "source_id": "IDRW",
+      "source_tier": 3,
+      "title": "Adani's JEET carbine placed L2 in Armed Forces programme",
+      "published_at": "2026-06-25T00:00:00Z",
+      "language": "en",
+      "main_text": "Adani Defence's IWI-derived JEET carbine was placed L2 on the Armed Forces close-quarter battle carbine programme, behind the DRDO-design winner on price and indigenous content."
+    },
+    "signals": [
+      {
+        "stream": "competitive", "competitor_id": "ADANI", "detected_country": "India",
+        "tech_domain": "small_arms",
+        "event_summary": "Adani's foreign-derived JEET carbine placed L2, behind the indigenous DRDO-design winner",
+        "published_at": "2026-06-25T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/armenia-sph-tender",
+      "content_hash": "sha256:armenia-0001",
+      "fetched_at": "2026-06-29T09:00:00Z",
+      "source_id": "DEFNEWS",
+      "source_tier": 2,
+      "title": "Armenia mounted-gun tender closing in days",
+      "published_at": "2026-06-26T00:00:00Z",
+      "language": "en",
+      "main_text": "Armenia's 155mm mounted-gun procurement is closing soon, with a bid window open for wheeled self-propelled howitzers worth an estimated 4000 crore."
+    },
+    "signals": [
+      {
+        "stream": "market", "detected_country": "Armenia", "tech_domain": "artillery",
+        "event_summary": "Armenia mounted-gun tender closing in 9 days — 155mm SPH, ~₹4,000 cr bid window open",
+        "deal_value_raw": "~₹4,000 cr", "published_at": "2026-06-26T00:00:00Z"
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/rheinmetall-ramjet",
+      "content_hash": "sha256:rhein-0001",
+      "fetched_at": "2026-06-20T09:00:00Z",
+      "source_id": "SHEPHARD",
+      "source_tier": 2,
+      "title": "Rheinmetall demonstrates ramjet 155mm projectile at extended range",
+      "published_at": "2026-06-20T00:00:00Z",
+      "language": "en",
+      "main_text": "Rheinmetall demonstrated a ramjet-assisted 155mm artillery projectile reaching beyond 70 km in a recent test, signalling a step change in tube-artillery reach."
+    },
+    "signals": [
+      {
+        "stream": "technology", "competitor_id": "RHEIN", "tech_domain": "artillery",
+        "event_summary": "Rheinmetall demos ramjet 155mm projectile beyond 70 km in test",
+        "published_at": "2026-06-20T00:00:00Z"
+      }
+    ],
+    "innovation": [
+      {
+        "tech_domain": "artillery", "competitor_id": "RHEIN",
+        "title": "Ramjet-assisted 155mm projectile reaches 70+ km",
+        "driver": "Rheinmetall / Boeing", "maturity_hint": "test", "horizon_hint": "2027-2028",
+        "description": "Ramjet-assisted projectile extends 155mm reach well beyond conventional ERFB-BB."
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/mod-155mm-mounted-gun-rfp",
+      "content_hash": "sha256:tender-art-0001",
+      "fetched_at": "2026-06-30T06:00:00Z",
+      "source_id": "MOD_IN",
+      "source_tier": 1,
+      "title": "RFP: 155mm 52-cal Mounted Gun System",
+      "published_at": "2026-06-20T00:00:00Z",
+      "language": "en",
+      "main_text": "Request for proposal for a truck-mounted 155mm/52 calibre gun system, 100 units, range not less than 45 km, system weight under 18 tonnes.",
+      "attachments": [
+        {"url": "https://example.test/rfp-art.pdf", "type": "pdf",
+         "extracted_text": "REQUEST FOR PROPOSAL. 155mm/52-cal mounted gun. Range >= 45 km. Weight < 18 tonnes. Quantity 100."}
+      ]
+    },
+    "tenders": [
+      {
+        "source_ref": "MoD/2026/ART/0441", "title": "155mm 52-cal Mounted Gun System",
+        "issuer": "Ministry of Defence", "country": "India", "category_hint": "artillery",
+        "value_raw": "~₹6,500 cr", "value_num": 65000000000, "value_currency": "INR",
+        "qty_raw": "100 units", "deadline_date": "2026-07-09",
+        "requirement_text": "Truck-mounted 155mm/52 gun system, range >= 45 km, weight < 18 tonnes.",
+        "requirement_fields": [
+          {"label": "System", "value": "155mm / 52-cal mounted gun"},
+          {"label": "Range", "value": "≥ 45 km"},
+          {"label": "Weight", "value": "< 18 tonnes"},
+          {"label": "Quantity", "value": "100 units"}
+        ]
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/mod-cqb-carbine-rfp",
+      "content_hash": "sha256:tender-sa-0001",
+      "fetched_at": "2026-06-30T06:00:00Z",
+      "source_id": "MOD_IN",
+      "source_tier": 1,
+      "title": "RFP: Close Quarter Battle Carbine",
+      "published_at": "2026-06-18T00:00:00Z",
+      "language": "en",
+      "main_text": "Request for proposal for a 5.56mm close quarter battle carbine, indigenous content preferred, effective range 200 m."
+    },
+    "tenders": [
+      {
+        "source_ref": "MoD/2026/SA/0207", "title": "Close Quarter Battle Carbine (5.56mm)",
+        "issuer": "Ministry of Defence", "country": "India", "category_hint": "small_arms",
+        "value_raw": "~₹2,800 cr", "value_num": 28000000000, "value_currency": "INR",
+        "qty_raw": "425,000 units", "deadline_date": "2026-08-20",
+        "requirement_text": "5.56mm CQB carbine, effective range 200 m, high indigenous content.",
+        "requirement_fields": [
+          {"label": "Calibre", "value": "5.56 mm"},
+          {"label": "Effective range", "value": "200 m"},
+          {"label": "Quantity", "value": "425,000 units"}
+        ]
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/nibe-sig-sauer",
+      "content_hash": "sha256:nibe-0001",
+      "fetched_at": "2026-06-22T09:00:00Z",
+      "source_id": "ECOTIMES",
+      "source_tier": 2,
+      "title": "NIBE licenses Sig Sauer rifle production",
+      "published_at": "2026-06-22T00:00:00Z",
+      "language": "en",
+      "main_text": "NIBE Limited signed a technology licensing agreement with Sig Sauer to manufacture rifles in India, extending its small-arms portfolio through foreign IP."
+    },
+    "signals": [
+      {
+        "stream": "competitive", "competitor_id": "NIBE", "tech_domain": "small_arms",
+        "event_summary": "NIBE licenses Sig Sauer rifle production — small-arms entry via foreign IP",
+        "published_at": "2026-06-22T00:00:00Z"
+      }
+    ],
+    "partnerships": [
+      {
+        "competitor_id": "NIBE", "partner_name": "Sig Sauer", "partner_id": "SIGSA",
+        "partner_country": "USA", "partner_kind": "Foreign OEM", "rel_type": "license",
+        "ptype_raw": "Technology licensing agreement", "date_announced": "2026-06-22",
+        "description": "NIBE licensed Sig Sauer rifle production for the Indian market.",
+        "detected_lines": ["small_arms"]
+      }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/lt-hanwha-k9-export",
+      "content_hash": "sha256:lt-hanwha-0001",
+      "fetched_at": "2026-06-24T09:00:00Z", "source_id": "DEFNEWS", "source_tier": 2,
+      "title": "L&T deepens Hanwha tie for K9 export variants",
+      "published_at": "2026-06-24T00:00:00Z", "language": "en",
+      "main_text": "L&T and Hanwha Aerospace extended their partnership to co-produce K9 export variants from Hazira, targeting Middle East artillery tenders."
+    },
+    "partnerships": [
+      { "competitor_id": "LT", "partner_name": "Hanwha Aerospace", "partner_id": "HANWHA",
+        "partner_country": "South Korea", "partner_kind": "Foreign OEM", "rel_type": "jv",
+        "ptype_raw": "Co-production agreement", "date_announced": "2026-06-24",
+        "description": "Extended K9 co-production for export variants.", "detected_lines": ["artillery"] }
+    ],
+    "company_events": [
+      { "competitor_id": "LT", "event_type": "product_launch", "headline": "L&T-Hanwha K9 export variant",
+        "date_of_event": "2026-06-24", "detected_lines": ["artillery"] }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/knds-caesar-nigeria",
+      "content_hash": "sha256:knds-ng-0001",
+      "fetched_at": "2026-06-23T09:00:00Z", "source_id": "SHEPHARD", "source_tier": 2,
+      "title": "Nigeria orders 18 CAESAR 6x6 howitzers",
+      "published_at": "2026-06-23T00:00:00Z", "language": "en",
+      "main_text": "Nigeria contracted KNDS for 18 CAESAR 6x6 155mm wheeled howitzers worth an estimated $120M, expanding French artillery presence in West Africa."
+    },
+    "signals": [
+      { "stream": "market", "competitor_id": "KNDS", "detected_country": "Nigeria", "tech_domain": "artillery",
+        "event_summary": "Nigeria orders 18 KNDS CAESAR 6x6 howitzers (~$120M) — French artillery expands in West Africa",
+        "deal_value_raw": "$120M", "deal_value_num": 120000000, "deal_currency": "USD",
+        "published_at": "2026-06-23T00:00:00Z" }
+    ],
+    "geo": [
+      { "competitor_id": "KNDS", "country": "Nigeria", "product_name": "CAESAR 6x6", "product_id": "CAESAR6x6",
+        "product_category": "artillery", "contract_value_raw": "$120M", "qty_raw": "18 units",
+        "since_year": "2026", "stage": "Contracted", "confidence": "high" }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/adani-elbit-drones",
+      "content_hash": "sha256:adani-elbit-0001",
+      "fetched_at": "2026-06-21T09:00:00Z", "source_id": "IDRW", "source_tier": 3,
+      "title": "Adani-Elbit expand Drishti-10 production",
+      "published_at": "2026-06-21T00:00:00Z", "language": "en",
+      "main_text": "Adani Defence expanded its Elbit partnership to scale Drishti-10 Starliner (Hermes 900) MALE UAV production in Hyderabad."
+    },
+    "partnerships": [
+      { "competitor_id": "ADANI", "partner_name": "Elbit Systems", "partner_id": "ELBIT",
+        "partner_country": "Israel", "partner_kind": "Foreign OEM", "rel_type": "jv",
+        "ptype_raw": "Production scale-up", "date_announced": "2026-06-21",
+        "description": "Scaling Drishti-10 (Hermes 900) MALE UAV production.", "detected_lines": ["uav"] }
+    ],
+    "geo": [
+      { "competitor_id": "ADANI", "country": "India", "product_name": "Drishti-10 Starliner",
+        "product_category": "uav", "stage": "Delivered", "since_year": "2025", "confidence": "high",
+        "note": "Fielded with Indian forces" }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/solar-eurenco",
+      "content_hash": "sha256:solar-eur-0001",
+      "fetched_at": "2026-06-19T09:00:00Z", "source_id": "ECOTIMES", "source_tier": 2,
+      "title": "Solar Industries, EURENCO deepen propellant partnership",
+      "published_at": "2026-06-19T00:00:00Z", "language": "en",
+      "main_text": "Solar Industries and EURENCO expanded their bi-modular charge system partnership for artillery ammunition under Make-in-India."
+    },
+    "signals": [
+      { "stream": "competitive", "competitor_id": "SOLAR", "tech_domain": "ammunition",
+        "event_summary": "Solar deepens EURENCO propellant tie for 155mm bi-modular charge systems",
+        "published_at": "2026-06-19T00:00:00Z" }
+    ],
+    "partnerships": [
+      { "competitor_id": "SOLAR", "partner_name": "EURENCO", "partner_id": "EUREN",
+        "partner_country": "France", "partner_kind": "Foreign OEM", "rel_type": "mou",
+        "ptype_raw": "Strategic partnership", "date_announced": "2026-06-19",
+        "description": "Bi-modular charge system and propellant co-development.", "detected_lines": ["ammunition"] }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/rheinmetall-aps",
+      "content_hash": "sha256:rhein-aps-0001",
+      "fetched_at": "2026-06-17T09:00:00Z", "source_id": "JANES", "source_tier": 1,
+      "title": "Rheinmetall fields next-gen active protection system",
+      "published_at": "2026-06-17T00:00:00Z", "language": "en",
+      "main_text": "Rheinmetall announced an active protection system with multi-sensor hard-kill discrimination, entering low-rate production for armoured platforms."
+    },
+    "signals": [
+      { "stream": "technology", "competitor_id": "RHEIN", "tech_domain": "armoured",
+        "event_summary": "Rheinmetall fields next-gen active protection system (hard-kill, multi-sensor)",
+        "published_at": "2026-06-17T00:00:00Z" }
+    ],
+    "innovation": [
+      { "tech_domain": "armoured", "competitor_id": "RHEIN",
+        "title": "Active protection system with multi-sensor hard-kill discrimination",
+        "driver": "Rheinmetall", "maturity_hint": "ioc", "horizon_hint": "2026-2027",
+        "description": "Hard-kill APS with improved threat discrimination entering low-rate production." }
+    ]
+  },
+  {
+    "document": {
+      "url": "https://example.test/india-defence-budget",
+      "content_hash": "sha256:india-budget-0001",
+      "fetched_at": "2026-06-16T09:00:00Z", "source_id": "PIB", "source_tier": 1,
+      "title": "India raises domestic defence procurement target",
+      "published_at": "2026-06-16T00:00:00Z", "language": "en",
+      "main_text": "India set a record domestic defence procurement target with higher indigenous-content thresholds, favouring made-in-India artillery and ammunition."
+    },
+    "signals": [
+      { "stream": "market", "detected_country": "India", "tech_domain": "artillery",
+        "event_summary": "India raises domestic procurement target with higher indigenous-content thresholds — tailwind for made-in-India artillery",
+        "published_at": "2026-06-16T00:00:00Z" }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "task": "tender_verdict",
+    "note": "high fit → go; must cite the given fit %",
+    "input": {"title": "MoD India RFP: 155mm 52-cal Mounted Gun System", "best_fit_pct": 88, "match_summary": "KSSL ATAGS matches calibre and range; exceeds mobility requirement."},
+    "expect": {"lean": "go", "lean_text_has_pct": 88}
+  },
+  {
+    "task": "tender_verdict",
+    "note": "mid fit → maybe",
+    "input": {"title": "SAM.gov 155mm Towed Howitzer Systems", "best_fit_pct": 62, "match_summary": "Partial calibre match; weight above requirement."},
+    "expect": {"lean": "maybe", "lean_text_has_pct": 62}
+  },
+  {
+    "task": "tender_verdict",
+    "note": "low fit → pass",
+    "input": {"title": "Armenia tender for loitering munitions", "best_fit_pct": 30, "match_summary": "Category adjacent; no direct KSSL product."},
+    "expect": {"lean": "pass", "lean_text_has_pct": 30}
+  }
+]

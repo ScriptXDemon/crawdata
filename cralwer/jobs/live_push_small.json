@@ -1,0 +1,62 @@
+[
+  {
+    "job_id": "job_news_LT_IDRW_001",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 6,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_ECOTIMES_003",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 6,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  }
+]

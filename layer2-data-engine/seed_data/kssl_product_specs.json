@@ -1,0 +1,24 @@
+{
+  "_note": "ILLUSTRATIVE placeholder specs for the tender-scoring demo. Replace with VERIFIED values via the Admin API before production — do not treat as authoritative.",
+  "specs": [
+    { "product_id": "ATAGS",     "spec_label": "Calibre",   "value_num": 155, "unit": "mm", "polarity": "match" },
+    { "product_id": "ATAGS",     "spec_label": "Max range", "value_num": 48,  "unit": "km", "polarity": "higher_better", "is_highlight": true },
+    { "product_id": "ATAGS",     "spec_label": "Weight",    "value_num": 18,  "unit": "t",  "polarity": "lower_better" },
+
+    { "product_id": "MARG155",   "spec_label": "Calibre",   "value_num": 155, "unit": "mm", "polarity": "match" },
+    { "product_id": "MARG155",   "spec_label": "Max range", "value_num": 40,  "unit": "km", "polarity": "higher_better" },
+    { "product_id": "MARG155",   "spec_label": "Weight",    "value_num": 30,  "unit": "t",  "polarity": "lower_better" },
+
+    { "product_id": "BHARAT45",  "spec_label": "Calibre",   "value_num": 155, "unit": "mm", "polarity": "match" },
+    { "product_id": "BHARAT45",  "spec_label": "Max range", "value_num": 39,  "unit": "km", "polarity": "higher_better" },
+    { "product_id": "BHARAT45",  "spec_label": "Weight",    "value_num": 9,   "unit": "t",  "polarity": "lower_better" },
+
+    { "product_id": "BHARATULH", "spec_label": "Calibre",   "value_num": 155, "unit": "mm", "polarity": "match" },
+    { "product_id": "BHARATULH", "spec_label": "Max range", "value_num": 30,  "unit": "km", "polarity": "higher_better" },
+    { "product_id": "BHARATULH", "spec_label": "Weight",    "value_num": 4.5, "unit": "t",  "polarity": "lower_better", "is_highlight": true },
+
+    { "product_id": "GARUDA105", "spec_label": "Calibre",   "value_num": 105, "unit": "mm", "polarity": "match" },
+    { "product_id": "GARUDA105", "spec_label": "Max range", "value_num": 17,  "unit": "km", "polarity": "higher_better" },
+    { "product_id": "GARUDA105", "spec_label": "Weight",    "value_num": 4,   "unit": "t",  "polarity": "lower_better" }
+  ]
+}

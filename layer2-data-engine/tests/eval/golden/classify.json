@@ -1,0 +1,26 @@
+[
+  {
+    "task": "classify_signal",
+    "note": "real event from ingested.ndjson — L&T win",
+    "input": {"stream": "competitive", "event_summary": "L&T secures Rs 4,500 cr K9 Vajra follow-on order for 100 155mm self-propelled howitzers", "threat_level": null},
+    "expect": {"dir": "threat", "lens_nonempty": true, "tags_include": ["threat"]}
+  },
+  {
+    "task": "classify_signal",
+    "note": "real event — Adani acquisition, competitive threat",
+    "input": {"stream": "competitive", "event_summary": "Adani Defence acquires General Aeronautics in UAV push", "threat_level": null},
+    "expect": {"dir": "threat", "lens_nonempty": true, "tags_include": ["threat"]}
+  },
+  {
+    "task": "classify_signal",
+    "note": "real event — market tender opening",
+    "input": {"stream": "market", "event_summary": "MoD India issues RFP for 155mm 52-cal Mounted Gun System, closing in 30 days", "threat_level": null},
+    "expect": {"dir": "watch", "lens_nonempty": true, "tags_include": ["opening"]}
+  },
+  {
+    "task": "classify_signal",
+    "note": "competitor setback → favourable",
+    "input": {"stream": "competitive", "event_summary": "Mahindra disqualified from artillery re-compete on compliance grounds", "threat_level": null},
+    "expect": {"dir": "fav", "lens_nonempty": true, "tags_include": ["fav"]}
+  }
+]

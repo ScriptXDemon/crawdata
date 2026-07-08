@@ -1,0 +1,26 @@
+[
+  {
+    "task": "enrich_signal",
+    "note": "real event — enrichment must not invent numbers beyond the given facts",
+    "input": {
+      "stream": "competitive",
+      "event_summary": "L&T secures Rs 4,500 cr K9 Vajra follow-on order",
+      "company": "L&T",
+      "dir": "threat",
+      "facts": [["Company", "L&T"], ["Domain", "Artillery"], ["Value", "Rs 4,500 cr"]]
+    },
+    "expect": {"sowhat_nonempty": true, "sowhat_max_len": 400, "no_uncited_numbers": true}
+  },
+  {
+    "task": "enrich_signal",
+    "note": "KNDS CAESAR Nigeria — French-language source, English enrichment",
+    "input": {
+      "stream": "competitive",
+      "event_summary": "KNDS wins a CAESAR order for Nigeria",
+      "company": "KNDS",
+      "dir": "threat",
+      "facts": [["Company", "KNDS"], ["Country", "Nigeria"], ["Domain", "Artillery"]]
+    },
+    "expect": {"sowhat_nonempty": true, "sowhat_max_len": 400, "no_uncited_numbers": true}
+  }
+]

@@ -1,0 +1,230 @@
+[
+  {
+    "job_id": "job_news_BAE_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=BAE+Systems+artillery"
+    ],
+    "keywords": [
+      "BAE Systems",
+      "Archer",
+      "M777",
+      "artillery"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=BAE+Systems+artillery"
+    ],
+    "keywords": [
+      "BAE Systems",
+      "Archer",
+      "M777",
+      "artillery"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=Elbit+Systems+artillery"
+    ],
+    "keywords": [
+      "Elbit",
+      "ATMOS",
+      "PULS",
+      "artillery",
+      "loitering"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_DEFWORLD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/?s=Elbit+Systems+artillery"
+    ],
+    "keywords": [
+      "Elbit",
+      "ATMOS",
+      "PULS",
+      "artillery",
+      "loitering"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_GENATOMICS_DEFWORLD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/?s=General+Atomics+MQ-9+contract"
+    ],
+    "keywords": [
+      "General Atomics",
+      "GA-ASI",
+      "MQ-9",
+      "Reaper",
+      "drone"
+    ],
+    "target_entity": "GENATOMICS",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_GENATOMICS_IDRW",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=General+Atomics+MQ-9+contract"
+    ],
+    "keywords": [
+      "General Atomics",
+      "GA-ASI",
+      "MQ-9",
+      "Reaper",
+      "drone"
+    ],
+    "target_entity": "GENATOMICS",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_OSHKOSH_IDRW",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Oshkosh+Defense+JLTV+contract"
+    ],
+    "keywords": [
+      "Oshkosh",
+      "JLTV",
+      "vehicle",
+      "tactical"
+    ],
+    "target_entity": "OSHKOSH",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_OSHKOSH_DEFNEWS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Oshkosh+Defense+JLTV+contract"
+    ],
+    "keywords": [
+      "Oshkosh",
+      "JLTV",
+      "vehicle",
+      "tactical"
+    ],
+    "target_entity": "OSHKOSH",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

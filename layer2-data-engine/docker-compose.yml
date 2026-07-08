@@ -1,0 +1,56 @@
+name: mallory-layer2
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mallory
+      POSTGRES_PASSWORD: mallory
+      POSTGRES_DB: mallory
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mallory"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Object store for crawler blobs (html / images / pdf / screenshots).
+  # Layer 2 reads blobs by reference; the crawler writes them here.
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: mallory
+      MINIO_ROOT_PASSWORD: mallory123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://mallory:mallory@postgres:5432/mallory
+      LLM_PROVIDER: ${LLM_PROVIDER:-stub}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SEED_DIR: ./seed_data
+      CRAWLER_INGEST_URL: ${CRAWLER_INGEST_URL:-http://localhost:9090}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    # On first boot: create tables, load seed, then serve.
+    command: >
+      sh -c "python -m mallory_engine.scripts.init_db &&
+             python -m mallory_engine.scripts.load_seed &&
+             uvicorn mallory_engine.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  pgdata:
+  miniodata:

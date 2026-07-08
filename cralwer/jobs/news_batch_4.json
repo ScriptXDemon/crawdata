@@ -1,0 +1,224 @@
+[
+  {
+    "job_id": "job_news_AMGENERAL_DEFNEWS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=AM+General+HUMVEE+JLTV"
+    ],
+    "keywords": [
+      "AM General",
+      "HUMVEE",
+      "JLTV"
+    ],
+    "target_entity": "AMGENERAL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_AMGENERAL_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=AM+General+HUMVEE+JLTV"
+    ],
+    "keywords": [
+      "AM General",
+      "HUMVEE",
+      "JLTV"
+    ],
+    "target_entity": "AMGENERAL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_AEROVIRONMENT_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=AeroVironment+Switchblade"
+    ],
+    "keywords": [
+      "AeroVironment",
+      "Switchblade",
+      "Puma",
+      "loitering"
+    ],
+    "target_entity": "AEROVIRONMENT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_AEROVIRONMENT_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=AeroVironment+Switchblade"
+    ],
+    "keywords": [
+      "AeroVironment",
+      "Switchblade",
+      "Puma",
+      "loitering"
+    ],
+    "target_entity": "AEROVIRONMENT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ANDURIL_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Anduril+Lattice+contract"
+    ],
+    "keywords": [
+      "Anduril",
+      "Lattice",
+      "Roadrunner",
+      "autonomous"
+    ],
+    "target_entity": "ANDURIL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ANDURIL_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=Anduril+Lattice+contract"
+    ],
+    "keywords": [
+      "Anduril",
+      "Lattice",
+      "Roadrunner",
+      "autonomous"
+    ],
+    "target_entity": "ANDURIL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_SIERRANEVADA_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=Sierra+Nevada+Corporation+ISR"
+    ],
+    "keywords": [
+      "Sierra Nevada",
+      "SNC",
+      "ISR",
+      "aircraft"
+    ],
+    "target_entity": "SIERRANEVADA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_SIERRANEVADA_DEFWORLD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/?s=Sierra+Nevada+Corporation+ISR"
+    ],
+    "keywords": [
+      "Sierra Nevada",
+      "SNC",
+      "ISR",
+      "aircraft"
+    ],
+    "target_entity": "SIERRANEVADA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

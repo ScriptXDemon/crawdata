@@ -1,0 +1,65 @@
+[
+  {
+    "job_id": "job_site_ANDURIL",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.anduril.com"
+    ],
+    "keywords": [
+      "Anduril Industries",
+      "Anduril",
+      "Lattice",
+      "Anvil",
+      "Roadrunner",
+      "Altius",
+      "Dive-LD",
+      "autonomous systems"
+    ],
+    "target_entity": "ANDURIL",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  },
+  {
+    "job_id": "job_site_SIERRANEVADA",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.sncorp.com"
+    ],
+    "keywords": [
+      "Sierra Nevada Corporation",
+      "SNC",
+      "Sierra Nevada",
+      "RAPCON-X",
+      "ISR aircraft",
+      "TRAX Edge",
+      "Freedom Trainer"
+    ],
+    "target_entity": "SIERRANEVADA",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  }
+]

@@ -1,0 +1,56 @@
+# --- secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*credential*
+*secret*.json
+
+# --- python ---
+.venv/
+.venv-win/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- node / frontend ---
+node_modules/
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# --- crawled data / object store / db (large, regenerable) ---
+cralwer/data/
+**/data/storage/
+**/data/output/
+*.sqlite
+*.sqlite3
+*.db
+
+# --- logs / runtime ---
+*.log
+*.err
+logs/
+
+# --- os / editor cruft ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- local agent/session dirs ---
+.claude/
+.commandcode/
+.opencode/
+
+# neutralized nested repo (monorepo consolidation)
+**/.git_DISABLED_for_monorepo/

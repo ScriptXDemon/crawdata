@@ -1,0 +1,228 @@
+[
+  {
+    "job_id": "job_news_LT_DEFNEWS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=L%26T+Defence+artillery"
+    ],
+    "keywords": [
+      "L&T",
+      "Larsen",
+      "K9 Vajra",
+      "artillery",
+      "howitzer"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=L%26T+Defence+artillery"
+    ],
+    "keywords": [
+      "L&T",
+      "Larsen",
+      "K9 Vajra",
+      "artillery",
+      "howitzer"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Adani+Defence"
+    ],
+    "keywords": [
+      "Adani",
+      "loitering",
+      "drone",
+      "ammunition"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Adani+Defence"
+    ],
+    "keywords": [
+      "Adani",
+      "loitering",
+      "drone",
+      "ammunition"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries",
+      "Nagastra",
+      "munition",
+      "ammunition"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries",
+      "Nagastra",
+      "munition",
+      "ammunition"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_BREAKDEF",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/?s=Bharat+Dynamics+missile"
+    ],
+    "keywords": [
+      "Bharat Dynamics",
+      "BDL",
+      "missile",
+      "Akash"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_DEFWORLD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/?s=Bharat+Dynamics+missile"
+    ],
+    "keywords": [
+      "Bharat Dynamics",
+      "BDL",
+      "missile",
+      "Akash"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

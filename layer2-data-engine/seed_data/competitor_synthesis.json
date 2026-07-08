@@ -1,0 +1,79 @@
+{
+  "_note": "Competitor synthesis (condensed from the demo COMPSYN). In production these are re-derived by the LLM over each competitor's signals/partnerships; seeded here for an end-to-end product.",
+  "synthesis": [
+    {
+      "competitor_id": "LT",
+      "thesis": "L&T owns the manufacturing and platform IP and licenses only the weapon core — the one private rival with the serial-production maturity to out-execute KSSL on artillery.",
+      "strat_sowhat": "Most dangerous on EXECUTION (Hazira serial production is real and hard to match), least sovereign on TECHNOLOGY. Compete on delivery credibility and indigenous-IP ownership.",
+      "vulnerabilities": [
+        { "title": "Every weapon-core is foreign-licensed", "intel": "K9 is Hanwha's, missiles MBDA's, submarine AIP Navantia's, radar IAI/ELTA's. L&T's moat is industrial, not technological." },
+        { "title": "Submarine bid failure exposes the model's ceiling", "intel": "L&T-Navantia's P75(I) bid was disqualified (AIP shore-demoed, not sea-proven) — no indigenous fallback when the partner's tech falls short." },
+        { "title": "Artillery is a side-business in a ₹2.5-lakh-crore giant", "intel": "L&T's largest 2025 order was a $4bn Qatar LNG deal; defence answers to conglomerate capital allocation." }
+      ],
+      "predictions": ["Keeps winning manufacturing-execution bids (K9 follow-ons), loses pure-technology competitions where indigenous IP is scored."],
+      "moves": ["Match L&T on execution credibility, not just product.", "Frame KSSL as indigenous-IP owner vs L&T the foreign-weapon assembler.", "Compete hardest where sustained, focused artillery investment decides the winner."]
+    },
+    {
+      "competitor_id": "ADANI",
+      "thesis": "Assembling the widest private arsenal in India by acquisition and foreign JV, with the conglomerate capital to fund it — but the indigenous weapon-IP underneath is still mostly foreign.",
+      "strat_sowhat": "Competes on breadth + scale + speed, not on owning weapon technology. KSSL can't match its breadth, but Adani can't match KSSL's indigenous artillery/forging depth.",
+      "vulnerabilities": [
+        { "title": "Lost the carbine programme to KSSL head-to-head", "intel": "Adani's IWI-derived JEET came L2; KSSL's DRDO-design came L1 on price and indigeneity — the one direct contract clash, on record." },
+        { "title": "Widest arsenal is also the most foreign-IP-dependent", "intel": "Drones (Elbit), rifles (IWI), rockets (Thales), missiles (EDGE), sonobuoys (Sparton) — breadth acquired, not developed." }
+      ],
+      "predictions": ["Will enter indigenous artillery via a foreign gun partner — putting it head-to-head with KSSL's ATAGS franchise."],
+      "moves": ["Repeat the carbine playbook on small arms.", "Frame Adani as the foreign-IP integrator at scale.", "Prepare now for Adani's licensed-gun artillery entry."]
+    },
+    {
+      "competitor_id": "NIBE",
+      "thesis": "Sprinting from components fabricator to full weapons integrator almost entirely by licensing IP — broad, but indigenous depth is thin and under public scrutiny.",
+      "strat_sowhat": "A licence-and-assemble roll-up buying the appearance of a full-spectrum prime faster than it can build the substance. Fragile at integration and when partner terms change.",
+      "vulnerabilities": [
+        { "title": "Borrowed-IP fragility across the whole portfolio", "intel": "All four weapons lines are externally sourced (Elbit/Suryastra, Sig Sauer, DRDO/Pinaka, HBE forging) — one structural weakness repeated four times." },
+        { "title": "Emergency-procurement is its only proven win route", "intel": "Its biggest win (Suryastra) came via EP, not a contested trial, and drew 'screwdriver-giri' scrutiny." }
+      ],
+      "predictions": ["More foreign-OEM licences in any line where it lacks IP; pushes EP over open trials."],
+      "moves": ["Lead head-to-heads with the portfolio-wide indigenous-vs-licensed contrast.", "Get ahead of NIBE's next EP attempt with the foreign-IP-content argument."]
+    },
+    {
+      "competitor_id": "SOLAR",
+      "thesis": "KSSL's most structurally dangerous ammunition rival — vertically integrated 'integrated lethality' owning energetics (HMX/RDX/TNT), warheads AND delivery (Pinaka, loitering).",
+      "strat_sowhat": "Vertical mirror-image of KSSL: Solar owns the chemistry-up stack, KSSL the forging-up stack. Compete on the gun/platform stack, not on energetics where its moat is strongest.",
+      "vulnerabilities": [
+        { "title": "Moat is chemistry, not gun-systems", "intel": "Solar dominates the explosive/warhead/rocket stack but not artillery gun systems or armoured platforms — KSSL's stack." },
+        { "title": "Pinaka is now a four-licensee pile-up", "intel": "NIBE, MIL, Yantra and Tata all licensed — Solar's first-mover rocket edge is commoditising on price." }
+      ],
+      "predictions": ["Deepens vertical integration; pushes into loitering and tactical missiles via DcPP."],
+      "moves": ["Compete on the gun/platform stack (ATAGS, forging).", "Don't over-invest fighting Solar on Pinaka — the pile-up compresses those margins for free."]
+    },
+    {
+      "competitor_id": "SMPP",
+      "thesis": "Newly serious DUAL-line threat via KNDS — 155mm precision (KATANA) AND loitering munitions at once — but both rest on borrowed KNDS technology, not SMPP's.",
+      "strat_sowhat": "A protection company reaching into precision munitions through one foreign partner. Real threat, concentrated vulnerability: both KSSL-overlap lines share one point of failure.",
+      "vulnerabilities": [
+        { "title": "Two KSSL core lines entered at once — both on KNDS IP", "intel": "KATANA guided shells and loitering both come from KNDS; SMPP brings manufacturing and protection heritage, not the IP." },
+        { "title": "Core competence is ballistic protection, not guided munitions", "intel": "Proven business is body armour; the munition moves are new and KNDS-dependent." }
+      ],
+      "predictions": ["Scales KATANA and loitering via KNDS; stays KNDS-dependent for guided-munition IP."],
+      "moves": ["Press the concentrated single-partner dependency angle.", "Compete on munitions maturity — KSSL has the forging-and-development depth."]
+    },
+    {
+      "competitor_id": "BDL",
+      "thesis": "India's incumbent missile-production PSU — strong on missiles/AD, but its decades-old monopoly was just ended by DAP-2026, putting private firms (incl. Bharat Forge) onto the same DRDO programmes.",
+      "strat_sowhat": "Contest is incumbency-vs-agility, and policy now favours the challenger. BDL's strength is installed capacity and DRDO trust; its weakness is DAP-2026 opening its turf.",
+      "vulnerabilities": [
+        { "title": "The monopoly just ended", "intel": "DAP-2026 designated four private firms — including Bharat Forge — as Development-cum-Production Partners on BDL's former exclusive missile programmes." },
+        { "title": "PSU pace against a private-sector reform wind", "intel": "Modest sales growth and PSU procurement cadence as the MoD deliberately injects private speed." }
+      ],
+      "predictions": ["Defends via co-production but loses exclusivity as private DcPP firms ramp."],
+      "moves": ["Leverage Bharat Forge's DcPP designation to enter missile programmes BDL can no longer monopolise.", "Compete on private-sector speed vs PSU cadence."]
+    }
+  ],
+  "field_patterns": [
+    { "title": "The universal gap: almost no rival owns its core weapon IP", "summary": "Across the field the dominant model is licence-and-integrate, not design-and-own — most rivals hold manufacturing/integration rights while the weapon core sits with a foreign OEM.", "exceptions": "Solar (owns energetics) and Zen (indigenous software/sim) are the real exceptions." },
+    { "title": "Three competitive archetypes — each beaten differently", "summary": "Licence-and-assemble roll-ups (NIBE, Adani, Zen), scale PSUs (BDL, BEL, MIL, Yantra), and niche specialists (Solar, SMPP, MKU, Raphe). Each type has a distinct structural profile.", "exceptions": "L&T is a hybrid (scale + roll-up); Adani is a roll-up with PSU-rivalling capital." },
+    { "title": "Foreign-supplier chokepoints", "summary": "Russian IP under 6 rivals (sanctions-exposed); Elbit/IAI/Thales/Safran concentrated across multiple competitors — a field-wide structural dependency.", "exceptions": "Solar and Zen sit outside the foreign-chokepoint map." },
+    { "title": "The Pinaka pile-up", "summary": "DRDO Pinaka rights now span NIBE, Solar, MIL, Yantra (+Tata) — four-plus rivals building the same rocket, structurally commoditising margins.", "exceptions": "None — the structure is self-commoditising." },
+    { "title": "The one place a rival beat KSSL — and KSSL won anyway", "summary": "On the Armed Forces carbine, Adani-IWI's JEET came L2 while KSSL's DRDO-design came L1 on price and indigeneity. The strongest single data point in the field.", "exceptions": "None — KSSL's record win." }
+  ]
+}

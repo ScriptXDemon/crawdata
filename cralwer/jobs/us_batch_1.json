@@ -1,0 +1,70 @@
+[
+  {
+    "job_id": "job_site_GENATOMICS",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.ga-asi.com"
+    ],
+    "keywords": [
+      "General Atomics",
+      "GA-ASI",
+      "General Atomics Aeronautical",
+      "MQ-9A Reaper",
+      "MQ-9B SkyGuardian",
+      "SeaGuardian",
+      "Gray Eagle",
+      "Avenger",
+      "Reaper",
+      "Predator"
+    ],
+    "target_entity": "GENATOMICS",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  },
+  {
+    "job_id": "job_site_OSHKOSH",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://oshkoshdefense.com"
+    ],
+    "keywords": [
+      "Oshkosh Corporation",
+      "Oshkosh",
+      "Oshkosh Defense",
+      "JLTV",
+      "eJLTV",
+      "M-ATV",
+      "FMTV A2",
+      "MTVR",
+      "FMTV",
+      "HEMTT"
+    ],
+    "target_entity": "OSHKOSH",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  }
+]

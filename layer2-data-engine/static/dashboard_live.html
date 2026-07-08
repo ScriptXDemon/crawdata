@@ -1,0 +1,538 @@
+<title>Mallory — Intelligence Layer Dashboard</title>
+<style>
+  :root {
+    /* Mallory control-room tokens (light) */
+    --bg: #f7f6f3; --bg-1: #ffffff; --bg-2: #f0efea; --line: #e2e0d8; --line-2: #cfcdc3;
+    --txt: #161614; --txt-2: #3d3d39; --txt-3: #6b6a63; --txt-4: #9a988e;
+    --threat: #b5341f; --watch: #9a6a08; --fav: #1f6e45; --synthetic: #c0610f;
+    --threat-ink: #a02c18; --watch-ink: #8a5e06; --fav-ink: #1a613e;
+    /* dataviz: validated categorical (light column), fixed slot order */
+    --k-competitor: #2a78d6; --k-product: #1baf7a; --k-tender: #eda100;
+    --k-country: #4a3aa7; --k-signal: #e87ba4; --k-org: #eb6834; --k-other: #6b6a63;
+    --seq: #2a78d6; --seq-track: #e6e4dd;
+    --chip-ink: #ffffff;
+    --mono: "IBM Plex Mono", "Cascadia Mono", ui-monospace, Menlo, monospace;
+    --sans: "Archivo", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161618; --bg-1: #1c1c1f; --bg-2: #212125; --line: #323237; --line-2: #46464d;
+      --txt: #f5f5f4; --txt-2: #bdbdbb; --txt-3: #908f8c; --txt-4: #65656a;
+      --threat-ink: #d97a68; --watch-ink: #cfa14a; --fav-ink: #63b287;
+      --k-competitor: #3987e5; --k-product: #199e70; --k-tender: #c98500;
+      --k-country: #9085e9; --k-signal: #d55181; --k-org: #d95926; --k-other: #908f8c;
+      --seq: #3987e5; --seq-track: #2a2a2f;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f7f6f3; --bg-1: #ffffff; --bg-2: #f0efea; --line: #e2e0d8; --line-2: #cfcdc3;
+    --txt: #161614; --txt-2: #3d3d39; --txt-3: #6b6a63; --txt-4: #9a988e;
+    --threat-ink: #a02c18; --watch-ink: #8a5e06; --fav-ink: #1a613e;
+    --k-competitor: #2a78d6; --k-product: #1baf7a; --k-tender: #eda100;
+    --k-country: #4a3aa7; --k-signal: #e87ba4; --k-org: #eb6834; --k-other: #6b6a63;
+    --seq: #2a78d6; --seq-track: #e6e4dd;
+  }
+  :root[data-theme="dark"] {
+    --bg: #161618; --bg-1: #1c1c1f; --bg-2: #212125; --line: #323237; --line-2: #46464d;
+    --txt: #f5f5f4; --txt-2: #bdbdbb; --txt-3: #908f8c; --txt-4: #65656a;
+    --threat-ink: #d97a68; --watch-ink: #cfa14a; --fav-ink: #63b287;
+    --k-competitor: #3987e5; --k-product: #199e70; --k-tender: #c98500;
+    --k-country: #9085e9; --k-signal: #d55181; --k-org: #d95926; --k-other: #908f8c;
+    --seq: #3987e5; --seq-track: #2a2a2f;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  body { background: var(--bg); color: var(--txt); font-family: var(--sans);
+         -webkit-font-smoothing: antialiased; margin: 0; }
+  .eyebrow { font-family: var(--mono); font-size: 10px; font-weight: 500;
+             letter-spacing: .22em; text-transform: uppercase; color: var(--txt-3); }
+  .mono { font-family: var(--mono); }
+
+  /* ── top bar ── */
+  .topbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center;
+            gap: 18px; padding: 0 22px; height: 56px; background: var(--bg);
+            border-bottom: 1px solid var(--line); }
+  .wordmark { font-weight: 800; font-size: 21px; letter-spacing: -0.02em; }
+  .wordmark small { font-weight: 500; color: var(--txt-3); font-size: 13px; margin-left: 8px; }
+  .topmeta { margin-left: auto; display: flex; gap: 14px; align-items: center;
+             font-family: var(--mono); font-size: 11px; color: var(--txt-3); }
+  .modelchip { border: 1px solid var(--line-2); border-radius: 3px; padding: 3px 8px;
+               color: var(--txt-2); background: var(--bg-1); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
+
+  /* ── stat strip ── */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+           gap: 1px; background: var(--line); border: 1px solid var(--line);
+           border-radius: 4px; overflow: hidden; margin: 22px 0 8px; }
+  .stat { background: var(--bg-1); padding: 14px 16px; }
+  .stat .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .18em;
+             text-transform: uppercase; color: var(--txt-3); }
+  .stat .v { font-size: 26px; font-weight: 700; margin-top: 4px;
+             font-variant-numeric: tabular-nums; }
+  .stat .s { font-size: 11px; color: var(--txt-3); margin-top: 2px; }
+
+  /* ── section nav ── */
+  .secnav { position: sticky; top: 56px; z-index: 30; display: flex; gap: 2px;
+            padding: 10px 0; background: var(--bg); border-bottom: 1px solid var(--line);
+            overflow-x: auto; }
+  .secnav a { font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+              text-transform: uppercase; color: var(--txt-3); text-decoration: none;
+              padding: 6px 12px; border-radius: 3px; white-space: nowrap; }
+  .secnav a:hover, .secnav a:focus-visible { color: var(--txt); background: var(--bg-2);
+              outline: none; }
+
+  section { margin-top: 44px; }
+  .sec-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px; }
+  .sec-h h2 { font-size: 21px; font-weight: 700; margin: 0; text-wrap: balance; }
+  .sec-sub { font-size: 12.5px; color: var(--txt-3); margin: 2px 0 16px; max-width: 68ch; }
+
+  /* ── chips ── */
+  .dir { display: inline-block; font-family: var(--mono); font-size: 9.5px;
+         letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px;
+         border-radius: 3px; color: var(--chip-ink); }
+  .dir.threat { background: var(--threat); } .dir.watch { background: var(--watch); }
+  .dir.fav { background: var(--fav); }
+  .prov { display: inline-block; font-family: var(--mono); font-size: 9.5px;
+          letter-spacing: .08em; padding: 2px 7px; border-radius: 3px;
+          border: 1px solid var(--line-2); color: var(--txt-3); }
+  .prov.est { border-color: var(--synthetic); color: var(--synthetic); }
+  .confchip { font-family: var(--mono); font-size: 10.5px; padding: 2px 7px;
+              border-radius: 3px; background: var(--bg-2); color: var(--txt-2);
+              font-variant-numeric: tabular-nums; }
+
+  /* ── cards ── */
+  .card { background: var(--bg-1); border: 1px solid var(--line); border-radius: 4px;
+          margin-bottom: 10px; overflow: hidden; }
+  .card .hd { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px;
+              cursor: pointer; }
+  .card .hd:hover { background: var(--bg-2); }
+  .stripe { flex: 0 0 4px; align-self: stretch; border-radius: 2px; }
+  .stripe.threat { background: var(--threat); } .stripe.watch { background: var(--watch); }
+  .stripe.fav { background: var(--fav); }
+  .card .ttl { font-weight: 600; font-size: 14.5px; }
+  .card .meta { font-size: 12px; color: var(--txt-3); margin-top: 2px; }
+  .card .sowhat { font-size: 13px; color: var(--txt-2); margin-top: 7px; max-width: 72ch; }
+  .card .aside { margin-left: auto; display: flex; flex-direction: column; gap: 5px;
+                 align-items: flex-end; flex-shrink: 0; }
+  .why { display: none; border-top: 1px solid var(--line); background: var(--bg-2);
+         padding: 14px 16px 16px; }
+  .card.open .why { display: block; }
+  .why h4 { margin: 0 0 8px; font-family: var(--mono); font-size: 10px;
+            letter-spacing: .18em; text-transform: uppercase; color: var(--txt-3);
+            font-weight: 500; }
+
+  /* decomposition bars */
+  .fbar { display: grid; grid-template-columns: 150px 1fr 52px; gap: 10px;
+          align-items: center; margin: 5px 0; }
+  .fbar .lbl { font-size: 11.5px; color: var(--txt-2); }
+  .fbar .track { height: 8px; background: var(--seq-track); border-radius: 4px;
+                 overflow: hidden; }
+  .fbar .fill { height: 100%; background: var(--seq); border-radius: 4px; }
+  .fbar .num { font-family: var(--mono); font-size: 11px; color: var(--txt-3);
+               text-align: right; font-variant-numeric: tabular-nums; }
+
+  .evq { border-left: 2px solid var(--line-2); padding: 4px 10px; margin: 8px 0;
+         font-size: 12px; color: var(--txt-2); }
+  .evq .eid { font-family: var(--mono); font-size: 10px; color: var(--txt-4); }
+
+  /* ── graph ── */
+  .graphbox { display: flex; gap: 16px; align-items: stretch; }
+  .graphbox svg { flex: 1 1 auto; min-width: 0; background: var(--bg-1);
+                  border: 1px solid var(--line); border-radius: 4px; }
+  .gside { flex: 0 0 250px; background: var(--bg-1); border: 1px solid var(--line);
+           border-radius: 4px; padding: 14px; font-size: 12px; overflow-y: auto;
+           max-height: 560px; }
+  .gside .ttl { font-weight: 600; margin-bottom: 2px; }
+  .gside .conn { padding: 4px 0; border-bottom: 1px solid var(--line); color: var(--txt-2); }
+  .gside .conn .rel { font-family: var(--mono); font-size: 10px; color: var(--txt-4); }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0 0;
+            font-size: 11.5px; color: var(--txt-2); }
+  .legend span::before { content: ""; display: inline-block; width: 9px; height: 9px;
+            border-radius: 50%; margin-right: 5px; background: var(--c); vertical-align: -1px; }
+  .gtip { position: fixed; pointer-events: none; z-index: 60; background: var(--bg-2);
+          border: 1px solid var(--line-2); border-radius: 4px; padding: 6px 9px;
+          font-size: 11.5px; display: none; max-width: 260px; }
+  .gtip .k { font-family: var(--mono); font-size: 9.5px; color: var(--txt-3);
+             text-transform: uppercase; letter-spacing: .1em; }
+  @media (max-width: 800px) { .graphbox { flex-direction: column; } .gside { max-height: 240px; } }
+
+  /* ── matchups ── */
+  .mu { background: var(--bg-1); border: 1px solid var(--line); border-radius: 4px;
+        padding: 15px 16px; margin-bottom: 10px; }
+  .mu .row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .mu .names { font-weight: 600; font-size: 14.5px; }
+  .mu .vs { color: var(--txt-4); font-size: 12px; }
+  .edgebar { position: relative; height: 10px; background: var(--seq-track);
+             border-radius: 5px; margin: 10px 0 4px; }
+  .edgebar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; }
+  .edgebar .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px;
+                  background: var(--txt-4); }
+  .edgelbl { display: flex; justify-content: space-between; font-family: var(--mono);
+             font-size: 10px; color: var(--txt-4); }
+  .spectbl { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+  .spectbl th { font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em;
+                text-transform: uppercase; color: var(--txt-3); text-align: left;
+                font-weight: 500; padding: 4px 8px; border-bottom: 1px solid var(--line); }
+  .spectbl td { padding: 5px 8px; border-bottom: 1px solid var(--line);
+                font-variant-numeric: tabular-nums; }
+  .lead-kssl { color: var(--fav-ink); font-weight: 600; }
+  .lead-comp { color: var(--threat-ink); font-weight: 600; }
+  .verdict { font-size: 13px; color: var(--txt-2); margin-top: 10px; max-width: 76ch; }
+
+  /* ── synthesis ── */
+  .syn { background: var(--bg-1); border: 1px solid var(--line); border-radius: 4px;
+         padding: 16px 18px; margin-bottom: 12px; }
+  .syn .thesis { font-size: 15.5px; font-weight: 600; max-width: 70ch; text-wrap: balance; }
+  .syn .sowhat { font-size: 13px; color: var(--txt-2); margin-top: 8px; max-width: 76ch; }
+  .vuln { border-left: 3px solid var(--threat); padding: 6px 12px; margin: 10px 0;
+          background: var(--bg-2); border-radius: 0 3px 3px 0; }
+  .vuln b { font-size: 13px; }
+  .vuln p { margin: 3px 0 0; font-size: 12.5px; color: var(--txt-2); }
+  .gaps { font-size: 12px; color: var(--synthetic); margin-top: 10px; }
+  .gaps b { font-family: var(--mono); font-size: 10px; letter-spacing: .14em;
+            text-transform: uppercase; font-weight: 500; }
+
+  /* ── tenders ── */
+  .fitbar { display: grid; grid-template-columns: 170px 1fr 56px; gap: 10px;
+            align-items: center; margin: 6px 0; }
+  .fitbar .track { height: 9px; background: var(--seq-track); border-radius: 4px; }
+  .fitbar .fill { height: 100%; border-radius: 4px; background: var(--seq); }
+  .mline { font-size: 12px; padding: 2px 0; }
+  .mline .up { color: var(--fav-ink); } .mline .down { color: var(--threat-ink); }
+
+  .pattern { background: var(--bg-1); border: 1px solid var(--line); border-radius: 4px;
+             padding: 13px 16px; margin-bottom: 8px; }
+  .pattern b { font-size: 13.5px; }
+  .pattern p { margin: 4px 0 0; font-size: 12.5px; color: var(--txt-2); max-width: 76ch; }
+  .pattern .bl { margin-top: 6px; font-size: 12px; color: var(--txt-3); }
+  .pattern .bl b { font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em;
+                   text-transform: uppercase; font-weight: 500; color: var(--txt-3); }
+
+  .grp-h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em;
+           text-transform: uppercase; color: var(--txt-3); margin: 18px 0 8px; }
+  .footer { margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--line);
+            font-family: var(--mono); font-size: 10.5px; color: var(--txt-4); }
+  a { color: inherit; }
+</style>
+
+<div class="topbar">
+  <div class="wordmark">MALLORY<small>intelligence layer</small></div>
+  <span class="eyebrow">live build · phases 0–3</span>
+  <div class="topmeta">
+    <span id="gen-at"></span>
+    <span class="modelchip" id="model-chip"></span>
+  </div>
+</div>
+
+<div id="boot" style="display:flex;align-items:center;justify-content:center;min-height:70vh;
+     font-family:var(--sans);color:var(--txt-2)">
+  <div class="mono" style="font-size:13px;color:var(--txt-3)">Loading live intelligence…</div>
+</div>
+
+<div class="wrap" style="display:none">
+  <div class="stats" id="stats"></div>
+
+  <nav class="secnav">
+    <a href="#signals">Signals · trust spine</a>
+    <a href="#network">Network · Intara graph</a>
+    <a href="#positioning">Positioning</a>
+    <a href="#synthesis">Synthesis</a>
+    <a href="#tenders">Tenders</a>
+    <a href="#patterns">Field patterns</a>
+  </nav>
+
+  <section id="signals">
+    <div class="sec-h"><h2>Signals — the trust spine</h2></div>
+    <p class="sec-sub">Every card carries a computed confidence: source tier + independent
+      corroboration + freshness + provenance. Click a card for the <b>why this?</b> panel —
+      the score decomposition and the evidence chain down to source URLs. Prose is written by
+      the local model; direction and tags stay rule-based.</p>
+    <div id="signal-feed"></div>
+  </section>
+
+  <section id="network">
+    <div class="sec-h"><h2>Network — the knowledge graph</h2></div>
+    <p class="sec-sub">Mallory Intara: every entity linked, rebuilt deterministically from the
+      relational record on each pipeline run. Hover for identity; click a node to inspect its
+      connections. Below: the hidden patterns the graph miners found.</p>
+    <div class="graphbox">
+      <svg id="gsvg" viewBox="0 0 900 560" role="img"
+           aria-label="Knowledge graph: competitors, products, countries, tenders and orgs as linked nodes"></svg>
+      <div class="gside" id="gside">
+        <div class="eyebrow" style="margin-bottom:8px">Inspect</div>
+        <div id="gsel" style="color:var(--txt-3)">Click a node to list its connections.
+          Solid edge = sourced · dashed = estimated.</div>
+      </div>
+    </div>
+    <div class="legend" id="glegend"></div>
+    <div class="grp-h">Hidden patterns — link analysis</div>
+    <div id="insights"></div>
+  </section>
+
+  <section id="positioning">
+    <div class="sec-h"><h2>Positioning — recomputed matchups</h2></div>
+    <p class="sec-sub">Head-to-heads are recomputed from reference specs by the S-22 engine —
+      never hand-written. The edge score is deterministic spec math (center tick = parity);
+      the verdict prose interprets it and is marked by method.</p>
+    <div id="matchups"></div>
+  </section>
+
+  <section id="synthesis">
+    <div class="sec-h"><h2>Competitor synthesis — the analyst brain</h2></div>
+    <p class="sec-sub">S-23: evidence gathered from published rows, synthesized by the model,
+      verified — uncited claims are dropped, declared gaps stay visible, and a bad generation
+      never overwrites a good row. <b>sourced</b> = computed from evidence ·
+      <b>est</b> = curated seed awaiting evidence.</p>
+    <div id="synthesis-list"></div>
+  </section>
+
+  <section id="tenders">
+    <div class="sec-h"><h2>Tender pipeline — fit scoring</h2></div>
+    <p class="sec-sub">Requirements parsed into slots, every in-category KSSL product scored
+      deterministically; the go / maybe / pass lean cites the computed fit.</p>
+    <div id="tender-list"></div>
+  </section>
+
+  <section id="patterns">
+    <div class="sec-h"><h2>Field patterns — what keeps happening</h2></div>
+    <p class="sec-sub">Cross-field aggregates (shared partners, contested countries, licensing
+      concentration) computed only from sourced rows, narrated over the syntheses.</p>
+    <div id="pattern-list"></div>
+  </section>
+
+  <div class="footer" id="foot"></div>
+</div>
+
+<div class="gtip" id="gtip"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let DATA = null;
+
+function render(D) {
+DATA = D;
+
+/* ── top meta + stats ── */
+$("gen-at").textContent = "as of " + (DATA.generated_at || "").slice(0, 16).replace("T", " ");
+$("model-chip").textContent = "live · " + DATA.stats.signals + " signals";
+const S = DATA.stats;
+$("stats").innerHTML = [
+  ["graph nodes", S.nodes, "entities linked"],
+  ["graph edges", S.edges, "typed relationships"],
+  ["signals", S.signals, "scored + ranked"],
+  ["evidence links", S.evidence_links, "claims → sources"],
+  ["insights", DATA.insights.length, "patterns mined"],
+  ["sourced synthesis", S.sourced_synth, "evidence-computed"],
+].map(([k, v, s]) =>
+  `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`
+).join("");
+
+/* ── signals ── */
+const evFor = (kind, id) => (DATA.evidence[kind + ":" + id] || []);
+$("signal-feed").innerHTML = DATA.signals.map((sg) => {
+  const parts = (sg.parts || []).map((p) =>
+    `<div class="fbar"><span class="lbl">${esc(p.label)}</span>
+       <div class="track"><div class="fill" style="width:${(p.points / p.max) * 100}%"></div></div>
+       <span class="num">${p.points}/${p.max}</span></div>`).join("");
+  const ev = evFor("signal", sg.id).map((e) =>
+    `<div class="evq">“${esc(e.quote)}”<br>
+       <span class="eid">${esc(e.eid)} · tier ${e.tier ?? "?"} · ${esc(e.method)}
+       ${e.url ? `· <a href="${esc(e.url)}">source</a>` : ""}</span></div>`).join("");
+  return `<div class="card" data-card>
+    <div class="hd">
+      <span class="stripe ${sg.dir}"></span>
+      <div>
+        <div class="ttl">${esc(sg.title)}</div>
+        <div class="meta">${esc([sg.pillar, sg.lens, sg.meta, sg.ago].filter(Boolean).join(" · "))}</div>
+        <div class="sowhat">${esc(sg.sowhat)}</div>
+      </div>
+      <div class="aside">
+        <span class="dir ${sg.dir}">${sg.dir}</span>
+        <span class="confchip">conf ${sg.confidence} · ×${sg.corroboration}</span>
+      </div>
+    </div>
+    <div class="why">
+      <h4>Why this score</h4>${parts}
+      <h4 style="margin-top:12px">Evidence chain</h4>${ev || "<div class='evq'>—</div>"}
+    </div></div>`;
+}).join("");
+document.querySelectorAll("[data-card] .hd").forEach((hd) =>
+  hd.addEventListener("click", () => hd.parentElement.classList.toggle("open")));
+
+/* ── graph ── */
+const KIND = { competitor: "--k-competitor", product: "--k-product", tender: "--k-tender",
+               country: "--k-country", signal: "--k-signal", org: "--k-org" };
+const kcolor = (k) => `var(${KIND[k] || "--k-other"})`;
+const G = DATA.graph;
+const xs = G.nodes.map((n) => n.x), ys = G.nodes.map((n) => n.y);
+const [x0, x1] = [Math.min(...xs), Math.max(...xs)], [y0, y1] = [Math.min(...ys), Math.max(...ys)];
+const px = (x) => 40 + ((x - x0) / (x1 - x0 || 1)) * 820;
+const py = (y) => 34 + ((y - y0) / (y1 - y0 || 1)) * 492;
+const byId = Object.fromEntries(G.nodes.map((n) => [n.id, n]));
+const R = { competitor: 9, org: 7, tender: 7, country: 6, product: 4, signal: 4.5, patent: 3.5 };
+const LABELED = new Set(["competitor", "org", "tender"]);
+
+const svg = $("gsvg");
+let svgParts = G.edges.map((e) => {
+  const a = byId[e.src], b = byId[e.dst];
+  if (!a || !b) return "";
+  return `<line x1="${px(a.x)}" y1="${py(a.y)}" x2="${px(b.x)}" y2="${py(b.y)}"
+    stroke="var(--line-2)" stroke-width="1"
+    ${e.prov === "sourced" ? "" : 'stroke-dasharray="4 3"'} opacity="0.55"/>`;
+}).join("");
+svgParts += G.nodes.map((n) => {
+  const r = R[n.kind] || 4;
+  const anchor = n.anchor ? `stroke="var(--fav)" stroke-width="2.5"` : `stroke="var(--bg)" stroke-width="1.5"`;
+  const lbl = (LABELED.has(n.kind) || n.anchor)
+    ? `<text x="${px(n.x)}" y="${py(n.y) - r - 4}" text-anchor="middle"
+         style="font:10px var(--mono);fill:var(--txt-2)">${esc(n.label.slice(0, 22))}</text>` : "";
+  return `<g data-node="${esc(n.id)}" style="cursor:pointer">
+    <circle cx="${px(n.x)}" cy="${py(n.y)}" r="${r}" fill="${kcolor(n.kind)}" ${anchor}/>${lbl}</g>`;
+}).join("");
+svg.innerHTML = svgParts;
+
+$("glegend").innerHTML = Object.keys(KIND)
+  .map((k) => `<span style="--c:var(${KIND[k]})">${k}</span>`).join("") +
+  `<span style="--c:var(--txt-4)">— solid = sourced · dashed = estimated · green ring = KSSL anchor</span>`;
+
+const tip = $("gtip");
+svg.addEventListener("mousemove", (ev) => {
+  const g = ev.target.closest("[data-node]");
+  if (!g) { tip.style.display = "none"; return; }
+  const n = byId[g.dataset.node];
+  tip.innerHTML = `<div class="k">${esc(n.kind)}${n.community != null ? " · bloc " + n.community : ""}</div>
+                   <b>${esc(n.label)}</b>${n.degree ? `<div class="k">degree ${n.degree}</div>` : ""}`;
+  tip.style.display = "block";
+  tip.style.left = Math.min(ev.clientX + 14, innerWidth - 280) + "px";
+  tip.style.top = (ev.clientY + 12) + "px";
+});
+svg.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+svg.addEventListener("click", (ev) => {
+  const g = ev.target.closest("[data-node]");
+  if (!g) return;
+  const n = byId[g.dataset.node];
+  const conns = G.edges.filter((e) => e.src === n.id || e.dst === n.id).map((e) => {
+    const other = byId[e.src === n.id ? e.dst : e.src];
+    return `<div class="conn"><span class="rel">${esc(e.rel)}${e.sub ? ":" + esc(e.sub) : ""}
+      ${e.prov === "sourced" ? "" : "· est"}</span><br>${esc(other ? other.label : "?")}</div>`;
+  }).join("");
+  $("gsel").innerHTML = `<div class="ttl">${esc(n.label)}</div>
+    <div style="color:var(--txt-3);margin-bottom:8px">${esc(n.kind)}
+      ${n.community != null ? " · bloc " + n.community : ""}${n.degree ? " · degree " + n.degree : ""}</div>
+    ${conns || "<div class='conn'>no edges</div>"}`;
+});
+
+$("insights").innerHTML = DATA.insights.map((i) => `
+  <div class="card"><div class="hd" style="cursor:default">
+    <span class="stripe ${i.dir}"></span>
+    <div><div class="ttl">${esc(i.title)}</div><div class="sowhat">${esc(i.sowhat)}</div></div>
+    <div class="aside"><span class="prov">${esc(i.kind.replace(/_/g, " "))}</span></div>
+  </div></div>`).join("") || "<p class='sec-sub'>No pattern insights on this dataset yet.</p>";
+
+/* ── matchups ── */
+$("matchups").innerHTML = DATA.matchups.map((m) => {
+  const fillColor = m.edge >= 60 ? "var(--fav)" : m.edge < 40 ? "var(--threat)" : "var(--watch)";
+  const specs = m.specs.map((sp) => `
+    <tr><td>${esc(sp.label)}</td>
+      <td class="${sp.leader === "kssl" ? "lead-kssl" : ""}">${esc(sp.kssl ?? "—")}</td>
+      <td class="${sp.leader === "comp" ? "lead-comp" : ""}">${esc(sp.comp ?? "—")}</td>
+      <td>${sp.leader === "tie" ? "·" : sp.leader === "kssl" ? "KSSL" : esc(m.comp)}</td></tr>`).join("");
+  return `<div class="mu">
+    <div class="row"><span class="names">${esc(m.kssl)}</span><span class="vs">vs</span>
+      <span class="names">${esc(m.comp)}</span><span class="vs">${esc(m.by || "")}</span>
+      <span style="margin-left:auto" class="dir ${m.dir}">${m.dir}</span>
+      <span class="prov">${m.method === "llm" ? "llm verdict" : "rule verdict"}</span></div>
+    <div class="edgebar"><div class="fill" style="width:${m.edge}%;background:${fillColor}"></div>
+      <div class="mid"></div></div>
+    <div class="edgelbl"><span>${esc(m.comp)} leads</span><span>edge ${m.edge}/100</span><span>KSSL leads</span></div>
+    <table class="spectbl"><thead><tr><th>Spec</th><th>KSSL</th><th>${esc(m.comp)}</th><th>Leads</th></tr></thead>
+      <tbody>${specs}</tbody></table>
+    <div class="verdict">${esc(m.verdict)}</div></div>`;
+}).join("");
+
+/* ── synthesis ── */
+const synSorted = [...DATA.synthesis].sort((a, b) =>
+  (b.provenance === "sourced") - (a.provenance === "sourced"));
+$("synthesis-list").innerHTML = synSorted.map((sy) => {
+  const vulns = (sy.vulnerabilities || []).map((v) =>
+    `<div class="vuln"><b>${esc(v.title)}</b><p>${esc(v.intel)}</p></div>`).join("");
+  const ev = evFor("synthesis", sy.id).slice(0, 4).map((e) =>
+    `<span class="eid mono" style="font-size:10px;color:var(--txt-4)">${esc(e.eid)}</span>`).join(" · ");
+  return `<div class="syn">
+    <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
+      <span class="eyebrow">${esc(sy.name)}</span>
+      <span class="prov ${sy.provenance === "sourced" ? "" : "est"}">${sy.provenance === "sourced" ? "sourced" : "est"}</span>
+      ${sy.confidence ? `<span class="confchip">conf ${sy.confidence} (${esc(sy.band)})</span>` : ""}
+    </div>
+    <div class="thesis" style="margin-top:8px">${esc(sy.thesis)}</div>
+    <div class="sowhat">${esc(sy.sowhat)}</div>
+    ${vulns}
+    ${sy.gaps && sy.gaps.length ? `<div class="gaps"><b>declared gaps</b> — ${esc(sy.gaps.join(" · "))}</div>` : ""}
+    ${ev ? `<div style="margin-top:8px">${ev}</div>` : ""}
+  </div>`;
+}).join("");
+
+/* ── tenders ── */
+$("tender-list").innerHTML = DATA.tenders.map((t) => {
+  const bars = t.matches.slice(0, 4).map((m) => `
+    <div class="fitbar"><span style="font-size:12px">${esc(m.name)}</span>
+      <div class="track"><div class="fill" style="width:${m.fit_pct}%"></div></div>
+      <span class="mono" style="font-size:11px;color:var(--txt-3);text-align:right">${m.fit_pct}%</span></div>`).join("");
+  const lines = (t.matches[0]?.lines || []).map((l) =>
+    `<div class="mline"><span class="${l[0]}">${l[0] === "up" ? "▲" : "▼"}</span> ${esc(l[1])}</div>`).join("");
+  const lean = t.lean === "go" ? "fav" : t.lean === "pass" ? "threat" : "watch";
+  return `<div class="mu">
+    <div class="row"><span class="names">${esc(t.title)}</span>
+      <span style="margin-left:auto" class="dir ${lean}">${esc(t.lean)}</span></div>
+    <div class="meta" style="font-size:12px;color:var(--txt-3);margin-top:2px">
+      ${esc([t.issuer, t.country, t.category, t.dl_days != null ? t.dl_days + " days left" : null]
+        .filter(Boolean).join(" · "))}</div>
+    ${bars}${lines ? `<div style="margin-top:6px">${lines}</div>` : ""}
+    <div class="verdict">${(t.lean_text || "").replace(/<[^>]*>/g, "")}</div></div>`;
+}).join("");
+
+/* ── patterns ── */
+$("pattern-list").innerHTML = DATA.field_patterns.map((p) => `
+  <div class="pattern"><b>${esc(p.title)}</b>
+    <span class="prov ${p.provenance === "sourced" ? "" : "est"}" style="margin-left:8px">
+      ${p.provenance === "sourced" ? "sourced" : "est"}</span>
+    <p>${esc(p.summary)}</p>
+    ${p.bottom_line ? `<div class="bl"><b>bottom line</b> — ${esc(p.bottom_line)}</div>` : ""}
+  </div>`).join("");
+
+$("foot").textContent =
+  `Mallory L2 intelligence layer — live from the running database · ${S.evidence_links} evidence links · ` +
+  `deterministic scores, cited claims · all data traceable via GET /api/v1/explain`;
+}  /* end render() */
+
+/* ── live fetch + graceful states + auto-refresh ── */
+async function load() {
+  try {
+    const res = await fetch("/api/v1/dashboard/data", { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`API ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    $("boot").style.display = "none";
+    document.querySelector(".wrap").style.display = "";
+    render(data);
+  } catch (err) {
+    $("boot").innerHTML =
+      `<div style="max-width:520px;text-align:center">
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">Can't reach the Mallory API</div>
+        <div style="color:var(--txt-3);font-size:13px;line-height:1.7">${esc(err.message)}<br>
+        This dashboard reads <code>/api/v1/dashboard/data</code> from the L2 server.
+        Make sure it's running:<br>
+        <code style="font-family:var(--mono)">uvicorn mallory_engine.main:app --port 8000</code></div>
+        <button id="retry" style="margin-top:16px;padding:8px 18px;border:1px solid var(--line-2);
+          border-radius:4px;background:var(--bg-1);color:var(--txt);cursor:pointer;font-family:var(--mono);
+          font-size:12px">Retry</button>
+      </div>`;
+    $("boot").style.display = "flex";
+    document.querySelector(".wrap").style.display = "none";
+    const r = $("retry"); if (r) r.onclick = load;
+  }
+}
+load();
+</script>

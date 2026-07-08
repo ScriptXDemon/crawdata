@@ -1,0 +1,230 @@
+[
+  {
+    "job_id": "job_news_TATA_DEFWORLD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/?s=Tata+Advanced+Systems"
+    ],
+    "keywords": [
+      "Tata Advanced",
+      "TASL",
+      "artillery",
+      "vehicle"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_IDRW",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Tata+Advanced+Systems"
+    ],
+    "keywords": [
+      "Tata Advanced",
+      "TASL",
+      "artillery",
+      "vehicle"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_IDRW",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Rheinmetall+contract"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "155mm",
+      "artillery",
+      "ammunition"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_DEFNEWS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Rheinmetall+contract"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "155mm",
+      "artillery",
+      "ammunition"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_DEFNEWS",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=KNDS+Nexter+artillery"
+    ],
+    "keywords": [
+      "KNDS",
+      "Nexter",
+      "Caesar",
+      "Leopard",
+      "howitzer"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=KNDS+Nexter+artillery"
+    ],
+    "keywords": [
+      "KNDS",
+      "Nexter",
+      "Caesar",
+      "Leopard",
+      "howitzer"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_SHEPHARD",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Hanwha+K9+howitzer"
+    ],
+    "keywords": [
+      "Hanwha",
+      "K9",
+      "Redback",
+      "howitzer",
+      "artillery"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_ARMYRECOG",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Hanwha+K9+howitzer"
+    ],
+    "keywords": [
+      "Hanwha",
+      "K9",
+      "Redback",
+      "howitzer",
+      "artillery"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 365,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "tender"
+    ]
+  }
+]

@@ -1,0 +1,4646 @@
+[
+  {
+    "job_id": "job_news_LT_IDRW_001",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_DEFNEWS_002",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_ECOTIMES_003",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_THEPRINT_004",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_SHEPHARD_005",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_LT_ARMYRECOG_006",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=L%26T+defence"
+    ],
+    "keywords": [
+      "Larsen & Toubro Defence",
+      "L&T",
+      "L&T Defence",
+      "Larsen & Toubro",
+      "K9 Vajra-T 155mm SPH"
+    ],
+    "target_entity": "LT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_IDRW_007",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_DEFNEWS_008",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_ECOTIMES_009",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_THEPRINT_010",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_SHEPHARD_011",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ADANI_ARMYRECOG_012",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Adani+Defence+defence"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_IDRW_013",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_DEFNEWS_014",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_ECOTIMES_015",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_THEPRINT_016",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_SHEPHARD_017",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SOLAR_ARMYRECOG_018",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Solar+Industries+defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_IDRW_019",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_DEFNEWS_020",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_ECOTIMES_021",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_THEPRINT_022",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_SHEPHARD_023",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NIBE_ARMYRECOG_024",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=NIBE+defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_IDRW_025",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_DEFNEWS_026",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_ECOTIMES_027",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_THEPRINT_028",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_SHEPHARD_029",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_SMPP_ARMYRECOG_030",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=SMPP+defence"
+    ],
+    "keywords": [
+      "SMPP Private Limited",
+      "SMPP",
+      "SMPP Pvt Ltd",
+      "Kavach MRAP",
+      "KATANA 155mm guided (via KNDS)"
+    ],
+    "target_entity": "SMPP",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_IDRW_031",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_DEFNEWS_032",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_ECOTIMES_033",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_THEPRINT_034",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_SHEPHARD_035",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MIL_ARMYRECOG_036",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Munitions+India+defence"
+    ],
+    "keywords": [
+      "Munitions India Limited",
+      "Munitions India",
+      "MIL",
+      "155mm HE ERFB-BT",
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_IDRW_037",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_DEFNEWS_038",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_ECOTIMES_039",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_THEPRINT_040",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_SHEPHARD_041",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_TATA_ARMYRECOG_042",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=TASL+defence"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_IDRW_043",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_DEFNEWS_044",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_ECOTIMES_045",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_THEPRINT_046",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_SHEPHARD_047",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_KNDS_ARMYRECOG_048",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=KNDS+defence"
+    ],
+    "keywords": [
+      "KNDS (Nexter / KMW)",
+      "KNDS",
+      "Nexter",
+      "Krauss-Maffei Wegmann",
+      "CAESAR 6x6",
+      "RCH-155",
+      "PzH 2000",
+      "Trajan"
+    ],
+    "target_entity": "KNDS",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_IDRW_049",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_DEFNEWS_050",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_ECOTIMES_051",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_THEPRINT_052",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_SHEPHARD_053",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_RHEIN_ARMYRECOG_054",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Rheinmetall+defence"
+    ],
+    "keywords": [
+      "Rheinmetall",
+      "Rheinmetall AG",
+      "Rheinmetall Defence",
+      "155mm Assegai / M107",
+      "HX-2 loitering"
+    ],
+    "target_entity": "RHEIN",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_IDRW_055",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_DEFNEWS_056",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_ECOTIMES_057",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_THEPRINT_058",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_SHEPHARD_059",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_HANWHA_ARMYRECOG_060",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Hanwha+defence"
+    ],
+    "keywords": [
+      "Hanwha Aerospace",
+      "Hanwha",
+      "Hanwha Defense",
+      "K9 Thunder",
+      "155mm HE / K307 (BB)"
+    ],
+    "target_entity": "HANWHA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_IDRW_061",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_DEFNEWS_062",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_ECOTIMES_063",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_THEPRINT_064",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_SHEPHARD_065",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BAE_ARMYRECOG_066",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=BAE+Systems+defence"
+    ],
+    "keywords": [
+      "BAE Systems (Bofors)",
+      "BAE Systems",
+      "BAE",
+      "Bofors",
+      "Archer FH77",
+      "M777",
+      "155mm L15 / M795",
+      "Bofors 40 Mk4 naval gun"
+    ],
+    "target_entity": "BAE",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_IDRW_067",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_DEFNEWS_068",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_ECOTIMES_069",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_THEPRINT_070",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_SHEPHARD_071",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_ELBIT_ARMYRECOG_072",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Elbit+defence"
+    ],
+    "keywords": [
+      "Elbit Systems",
+      "Elbit",
+      "ATMOS 2000",
+      "ATHOS 2052",
+      "155mm M454 precision",
+      "Skylark"
+    ],
+    "target_entity": "ELBIT",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_IDRW_073",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_DEFNEWS_074",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_ECOTIMES_075",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_THEPRINT_076",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_SHEPHARD_077",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_NORINCO_ARMYRECOG_078",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Norinco+defence"
+    ],
+    "keywords": [
+      "NORINCO",
+      "Norinco",
+      "China North Industries",
+      "NORINCO Group",
+      "PCL-181 / SH-15 155mm",
+      "AH-4 155mm lightweight",
+      "155mm GP / WS-35 guided",
+      "CS/VP3 MRAP"
+    ],
+    "target_entity": "NORINCO",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_IDRW_079",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_DEFNEWS_080",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_ECOTIMES_081",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_THEPRINT_082",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_SHEPHARD_083",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BDL_ARMYRECOG_084",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=BDL+defence"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_IDRW_085",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_DEFNEWS_086",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_ECOTIMES_087",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_THEPRINT_088",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_SHEPHARD_089",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_BEL_ARMYRECOG_090",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=BEL+defence"
+    ],
+    "keywords": [
+      "Bharat Electronics Limited",
+      "BEL",
+      "Bharat Electronics",
+      "AD/PGM electronics, seekers, radar"
+    ],
+    "target_entity": "BEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_IDRW_091",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_DEFNEWS_092",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_ECOTIMES_093",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_THEPRINT_094",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_SHEPHARD_095",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_MAHINDRA_ARMYRECOG_096",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Mahindra+Defence+defence"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_IDRW_097",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_DEFNEWS_098",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_ECOTIMES_099",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_THEPRINT_100",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_SHEPHARD_101",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_AWEIL_ARMYRECOG_102",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=AWEIL+defence"
+    ],
+    "keywords": [
+      "Advanced Weapons & Equipment India Ltd",
+      "AWEIL",
+      "Advanced Weapons and Equipment India",
+      "Dhanush 155/45",
+      "105mm Light Field Gun",
+      "JVPC",
+      "TAR 7.62x39",
+      "TriCa Carbine 5.56x30"
+    ],
+    "target_entity": "AWEIL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_IDRW_103",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_DEFNEWS_104",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_ECOTIMES_105",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_THEPRINT_106",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_SHEPHARD_107",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_YANTRA_ARMYRECOG_108",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Yantra+India+defence"
+    ],
+    "keywords": [
+      "Yantra India Limited",
+      "Yantra India",
+      "YIL",
+      "155mm ERFB / HEER / HE-77B",
+      "105mm IFG",
+      "130mm HE"
+    ],
+    "target_entity": "YANTRA",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_IDRW_109",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/?s=Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_DEFNEWS_110",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_ECOTIMES_111",
+    "job_type": "news",
+    "seed_urls": [
+      "https://economictimes.indiatimes.com/topic/Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_THEPRINT_112",
+    "job_type": "news",
+    "seed_urls": [
+      "https://theprint.in/?s=Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_SHEPHARD_113",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_news_PEL_ARMYRECOG_114",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Premier+Explosives+defence"
+    ],
+    "keywords": [
+      "Premier Explosives Limited",
+      "Premier Explosives",
+      "PEL",
+      "Propellants / warhead components"
+    ],
+    "target_entity": "PEL",
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event"
+    ]
+  },
+  {
+    "job_id": "job_tender_MOD_IN_115",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://mod.gov.in/tenders"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_GEPNIC_116",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://eprocure.gov.in"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_DEFPROC_117",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://srijandefence.gov.in"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_SAMGOV_118",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://api.sam.gov"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_OCCAR_119",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://www.occar.int"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_NSPA_120",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://www.nspa.nato.int"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_tender_TED_EU_121",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://ted.europa.eu"
+    ],
+    "keywords": [
+      "155mm",
+      "52 calibre",
+      "mounted gun system",
+      "towed howitzer",
+      "self-propelled howitzer",
+      "ultra light howitzer",
+      "light field gun",
+      "artillery ammunition",
+      "precision munition",
+      "light tank",
+      "armoured fighting vehicle",
+      "MRAP",
+      "protected mobility vehicle",
+      "8x8",
+      "assault rifle",
+      "carbine",
+      "sniper rifle",
+      "light machine gun",
+      "close quarter battle",
+      "anti-tank guided missile",
+      "ATGM",
+      "air defence system",
+      "QRSAM",
+      "MANPADS",
+      "loitering munition",
+      "kamikaze drone",
+      "MALE UAV",
+      "tactical UAV",
+      "counter-UAS",
+      "naval gun",
+      "autonomous underwater vehicle",
+      "mine countermeasure",
+      "RFP",
+      "RFI",
+      "EOI",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 60,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "tender"
+    ]
+  },
+  {
+    "job_id": "job_profile_NIBE_122",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.nibe.co.in/?s=defence"
+    ],
+    "keywords": [
+      "NIBE Limited",
+      "NIBE",
+      "NIBE Defence",
+      "NIBE Ltd",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "NIBE",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_profile_SOLAR_123",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.solargroup.com/?s=defence"
+    ],
+    "keywords": [
+      "Solar Industries India",
+      "Solar Industries",
+      "Solar Group",
+      "Economic Explosives",
+      "155mm ammunition",
+      "Nagastra-1/2/3",
+      "Rudrastra",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_profile_TATA_124",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.tataadvancedsystems.com/?s=news"
+    ],
+    "keywords": [
+      "Tata Advanced Systems",
+      "TASL",
+      "Tata Defence",
+      "MGS (mounted gun system)",
+      "WhAP 8x8",
+      "Kestrel",
+      "LSV 4x4",
+      "ALS-50",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "TATA",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_profile_ADANI_125",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.adanidefence.com/?s=news"
+    ],
+    "keywords": [
+      "Adani Defence & Aerospace",
+      "Adani Defence",
+      "ADSTL",
+      "Adani Defence Systems",
+      "Adani JEET (Tavor X95)",
+      "Drishti-10 Starliner",
+      "Galil ACE",
+      "Negev NG7 LMG",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_profile_MAHINDRA_126",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.mahindradefence.com/?s=news"
+    ],
+    "keywords": [
+      "Mahindra Defence",
+      "Mahindra Defence Systems",
+      "MDS",
+      "Armado ALSV",
+      "Axe FAV",
+      "MPV-I",
+      "Marksman APC",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "MAHINDRA",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_profile_BDL_127",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://bdl-india.in/?s=news"
+    ],
+    "keywords": [
+      "Bharat Dynamics Limited",
+      "BDL",
+      "Bharat Dynamics",
+      "Nag ATGM (Prospina)",
+      "MPATGM",
+      "Helina / Dhruvastra",
+      "Amogha-III ATGM",
+      "Milan-2T",
+      "partnership",
+      "MoU",
+      "joint venture",
+      "export"
+    ],
+    "target_entity": "BDL",
+    "max_pages": 25,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "partnership",
+      "geo_footprint"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_K9VAJRAT155MMSPH_128",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=K9+Vajra-T+155mm+SPH"
+    ],
+    "keywords": [
+      "K9 Vajra-T 155mm SPH",
+      "K9 Vajra",
+      "K9 Vajra-T"
+    ],
+    "target_entity": "LT",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_ADANIJEETTAVORX95_129",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Adani+JEET+%28Tavor+X95%29"
+    ],
+    "keywords": [
+      "Adani JEET (Tavor X95)",
+      "JEET",
+      "Tavor X95"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_DRISHTI10STARLINER_130",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Drishti-10+Starliner"
+    ],
+    "keywords": [
+      "Drishti-10 Starliner",
+      "Hermes 900",
+      "Drishti-10"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_GALILACE_131",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Galil+ACE"
+    ],
+    "keywords": [
+      "Galil ACE"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_NEGEVNG7LMG_132",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Negev+NG7+LMG"
+    ],
+    "keywords": [
+      "Negev NG7 LMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_SKYSTRIKER_133",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=SkyStriker"
+    ],
+    "keywords": [
+      "SkyStriker",
+      "loitering munition"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_UZIPROSMG_134",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Uzi+Pro+SMG"
+    ],
+    "keywords": [
+      "Uzi Pro SMG"
+    ],
+    "target_entity": "ADANI",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_155MMAMMUNITION_135",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=155mm+ammunition"
+    ],
+    "keywords": [
+      "155mm ammunition"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_NAGASTRA123_136",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Nagastra-1%2F2%2F3"
+    ],
+    "keywords": [
+      "Nagastra-1/2/3",
+      "Nagastra",
+      "loitering munition"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_RUDRASTRA_137",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=Rudrastra"
+    ],
+    "keywords": [
+      "Rudrastra"
+    ],
+    "target_entity": "SOLAR",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_155MMHEERFBBT_138",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=155mm+HE+ERFB-BT"
+    ],
+    "keywords": [
+      "155mm HE ERFB-BT"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_spec_P_155105AMMUNITION_139",
+    "job_type": "spec",
+    "seed_urls": [
+      "https://www.armyrecognition.com/?s=155%2F105+ammunition"
+    ],
+    "keywords": [
+      "155/105 ammunition"
+    ],
+    "target_entity": "MIL",
+    "max_pages": 10,
+    "max_depth": 1,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "pdf",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_market_140",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Armenia+artillery+tender"
+    ],
+    "keywords": [
+      "Armenia",
+      "artillery",
+      "howitzer",
+      "tender"
+    ],
+    "target_entity": null,
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_market_141",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=India+defence+budget"
+    ],
+    "keywords": [
+      "India",
+      "defence budget",
+      "capital outlay",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_market_142",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/search/?q=Saudi+Arabia+howitzer"
+    ],
+    "keywords": [
+      "Saudi Arabia",
+      "howitzer",
+      "155mm"
+    ],
+    "target_entity": null,
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 120,
+    "capture": [
+      "html",
+      "text",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "competitive_signal"
+    ]
+  },
+  {
+    "job_id": "job_tech_143",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=ramjet+155mm"
+    ],
+    "keywords": [
+      "ramjet",
+      "155mm",
+      "artillery",
+      "range"
+    ],
+    "target_entity": null,
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "innovation"
+    ]
+  },
+  {
+    "job_id": "job_tech_144",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/search/?q=loitering+munition"
+    ],
+    "keywords": [
+      "loitering munition",
+      "kamikaze drone",
+      "UAV"
+    ],
+    "target_entity": null,
+    "max_pages": 30,
+    "max_depth": 2,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": 180,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot"
+    ],
+    "expected_record_types": [
+      "innovation"
+    ]
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "job_id": "job_site_AMGENERAL",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.amgeneral.com"
+    ],
+    "keywords": [
+      "AM General",
+      "HUMVEE",
+      "JLTV A2",
+      "HUMVEE Saber",
+      "Hawkeye MHS",
+      "Hawkeye"
+    ],
+    "target_entity": "AMGENERAL",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  },
+  {
+    "job_id": "job_site_AEROVIRONMENT",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.avinc.com"
+    ],
+    "keywords": [
+      "AeroVironment",
+      "AV Inc",
+      "Switchblade 300",
+      "Switchblade 600",
+      "Switchblade",
+      "Puma",
+      "Raven",
+      "Wasp",
+      "counter-UAS",
+      "loitering munition"
+    ],
+    "target_entity": "AEROVIRONMENT",
+    "max_pages": 40,
+    "max_depth": 3,
+    "same_domain_only": true,
+    "render_js": false,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text"
+    ],
+    "expected_record_types": [
+      "competitive_signal",
+      "company_event",
+      "innovation"
+    ]
+  }
+]

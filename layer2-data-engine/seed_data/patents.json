@@ -1,0 +1,30 @@
+{
+  "_note": "Sample patents for an end-to-end product. Provenance='estimate' until the patent API (USPTO/EPO/Lens) + crawler are connected — these illustrate the per-competitor and per-technology layouts.",
+  "patents": [
+    { "id": "IN-SAMPLE-0001", "competitor_id": "ADANI", "tech_domain_id": "uav", "jurisdiction": "IN",
+      "title": "Modular loitering munition with foldable wing assembly and terminal guidance",
+      "status": "granted", "filed_date": "2025-01-14", "assignee": "Adani Defence Systems & Technologies Ltd",
+      "abstract": "Sample record for layout. Live data will populate from the patent API once connected.",
+      "kssl_relevance": "CORE" },
+    { "id": "EP-SAMPLE-0002", "competitor_id": "RHEIN", "tech_domain_id": "artillery", "jurisdiction": "EP",
+      "title": "Ramjet-assisted 155mm projectile with course-correcting fuze",
+      "status": "pending", "filed_date": "2024-09-02", "assignee": "Rheinmetall AG",
+      "abstract": "Sample record. Extended-range tube-artillery projectile.", "kssl_relevance": "CORE" },
+    { "id": "US-SAMPLE-0003", "competitor_id": "ELBIT", "tech_domain_id": "artillery", "jurisdiction": "US",
+      "title": "Autonomous laying and fire-control for towed howitzer",
+      "status": "granted", "filed_date": "2023-11-20", "assignee": "Elbit Systems Ltd",
+      "abstract": "Sample record. Auto-laying subsystem for towed guns.", "kssl_relevance": "ADJACENT" },
+    { "id": "IN-SAMPLE-0004", "competitor_id": "SOLAR", "tech_domain_id": "ammunition", "jurisdiction": "IN",
+      "title": "Bi-modular charge system composition and loading method",
+      "status": "granted", "filed_date": "2024-03-08", "assignee": "Solar Industries India Ltd",
+      "abstract": "Sample record. Propellant charge system.", "kssl_relevance": "CORE" },
+    { "id": "IN-SAMPLE-0005", "competitor_id": "BDL", "tech_domain_id": "missiles_ad", "jurisdiction": "IN",
+      "title": "Imaging infrared seeker with anti-jam terminal logic",
+      "status": "pending", "filed_date": "2025-02-11", "assignee": "Bharat Dynamics Ltd",
+      "abstract": "Sample record. IIR seeker for ATGM.", "kssl_relevance": "ADJACENT" },
+    { "id": "US-SAMPLE-0006", "competitor_id": "RHEIN", "tech_domain_id": "armoured", "jurisdiction": "US",
+      "title": "Active protection system with multi-sensor threat discrimination",
+      "status": "granted", "filed_date": "2023-07-19", "assignee": "Rheinmetall AG",
+      "abstract": "Sample record. APS hard-kill discrimination.", "kssl_relevance": "ADJACENT" }
+  ]
+}
