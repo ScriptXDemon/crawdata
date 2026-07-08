@@ -296,12 +296,16 @@ def extract_pending(db: Session, llm=None) -> dict[str, int]:
 
     known_ids = {c.id for c in db.scalars(select(RefCompetitor)).all()}
 
-    # Fan out the LLM extraction (pure HTTP → dict); no DB access inside workers.
+    # Fan out the LLM extraction (pure HTTP → dict). Workers MUST NOT touch the request
+    # session: a SQLAlchemy Session is not thread-safe, and the db-bound llm's cache/ledger
+    # writes would deadlock it under 4 concurrent threads. So use a DB-LESS llm here (no
+    # cache/ledger during the fan-out); the pipeline's db-bound llm still logs the serial tasks.
     outputs: dict[str, dict] = {}
-    if llm is not None and pending:
+    worker_llm = llm.with_db(None) if hasattr(llm, "with_db") else llm
+    if worker_llm is not None and pending:
         def _call(doc: StgDocument) -> tuple[str, dict]:
             try:
-                return doc.id, llm.extract_records(
+                return doc.id, worker_llm.extract_records(
                     title=doc.title or "", text=doc.main_text_en or doc.main_text or "",
                     entities_detected=doc.entities_detected or [], tables=doc.tables or [],
                 )
