@@ -101,9 +101,23 @@ def health() -> dict:
             "sources": len(_SEED.sources)}
 
 
+@app.get("/v1/config")
+def api_config() -> dict:
+    """Server-side wiring the dashboard needs. l2_forward_url is the URL the CRAWLER uses to
+    reach L2 (a container name like http://l2:8000 in Docker, or http://127.0.0.1:8000 native)
+    — distinct from the browser-facing URL the operator types for the 'Process in L2' button."""
+    import os
+    return {"l2_forward_url": os.environ.get("L2_INGEST_URL", "")}
+
+
 @app.get("/", response_class=HTMLResponse)
-def home() -> str:
-    return dashboard.render()
+def home() -> HTMLResponse:
+    # no-store so the browser always fetches the current dashboard JS (avoids stale-cache
+    # bugs where an old page reported wrong counts / ignored the freshness toggle).
+    return HTMLResponse(
+        dashboard.render(),
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"},
+    )
 
 
 @app.get("/v1/generate-jobs")

@@ -1,0 +1,144 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Mallory — FULL stack in Docker (all dashboards + data services).
+#  Run from repo root:  docker compose -f docker-compose.full.yml up -d --build
+#
+#  Services (host ports):
+#    postgres  :5433   ·  minio :9000 (console :9001)
+#    l2        :8000   ·  crawler-api :8099  ·  ingest :9090  ·  client :5173
+#
+#  Inter-service URLs use CONTAINER NAMES (not localhost) — that's the whole point
+#  of a shared compose network. LLM = the remote Ollama farm (reachable from
+#  containers, unlike a host-local ollama). Embeddings are OFF in-container
+#  (no local ollama reachable); deterministic corroboration still works.
+#
+#  Set the farm key once:  export OLLAMA_API_KEY=sk-farm-...   (or put it in a .env
+#  file next to this compose). Never bake it into the image.
+# ═══════════════════════════════════════════════════════════════════════════
+name: mallory
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mallory
+      POSTGRES_PASSWORD: mallory
+      POSTGRES_DB: mallory
+    ports: ["5433:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mallory"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: mallory
+      MINIO_ROOT_PASSWORD: mallory123
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["miniodata:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "mc alias set h http://localhost:9000 mallory mallory123 && mc ready h || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-shot: create the mallory-raw bucket, then exit.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >
+      sh -c "until mc alias set local http://minio:9000 mallory mallory123; do sleep 2; done &&
+             mc mb -p local/mallory-raw || true &&
+             mc anonymous set download local/mallory-raw || true &&
+             echo 'bucket ready'"
+    restart: "no"
+
+  # ── L2 intelligence (8000) — Postgres + MinIO + Ollama farm ──
+  l2:
+    build: ./layer2-data-engine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://mallory:mallory@postgres:5432/mallory
+      LLM_PROVIDER: ollama
+      # LOCAL Ollama on the host — the container reaches it via host.docker.internal.
+      # (Farm ollama.i3softlab.com is down: Cloudflare 530/1033. Swap OLLAMA_BASE_URL back
+      #  to the farm + set OLLAMA_API_KEY when it recovers.)
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+      OLLAMA_MODEL_FAST: qwen2.5:7b
+      OLLAMA_MODEL_DEEP: qwen2.5:14b
+      OLLAMA_MODEL_VISION: qwen2.5vl:7b
+      OLLAMA_EMBED_BASE_URL: http://host.docker.internal:11434/v1
+      OLLAMA_MODEL_EMBED: nomic-embed-text
+      LLM_TIMEOUT_S: "120"           # local models are slower than a hosted API
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: mallory
+      MINIO_SECRET_KEY: mallory123
+      MINIO_BUCKET: mallory-raw
+      SEED_DIR: ./seed_data
+      SCHEDULER_ENABLED: "0"
+      # Allow the client (5173) AND the crawler dashboards (8098/8099) to call L2 from the
+      # browser — the "Process in L2" button on the crawler dashboard is a cross-origin fetch.
+      CORS_ORIGINS: http://localhost:5173,http://localhost:8099,http://localhost:8098,http://127.0.0.1:8099,http://127.0.0.1:8098,http://127.0.0.1:5173
+    # Map host.docker.internal to the host so the container reaches local Ollama on :11434.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports: ["8000:8000"]
+    command: >
+      sh -c "python -m mallory_engine.scripts.init_db &&
+             python -m mallory_engine.scripts.load_seed &&
+             uvicorn mallory_engine.main:app --host 0.0.0.0 --port 8000"
+
+  # ── Crawler API (8099) — paste jobs here; forwards to ingest + L2 ──
+  crawler-api:
+    build: ./cralwer
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      CRAWLER_API_PORT: "8099"
+      CRAWLER_ALLOW_NETWORK: "1"
+      CRAWLER_PREFER_FIXTURES: "0"
+      INGEST_BASE_URL: http://ingest:9090          # default forward target (container name)
+      L2_INGEST_URL: http://l2:8000                # where the crawler reaches L2 (container name)
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: mallory
+      MINIO_SECRET_KEY: mallory123
+      MINIO_BUCKET: mallory-raw
+    ports: ["8099:8099"]
+    command: ["python", "run.py", "crawler-api"]
+
+  # ── Ingest dashboard (9090) — raw harvested pages ──
+  ingest:
+    build: ./cralwer
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: mallory
+      MINIO_SECRET_KEY: mallory123
+      MINIO_BUCKET: mallory-raw
+    ports: ["9090:9090"]
+    command: ["python", "run.py", "serve"]
+
+  # ── React client (5173) — served by nginx, proxies /api + /ops to l2 ──
+  client:
+    build:
+      context: ./layer3-client
+    depends_on: [l2]
+    ports: ["5173:80"]
+    environment:
+      # nginx.conf proxies /api and /ops to this upstream (the l2 container).
+      L2_UPSTREAM: http://l2:8000
+
+volumes:
+  pgdata:
+  miniodata:

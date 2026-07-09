@@ -120,8 +120,10 @@ def cmd_serve() -> int:
 
 
 def cmd_crawler_api() -> int:
+    import os
     import uvicorn
-    uvicorn.run("crawler_api.app:app", host="0.0.0.0", port=8099, log_level="info")
+    port = int(os.environ.get("CRAWLER_API_PORT", "8099"))
+    uvicorn.run("crawler_api.app:app", host="0.0.0.0", port=port, log_level="info")
     return 0
 
 

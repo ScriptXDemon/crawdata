@@ -30,8 +30,25 @@ from ..models.serving import (
 
 router = APIRouter(tags=["dashboard"])
 
-# api/dashboard.py → api → mallory_engine → src → layer2-data-engine/  (static lives here)
-_STATIC = Path(__file__).resolve().parents[3] / "static"
+
+def _find_static() -> Path:
+    """Locate the static/ dir. In the source tree it's parents[3]/static; when the package
+    is pip-installed (Docker), the source path doesn't exist, so also check the CWD and an
+    env override. First existing candidate wins."""
+    import os
+    env = os.environ.get("MALLORY_STATIC_DIR")
+    candidates = [
+        Path(env) if env else None,
+        Path(__file__).resolve().parents[3] / "static",  # src-tree layout
+        Path.cwd() / "static",                            # container WORKDIR /app/static
+    ]
+    for c in candidates:
+        if c and (c / "dashboard_live.html").exists():
+            return c
+    return Path(__file__).resolve().parents[3] / "static"  # last resort (yields a clear 404)
+
+
+_STATIC = _find_static()
 
 
 def _layout(nodes: list[KgNode], edges: list[KgEdge]) -> dict[str, tuple[float, float]]:

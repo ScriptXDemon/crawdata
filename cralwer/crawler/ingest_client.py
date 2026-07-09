@@ -52,14 +52,19 @@ class CollectingIngestClient:
             except Exception as exc:
                 fwd_outcomes.append({"url": fw.base_url, "accepted": False, "failing_rule": f"transport_error:{exc}"})
         outcome = fwd_outcomes[-1] if fwd_outcomes else None
+        # A page counts as accepted if ANY forwarder accepted it (or, with no forwarders,
+        # local validation passed). Previously we returned `local` regardless, so batches
+        # that forwarded to L2 reported accepted=0 even when L2 stored every page.
+        any_accepted = (any(o["accepted"] for o in fwd_outcomes)
+                        if fwd_outcomes else local.accepted)
         self.collected.append({
             "document_id": doc.document_id,
             "document": docd,
-            "accepted": outcome["accepted"] if outcome else local.accepted,
-            "failing_rule": outcome["failing_rule"] if outcome else local.failing_rule,
+            "accepted": any_accepted,
+            "failing_rule": outcome["failing_rule"] if (outcome and not any_accepted) else local.failing_rule,
             "forwarded_to": [o["url"] for o in fwd_outcomes if o["accepted"]],
         })
-        return local
+        return IngestOutcome(any_accepted, local.failing_rule, doc.document_id)
 
 
 class HttpIngestClient:

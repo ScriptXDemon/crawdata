@@ -6,14 +6,15 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Install dependencies first (layer caching)
+# Copy the whole project, then install. (The build backend needs src/ present, so we
+# can't install from pyproject.toml alone — one COPY + one install is correct here.)
 COPY pyproject.toml ./
-RUN pip install --upgrade pip && pip install .
-
-# Application source + bundled seed data
 COPY src ./src
 COPY seed_data ./seed_data
-RUN pip install --no-deps -e .
+RUN pip install --upgrade pip && pip install .
+
+# The L2 /dashboard endpoint serves static/dashboard_live.html (resolved as /app/static).
+COPY static ./static
 
 EXPOSE 8000
 

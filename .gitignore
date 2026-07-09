@@ -58,3 +58,4 @@ Thumbs.db
 # SQLite runtime artifacts
 *.db-shm
 *.db-wal
+.opencode
