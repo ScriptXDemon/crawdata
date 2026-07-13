@@ -22,25 +22,20 @@ from crawler import config
 
 def _summary(results) -> None:
     tot = Counter()
-    by_type: Counter = Counter()
     for r in results:
-        tot["fetched"] += r.fetched
-        tot["kept"] += r.kept
-        tot["dropped"] += r.dropped_by_gate
-        tot["304"] += r.not_modified
-        tot["skipped_unchanged"] += r.skipped_unchanged
-        tot["skipped_duplicate"] += r.skipped_duplicate
-        tot["emitted"] += r.emitted
-        tot["accepted"] += r.accepted
-        tot["rejected"] += r.rejected
-        for o in r.outcomes:
-            if o.accepted:
-                by_type[o.record_type] += 1
+        s = r.get("summary", {}) if isinstance(r, dict) else r
+        tot["fetched"] += s.get("fetched", 0) if isinstance(s, dict) else s.fetched
+        tot["kept"] += s.get("kept", 0) if isinstance(s, dict) else s.kept
+        tot["dropped"] += s.get("dropped_by_gate", 0) if isinstance(s, dict) else s.dropped_by_gate
+        tot["304"] += s.get("not_modified_304", 0) if isinstance(s, dict) else s.not_modified
+        tot["skipped_unchanged"] += s.get("skipped_unchanged", 0) if isinstance(s, dict) else s.skipped_unchanged
+        tot["skipped_duplicate"] += s.get("skipped_duplicate", 0) if isinstance(s, dict) else s.skipped_duplicate
+        tot["accepted"] += s.get("accepted", 0) if isinstance(s, dict) else s.accepted
+        tot["rejected"] += s.get("rejected", 0) if isinstance(s, dict) else s.rejected
     print("\n=== BATCH SUMMARY ===")
     for k in ("fetched", "kept", "dropped", "304", "skipped_unchanged",
-              "skipped_duplicate", "emitted", "accepted", "rejected"):
+              "skipped_duplicate", "accepted", "rejected"):
         print(f"  {k:18} {tot[k]}")
-    print(f"  accepted by type   {dict(by_type)}")
 
 
 def cmd_testing() -> int:
@@ -63,16 +58,15 @@ def cmd_gen() -> int:
 
 
 def cmd_run(path: str) -> int:
-    from crawler.ingest_client import InProcessIngestClient
+    from crawler.async_engine import run_batch_async
     from crawler.models import Job
-    from crawler.pipeline import run_batch
+    from crawler.ingest_client import CollectingIngestClient
     raw = json.loads(Path(path).read_text())
     jobs = [Job(**j) for j in raw]
-    client = InProcessIngestClient()
     print(f"Running {len(jobs)} jobs from {path} "
           f"(network={'on' if config.allow_network() else 'off'}, "
           f"fixtures={'on' if config.prefer_fixtures() else 'off'})")
-    results = run_batch(jobs, client)
+    results = run_batch_async(jobs, forward=False)
     _summary(results)
     print(f"  accepted records -> {config.OUTPUT_DIR / 'ingested.ndjson'}")
     return 0
@@ -83,34 +77,30 @@ def cmd_push(path: str) -> int:
 
     Target comes from INGEST_BASE_URL (e.g. http://127.0.0.1:8000 for a local L2).
     """
-    from crawler.ingest_client import HttpIngestClient
+    from crawler.async_engine import run_batch_async
     from crawler.models import Job
-    from crawler.pipeline import run_batch
     raw = json.loads(Path(path).read_text())
     jobs = [Job(**j) for j in raw]
-    client = HttpIngestClient()
-    print(f"Pushing {len(jobs)} jobs from {path} -> {client.base_url} "
+    print(f"Pushing {len(jobs)} jobs from {path} -> {config.INGEST_BASE_URL} "
           f"(network={'on' if config.allow_network() else 'off'}, "
           f"fixtures={'on' if config.prefer_fixtures() else 'off'})")
-    results = run_batch(jobs, client)
+    results = run_batch_async(jobs, forward=True)
 
     tot = Counter()
     reasons: Counter = Counter()
     for r in results:
-        for k in ("fetched", "kept", "dropped_by_gate", "not_modified",
+        s = r.get("summary", {})
+        for k in ("fetched", "kept", "dropped_by_gate", "not_modified_304",
                   "skipped_unchanged", "skipped_duplicate", "sent", "accepted",
                   "rejected", "errors"):
-            tot[k] += getattr(r, k, 0)
-        reasons.update(r.gate_reasons)
-        for o in r.outcomes:
-            if not o.accepted:
-                print(f"  REJECTED: {o.failing_rule}")
+            tot[k] += s.get(k, 0)
+        reasons.update(s.get("gate_reasons", {}))
     print("\n=== PUSH SUMMARY ===")
     for k, v in tot.items():
         print(f"  {k:18} {v}")
     if reasons:
         print(f"  gate reasons       {dict(reasons)}")
-    return 0 if tot["errors"] == 0 else 1
+    return 0 if tot.get("errors", 0) == 0 else 1
 
 
 def cmd_serve() -> int:

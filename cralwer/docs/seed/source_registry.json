@@ -7,6 +7,7 @@
     { "id": "DRDO",      "name": "DRDO",                      "domain": "drdo.gov.in",         "tier": 1, "type": "gov_primary",  "region": "India" },
     { "id": "DDP_MOD",   "name": "Dept of Defence Production", "domain": "ddpmod.gov.in",     "tier": 1, "type": "gov_primary",  "region": "India" },
     { "id": "COMPANY_IR","name": "Company IR / press pages",  "domain": "*",                   "tier": 1, "type": "primary",      "region": "global" },
+    { "id": "USDOD",     "name": "US Dept of Defense",        "domain": "war.gov",             "tier": 1, "type": "gov_primary",  "region": "US", "api_url": "https://api.dvidshub.net/search?q=defense&type=news", "feed_url": "https://www.dvidshub.net/rss/news" },
     { "id": "JANES",     "name": "Janes",                     "domain": "janes.com",           "tier": 1, "type": "trade_press",  "region": "global" },
     { "id": "DEFNEWS",   "name": "Defense News",              "domain": "defensenews.com",     "tier": 2, "type": "trade_press",  "region": "global" },
     { "id": "BREAKDEF",  "name": "Breaking Defense",          "domain": "breakingdefense.com", "tier": 2, "type": "trade_press",  "region": "global" },
@@ -21,7 +22,7 @@
   ],
   "global_capture_defaults": {
     "respect_robots_txt": true,
-    "user_agent": "MalloryBot/1.0 (+contact@kssl-intel.example)",
+    "user_agent": "advanceBot/1.0 (+mailto:emperorfoworld99@gmail.com)",
     "crawl_delay_seconds": 2,
     "max_retries": 2,
     "timeout_seconds": 30

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import functools
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -57,6 +58,14 @@ class Source:
     tier: int
     type: str
     region: str | None = None
+    # Un-gated RSS/Atom/JSON feed for the same content. When the site's HTML is
+    # WAF-blocked (needs_network_path), the engine crawls this feed's item links
+    # instead — feeds are rarely bot-challenged. Optional.
+    feed_url: str | None = None
+    # Official JSON API for the same content (e.g. DVIDS for DoD sites). Tried
+    # BEFORE Wayback/feed on a WAF block — it's the freshest & fullest source.
+    # DVIDS pattern: https://api.dvidshub.net/search (key via DVIDS_API_KEY env). Optional.
+    api_url: str | None = None
 
 
 @dataclass
@@ -154,7 +163,8 @@ def load_seed(seed_dir: str | None = None) -> Seed:
     sources = {
         s["id"]: Source(
             id=s["id"], name=s["name"], domain=s["domain"], tier=s["tier"],
-            type=s["type"], region=s.get("region"),
+            type=s["type"], region=s.get("region"), feed_url=s.get("feed_url"),
+            api_url=s.get("api_url"),
         )
         for s in reg_raw["sources"]
     }
@@ -167,8 +177,12 @@ def load_seed(seed_dir: str | None = None) -> Seed:
         tender_keywords=tuple(tenders_raw["keywords"]),
         tender_countries=tuple(tenders_raw["target_countries"]),
         tender_sources=list(tenders_raw["sources"]),
+        # env > registry json > hard fallback. CRAWLER_USER_AGENT is the final say so an
+        # operator can set an honest identifying UA without editing the seed.
         capture_defaults={**config.FALLBACK_CAPTURE_DEFAULTS,
-                          **reg_raw.get("global_capture_defaults", {})},
+                          **reg_raw.get("global_capture_defaults", {}),
+                          **({"user_agent": os.environ["CRAWLER_USER_AGENT"]}
+                             if os.environ.get("CRAWLER_USER_AGENT") else {})},
     )
 
     # Build lowercase alias -> id indexes. Name is always an alias of itself.

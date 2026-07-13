@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
-from . import config, fixtures, interaction
+from . import config, errors, fixtures, interaction
 from .canonicalize import canonicalize_url
 from .models import InteractionConfig
 
@@ -43,6 +43,8 @@ class FetchResult:
     tier: int = 0                             # 0=httpx/fixture, 1=rendered
     fetched_at: str = ""
     error: str | None = None
+    reason: str | None = None                 # errors.classify_failure output (typed category)
+    retry_after_s: float | None = None        # parsed Retry-After (429/503 only)
     from_fixture: bool = False
 
     def is_html(self) -> bool:
@@ -219,12 +221,14 @@ class Fetcher:
         if not self.allow_network:
             # Offline and no fixture -> a clean error (never a fabricated page).
             return FetchResult(url=canon, final_url=canon, status=None,
-                               fetched_at=_now_iso(), error="offline_no_fixture")
+                               fetched_at=_now_iso(), error="offline_no_fixture",
+                               reason=errors.OTHER)
 
         # robots.txt politeness — only for live (non-fixture) fetches.
         if self._robots is not None and not self._robots.allowed(canon):
             return FetchResult(url=canon, final_url=canon, status=None,
-                               fetched_at=_now_iso(), error="blocked_by_robots")
+                               fetched_at=_now_iso(), error="blocked_by_robots",
+                               reason=errors.ROBOTS)
 
         self._throttle()
 
@@ -245,6 +249,16 @@ class Fetcher:
             if retried.status != 403:
                 res = retried
 
+        # 429/503 rate-limit: wait out Retry-After (capped) then one refetch. The sync driver
+        # has no event loop to defer to, so this is a bounded blocking sleep. ponytail: capped
+        # at 60s — a longer Retry-After surfaces as an error, retried next run via record_failure.
+        if res.status in (429, 503):
+            wait = min(res.retry_after_s or 30.0, 60.0)
+            time.sleep(wait)
+            retried = self._http_fetch(canon, conditional)
+            if retried.status not in (429, 503):
+                res = retried
+
         # If interaction is configured, always use Playwright for richer page content
         # (even if httpx returned valid HTML — interaction steps need a real browser).
         if self._interaction_cfg and self._has_any_interaction(self._interaction_cfg):
@@ -257,17 +271,29 @@ class Fetcher:
         # which would try to page.goto() it and fail on "Download is starting".
         got_binary_file = (res.status and res.status < 400 and res.body_bytes
                            and not res.is_html())
-        if (res.error or not res.text_html or res.status == 403) and self.render_js \
+        # Any 4xx (not just 403) may be a bot-block that a real browser session
+        # clears — WAFs return 401/403/429 and sometimes a masking 404/406. Give
+        # them all one full Playwright pass with a browser UA before giving up.
+        blocked_4xx = bool(res.status and 400 <= res.status < 500)
+        if (res.error or not res.text_html or blocked_4xx) and self.render_js \
                 and not got_binary_file:
             if click_mode and self._shared_ctx is not None:
                 clicked = self._click_or_goto(canon, self._interaction_cfg)
                 if clicked is not None:
                     return clicked
                 # fall through to the ordinary cold-render ladder below
-            fallback_ua = _BROWSER_UA_FALLBACK if res.status == 403 else None
+            fallback_ua = _BROWSER_UA_FALLBACK if blocked_4xx else None
             rendered = self._render_fetch(canon, user_agent_override=fallback_ua)
-            if rendered is not None:
+            still_blocked = (rendered is not None and rendered.status
+                             and 400 <= rendered.status < 500)
+            if rendered is not None and not (blocked_4xx and still_blocked):
                 return rendered
+            # The human-like render still couldn't clear the block. Keep the
+            # original 4xx but retag it: this needs a different network path
+            # (residential proxy / real headless session / source API), not
+            # another UA retry. NEEDS_NETWORK_PATH makes these queryable.
+            if blocked_4xx:
+                res.reason = errors.NEEDS_NETWORK_PATH
         return res
 
     def fetch_asset(self, url: str) -> FetchResult:
@@ -287,10 +313,12 @@ class Fetcher:
             return self._from_fixture(canon, None)
         if not self.allow_network:
             return FetchResult(url=canon, final_url=canon, status=None,
-                               fetched_at=_now_iso(), error="offline_no_fixture")
+                               fetched_at=_now_iso(), error="offline_no_fixture",
+                               reason=errors.OTHER)
         if self._robots is not None and not self._robots.allowed(canon):
             return FetchResult(url=canon, final_url=canon, status=None,
-                               fetched_at=_now_iso(), error="blocked_by_robots")
+                               fetched_at=_now_iso(), error="blocked_by_robots",
+                               reason=errors.ROBOTS)
         return self._http_fetch(canon, None)
 
     def fetch_assets(self, urls: list[str]) -> list[FetchResult]:
@@ -338,26 +366,54 @@ class Fetcher:
         headers = {"User-Agent": user_agent or self.user_agent, "Accept": "*/*"}
         if conditional:
             headers.update({k: v for k, v in conditional.items() if v})
+        html_cap = int(os.environ.get("CRAWLER_MAX_HTML_BYTES", str(20 * 1024 * 1024)))
+        asset_cap = int(os.environ.get("CRAWLER_MAX_ASSET_BYTES", str(50 * 1024 * 1024)))
         last_err = None
         for attempt in range(self.max_retries + 1):
             try:
+                # Stream so a Content-Length header (or a streamed overrun) aborts a giant
+                # file before it's read whole into RAM — a 500MB "page" no longer OOMs a worker.
                 with httpx.Client(timeout=self.timeout_s, follow_redirects=True,
                                   headers=headers) as client:
-                    resp = client.get(fetch_url)
-                ct = resp.headers.get("content-type")
-                etag = resp.headers.get("etag")
-                lm = resp.headers.get("last-modified")
-                if resp.status_code == 304:
-                    return FetchResult(url=canon, final_url=str(resp.url), status=304,
-                                       not_modified=True, etag=etag, last_modified=lm,
-                                       content_type=ct, fetched_at=_now_iso())
-                kind = _classify_kind(ct, canon)
-                text_html = resp.text if kind in ("html", "other") else None
-                body = resp.content if kind in ("pdf", "image") else None
+                    with client.stream("GET", fetch_url) as resp:
+                        ct = resp.headers.get("content-type")
+                        etag = resp.headers.get("etag")
+                        lm = resp.headers.get("last-modified")
+                        sc = resp.status_code
+                        final_url = str(resp.url)
+                        if sc == 304:
+                            return FetchResult(url=canon, final_url=final_url, status=304,
+                                               not_modified=True, etag=etag, last_modified=lm,
+                                               content_type=ct, fetched_at=_now_iso())
+                        kind = _classify_kind(ct, canon)
+                        cap = asset_cap if kind in ("pdf", "image") else html_cap
+                        clen = resp.headers.get("content-length")
+                        if clen and clen.isdigit() and int(clen) > cap:
+                            return FetchResult(url=canon, final_url=final_url, status=sc,
+                                               content_type=ct, kind=kind, fetched_at=_now_iso(),
+                                               error="too_large", reason=errors.TOO_LARGE)
+                        buf = bytearray()
+                        overrun = False
+                        for chunk in resp.iter_bytes():
+                            buf += chunk
+                            if len(buf) > cap:
+                                overrun = True
+                                break
+                        if overrun:
+                            return FetchResult(url=canon, final_url=final_url, status=sc,
+                                               content_type=ct, kind=kind, fetched_at=_now_iso(),
+                                               error="too_large", reason=errors.TOO_LARGE)
+                        enc = resp.encoding or "utf-8"
+                text_html = bytes(buf).decode(enc, errors="ignore") if kind in ("html", "other") else None
+                body = bytes(buf) if kind in ("pdf", "image") else None
+                reason = errors.http_reason(sc) if sc >= 400 else None
+                retry_after = (errors.parse_retry_after(resp.headers.get("retry-after"))
+                               if sc in (429, 503) else None)
                 return FetchResult(
-                    url=canon, final_url=str(resp.url), status=resp.status_code,
+                    url=canon, final_url=final_url, status=sc,
                     content_type=ct, kind=kind, text_html=text_html, body_bytes=body,
                     etag=etag, last_modified=lm, fetched_at=_now_iso(),
+                    reason=reason, retry_after_s=retry_after,
                 )
             except Exception as exc:  # noqa: BLE001
                 last_err = str(exc)
@@ -369,7 +425,8 @@ class Fetcher:
                         return self._http_fetch(canon, conditional, user_agent, _fetch_url=www_url)
                 time.sleep(0.3 * (attempt + 1))
         return FetchResult(url=canon, final_url=canon, status=None,
-                           fetched_at=_now_iso(), error=last_err or "fetch_failed")
+                           fetched_at=_now_iso(), error=last_err or "fetch_failed",
+                           reason=errors.classify_failure(None, last_err) or errors.OTHER)
 
     def _render_fetch(self, canon: str, interaction_cfg: InteractionConfig | None = None,
                        user_agent_override: str | None = None) -> FetchResult | None:
@@ -397,8 +454,15 @@ class Fetcher:
                 headless = os.environ.get("CRAWLER_HEADLESS", "1") != "0"
                 slow_mo = int(os.environ.get("CRAWLER_SLOW_MO", "0"))
                 browser = pw_cm.chromium.launch(headless=headless, slow_mo=slow_mo, args=["--no-sandbox"])
-                ctx = browser.new_context(user_agent=user_agent_override or self.user_agent,
-                                          viewport={"width": 1920, "height": 1080})
+                # Look like a real Chrome session: WAFs fingerprint missing
+                # Accept-Language / locale / timezone as bot traffic.
+                ctx = browser.new_context(
+                    user_agent=user_agent_override or _BROWSER_UA_FALLBACK,
+                    viewport={"width": 1920, "height": 1080},
+                    locale="en-US",
+                    timezone_id="America/New_York",
+                    extra_http_headers={"Accept-Language": "en-US,en;q=0.9"},
+                )
                 page = ctx.new_page()
             else:
                 # Navigate the shared page itself (not a new tab) so its
@@ -519,7 +583,8 @@ class Fetcher:
                 except Exception:
                     pass
             return FetchResult(url=canon, final_url=canon, status=None,
-                               fetched_at=_now_iso(), error=f"render_failed: {exc}")
+                               fetched_at=_now_iso(), error=f"render_failed: {exc}",
+                               reason=errors.classify_failure(None, f"render_failed: {exc}"))
 
     @staticmethod
     def _has_any_interaction(cfg: InteractionConfig) -> bool:

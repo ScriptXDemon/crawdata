@@ -1,0 +1,961 @@
+[
+  {
+    "job_id": "tp_armyrec",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armyrecognition.com/news/army-news"
+    ],
+    "keywords": [
+      "artillery",
+      "howitzer",
+      "155mm",
+      "missile",
+      "drone",
+      "vehicle",
+      "armoured",
+      "contract",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_navalnews",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.navalnews.com/"
+    ],
+    "keywords": [
+      "naval",
+      "ship",
+      "submarine",
+      "frigate",
+      "corvette",
+      "missile",
+      "contract",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_defpost",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.thedefensepost.com/"
+    ],
+    "keywords": [
+      "defence",
+      "military",
+      "contract",
+      "missile",
+      "drone",
+      "vehicle",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_overt",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.overtdefense.com/"
+    ],
+    "keywords": [
+      "artillery",
+      "rifle",
+      "vehicle",
+      "drone",
+      "defence",
+      "contract",
+      "ammunition"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_defweb",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenceweb.co.za/"
+    ],
+    "keywords": [
+      "defence",
+      "army",
+      "vehicle",
+      "artillery",
+      "contract",
+      "procurement",
+      "Africa"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_edr",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.edrmagazine.eu/"
+    ],
+    "keywords": [
+      "artillery",
+      "vehicle",
+      "armoured",
+      "missile",
+      "defence",
+      "contract",
+      "ammunition"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_milafrica",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.militaryafrica.com/"
+    ],
+    "keywords": [
+      "defence",
+      "army",
+      "vehicle",
+      "contract",
+      "procurement",
+      "artillery"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_defworld",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defenseworld.net/"
+    ],
+    "keywords": [
+      "defence",
+      "contract",
+      "missile",
+      "vehicle",
+      "artillery",
+      "navy",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_milaero",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.militaryaerospace.com/"
+    ],
+    "keywords": [
+      "radar",
+      "sensor",
+      "avionics",
+      "drone",
+      "defence",
+      "contract",
+      "electronics"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_breaking",
+    "job_type": "news",
+    "seed_urls": [
+      "https://breakingdefense.com/"
+    ],
+    "keywords": [
+      "defense",
+      "army",
+      "missile",
+      "contract",
+      "budget",
+      "procurement",
+      "artillery"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_defscoop",
+    "job_type": "news",
+    "seed_urls": [
+      "https://defensescoop.com/"
+    ],
+    "keywords": [
+      "defense",
+      "technology",
+      "contract",
+      "drone",
+      "network",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_armada",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.armadainternational.com/"
+    ],
+    "keywords": [
+      "artillery",
+      "vehicle",
+      "naval",
+      "radar",
+      "missile",
+      "defence",
+      "contract"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_armytech",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.army-technology.com/news/"
+    ],
+    "keywords": [
+      "artillery",
+      "vehicle",
+      "armoured",
+      "howitzer",
+      "contract",
+      "defence",
+      "missile"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_navaltech",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.naval-technology.com/news/"
+    ],
+    "keywords": [
+      "naval",
+      "ship",
+      "submarine",
+      "missile",
+      "contract",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_airtech",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.airforce-technology.com/news/"
+    ],
+    "keywords": [
+      "aircraft",
+      "radar",
+      "missile",
+      "drone",
+      "avionics",
+      "contract",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_ndm",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.nationaldefensemagazine.org/"
+    ],
+    "keywords": [
+      "defense",
+      "artillery",
+      "procurement",
+      "contract",
+      "army",
+      "technology"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_defnews",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defensenews.com/land/"
+    ],
+    "keywords": [
+      "artillery",
+      "vehicle",
+      "contract",
+      "award",
+      "missile",
+      "armoured"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_shephard",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.shephardmedia.com/news/landwarfareintl/"
+    ],
+    "keywords": [
+      "artillery",
+      "armoured",
+      "vehicle",
+      "contract",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_gdc",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.globaldefensecorp.com/"
+    ],
+    "keywords": [
+      "defence",
+      "missile",
+      "contract",
+      "artillery",
+      "vehicle",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tp_milwatch",
+    "job_type": "news",
+    "seed_urls": [
+      "https://militarywatchmagazine.com/"
+    ],
+    "keywords": [
+      "missile",
+      "aircraft",
+      "defence",
+      "artillery",
+      "contract",
+      "army"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_idrw",
+    "job_type": "news",
+    "seed_urls": [
+      "https://idrw.org/category/indian-defense-news/"
+    ],
+    "keywords": [
+      "artillery",
+      "K9",
+      "ATAGS",
+      "Tata",
+      "DRDO",
+      "BEL",
+      "HAL",
+      "Kalyani",
+      "contract"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_livefist",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.livefistdefence.com/"
+    ],
+    "keywords": [
+      "DRDO",
+      "HAL",
+      "missile",
+      "drone",
+      "artillery",
+      "contract",
+      "India",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_idr",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.indiandefencereview.com/"
+    ],
+    "keywords": [
+      "DRDO",
+      "artillery",
+      "missile",
+      "army",
+      "contract",
+      "ATAGS",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_raksha",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.raksha-anirveda.com/"
+    ],
+    "keywords": [
+      "DRDO",
+      "defence",
+      "contract",
+      "artillery",
+      "missile",
+      "HAL",
+      "BEL",
+      "indigenous"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_fe",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.financialexpress.com/business/defence/"
+    ],
+    "keywords": [
+      "defence",
+      "contract",
+      "order",
+      "DRDO",
+      "HAL",
+      "BEL",
+      "Bharat Forge",
+      "Kalyani"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "in_defxp",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defencexp.com/"
+    ],
+    "keywords": [
+      "DRDO",
+      "HAL",
+      "BEL",
+      "artillery",
+      "missile",
+      "contract",
+      "India",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "gov_ddp",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://www.ddpmod.gov.in/"
+    ],
+    "keywords": [
+      "procurement",
+      "contract",
+      "tender",
+      "indigenous",
+      "defence",
+      "order"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "gov_drdo",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.drdo.gov.in/drdo/press-release"
+    ],
+    "keywords": [
+      "DRDO",
+      "missile",
+      "artillery",
+      "technology",
+      "trial",
+      "indigenous",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "tn_global",
+    "job_type": "tender",
+    "seed_urls": [
+      "https://www.globaltenders.com/defence-tenders"
+    ],
+    "keywords": [
+      "tender",
+      "procurement",
+      "defence",
+      "artillery",
+      "ammunition",
+      "supply",
+      "RFP"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "oem_rhein",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.rheinmetall.com/en/media/news"
+    ],
+    "keywords": [
+      "artillery",
+      "ammunition",
+      "vehicle",
+      "155mm",
+      "contract",
+      "howitzer",
+      "defence"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "oem_bel",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://www.bel-india.in/"
+    ],
+    "keywords": [
+      "BEL",
+      "radar",
+      "electronics",
+      "contract",
+      "defence",
+      "order",
+      "system"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "oem_hal",
+    "job_type": "profile",
+    "seed_urls": [
+      "https://hal-india.co.in/"
+    ],
+    "keywords": [
+      "HAL",
+      "aircraft",
+      "helicopter",
+      "contract",
+      "defence",
+      "order",
+      "engine"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  }
+]

@@ -67,17 +67,18 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://mallory:mallory@postgres:5432/mallory
       LLM_PROVIDER: ollama
-      # LOCAL Ollama on the host — the container reaches it via host.docker.internal.
-      # (Farm ollama.i3softlab.com is down: Cloudflare 530/1033. Swap OLLAMA_BASE_URL back
-      #  to the farm + set OLLAMA_API_KEY when it recovers.)
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      # Default brain = the remote Ollama FARM (serves text-model + vlm-model). Flip to LOCAL
+      # live — no restart — from the crawler dashboard toggle (POST /ops/llm/switch?mode=local),
+      # or override OLLAMA_BASE_URL here. The farm KEY comes from the repo-root .env (gitignored).
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-https://ollama.i3softlab.com/v1}
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
-      OLLAMA_MODEL_FAST: qwen2.5:7b
-      OLLAMA_MODEL_DEEP: qwen2.5:14b
-      OLLAMA_MODEL_VISION: qwen2.5vl:7b
+      OLLAMA_MODEL_FAST: ${OLLAMA_MODEL_FAST:-text-model}
+      OLLAMA_MODEL_DEEP: ${OLLAMA_MODEL_DEEP:-text-model}
+      OLLAMA_MODEL_VISION: ${OLLAMA_MODEL_VISION:-vlm-model}
+      # Embeddings have NO farm model, so they always run on local Ollama (via host.docker.internal).
       OLLAMA_EMBED_BASE_URL: http://host.docker.internal:11434/v1
       OLLAMA_MODEL_EMBED: nomic-embed-text
-      LLM_TIMEOUT_S: "120"           # local models are slower than a hosted API
+      LLM_TIMEOUT_S: "45"            # farm answers ~3s but has slow tails; fail stuck calls fast
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: mallory
       MINIO_SECRET_KEY: mallory123
@@ -99,6 +100,9 @@ services:
   # ── Crawler API (8099) — paste jobs here; forwards to ingest + L2 ──
   crawler-api:
     build: ./cralwer
+    # tini as PID 1 reaps zombie Chromium children — the async pool spawns/kills many
+    # browsers per batch, and without an init they pile up as <defunct> and exhaust PIDs.
+    init: true
     depends_on:
       minio-init:
         condition: service_completed_successfully
@@ -106,6 +110,27 @@ services:
       CRAWLER_API_PORT: "8099"
       CRAWLER_ALLOW_NETWORK: "1"
       CRAWLER_PREFER_FIXTURES: "0"
+      # Async multi-tab browser-pool engine — one shared pool across the whole batch, saturates
+      # the box. Tuned from scripts/bench_engine.py: 8 browsers x 12 tabs = 96 concurrent tabs
+      # hit ~86% CPU (sweet spot before RAM pressure on the 33GB WSL2-capped container). Per-host
+      # concurrency 3 keeps 96 tabs from ever hammering one site. Set _ENGINE=0 for the old path.
+      CRAWLER_ASYNC_ENGINE: "1"
+      CRAWLER_BROWSERS: "8"
+      CRAWLER_TABS_PER_BROWSER: "12"
+      CRAWLER_HOST_CONCURRENCY: "3"
+      CRAWLER_HOST_DELAY: "1.0"
+      # IP-blocked hosts (war.gov etc.): route Chromium through a RESIDENTIAL/mobile
+      # proxy gateway (the provider rotates the exit IP per request). Empty = direct
+      # (current behaviour). Datacenter proxies DON'T work — same blocklists as a server.
+      # Format: http://user:pass@gateway.provider.com:7777  (or socks5://)
+      CRAWLER_PROXY_URL: "${CRAWLER_PROXY_URL:-}"
+      # DVIDS API key (free signup) — unlocks the official DoD news/press JSON API,
+      # the sanctioned WAF-free path for war.gov/defense.gov. Empty = API path skipped
+      # (Wayback + RSS still cover it). Get a key at https://api.dvidshub.net/docs
+      DVIDS_API_KEY: "${DVIDS_API_KEY:-}"
+      # A 32-job x 500-page render-everything batch needs more than the 30-min default.
+      # 2h wall-clock; the 120s idle watchdog still stops early if the frontier drains.
+      CRAWLER_ENGINE_WALL_CLOCK_S: "7200"
       INGEST_BASE_URL: http://ingest:9090          # default forward target (container name)
       L2_INGEST_URL: http://l2:8000                # where the crawler reaches L2 (container name)
       MINIO_ENDPOINT: minio:9000
@@ -118,6 +143,7 @@ services:
   # ── Ingest dashboard (9090) — raw harvested pages ──
   ingest:
     build: ./cralwer
+    init: true
     depends_on:
       minio-init:
         condition: service_completed_successfully

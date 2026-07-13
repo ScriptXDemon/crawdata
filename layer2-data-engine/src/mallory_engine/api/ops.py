@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from ..config import get_settings
 from ..db import get_db
 from ..models.serving import SrvSignal, SrvTender
 from ..models.staging import StgSignal, StgTender
@@ -72,6 +73,82 @@ def refresh_patterns(db: Session = Depends(get_db)) -> dict:
 def analyze_assets(db: Session = Depends(get_db)) -> dict:
     # opt-in because the vision model must swap into VRAM; keep it off the hot path.
     return multimodal.analyze_pending_assets(db, get_llm(db=db))
+
+
+# ── LLM backend: live farm ⇄ local switch (no restart) ─────────────────────────
+# Two presets. get_llm() rebuilds its transport from the settings singleton on every call,
+# so mutating that singleton flips the backend for the very next pipeline run.
+# ponytail: two hardcoded presets — there are exactly two brains; a config table would be
+# ceremony. host.docker.internal is the container's route to the host's local Ollama.
+_LLM_PRESETS = {
+    "farm": {"base_url": "https://ollama.i3softlab.com/v1",
+             "fast": "text-model", "deep": "text-model", "vision": "vlm-model"},
+    # deep=7b too: on a 24GB GPU, 14b at 32k ctx spills to CPU (~2x slower per call) and the
+    # enrichment loop is sequential — that combo turns a backfill into hours. 7b fits fully in
+    # VRAM and is fast; re-enrich high-value rows with 14b later if wanted.
+    # ponytail: raise deep back to 14b (with capped num_ctx) once enrichment is parallelized.
+    "local": {"base_url": "http://host.docker.internal:11434/v1",
+              "fast": "qwen2.5:7b", "deep": "qwen2.5:7b", "vision": "qwen2.5vl:7b"},
+}
+
+
+def _llm_mode(s) -> str:
+    return "farm" if "i3softlab" in (s.ollama_base_url or "") else "local"
+
+
+def _ping(base_url: str, api_key: str) -> dict:
+    """Quick GET {base}/models — is this backend reachable right now?"""
+    import time
+
+    import httpx  # already a dependency (the transport uses it)
+
+    h = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+    t0 = time.perf_counter()
+    try:
+        r = httpx.get(f"{base_url.rstrip('/')}/models", headers=h, timeout=6)
+        ms = int((time.perf_counter() - t0) * 1000)
+        if r.status_code == 200:
+            return {"ok": True, "ms": ms,
+                    "models": [m.get("id") for m in r.json().get("data", [])]}
+        return {"ok": False, "ms": ms, "error": f"HTTP {r.status_code}"}
+    except Exception as e:
+        return {"ok": False, "error": type(e).__name__}
+
+
+@router.get("/llm", summary="Current LLM backend + live farm/local health")
+def llm_status() -> dict:
+    s = get_settings()
+    return {
+        "mode": _llm_mode(s),
+        "base_url": s.ollama_base_url,
+        "models": {"fast": s.ollama_model_fast, "deep": s.ollama_model_deep,
+                   "vision": s.ollama_model_vision},
+        "has_key": bool(s.ollama_api_key),
+        "health": {
+            "farm": _ping(_LLM_PRESETS["farm"]["base_url"], s.ollama_api_key),
+            "local": _ping(_LLM_PRESETS["local"]["base_url"], ""),
+        },
+    }
+
+
+@router.post("/llm/switch", summary="Live-switch LLM backend farm⇄local (no restart)")
+def llm_switch(mode: str) -> dict:
+    if mode not in _LLM_PRESETS:
+        raise HTTPException(400, f"mode must be 'farm' or 'local', got {mode!r}")
+    s = get_settings()
+    p = _LLM_PRESETS[mode]
+    # Mutate the cached singleton in place — GIL-atomic attribute writes, no lock; a race
+    # between two rapid toggles self-heals on the next switch. ponytail: per-request lock
+    # only if concurrent toggling ever matters (it won't — one operator, one dashboard).
+    s.ollama_base_url = p["base_url"]
+    s.ollama_model_fast = p["fast"]
+    s.ollama_model_deep = p["deep"]
+    s.ollama_model_vision = p["vision"]
+    s.llm_provider = "ollama"  # never leave it on the stub after an explicit switch
+    key = s.ollama_api_key if mode == "farm" else ""
+    return {"switched_to": mode, "base_url": s.ollama_base_url,
+            "models": {"fast": p["fast"], "deep": p["deep"], "vision": p["vision"]},
+            "ping": _ping(p["base_url"], key)}
 
 
 @router.get("/status", summary="Processing-state counts (feeds the monitor view)")

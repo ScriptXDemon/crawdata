@@ -16,7 +16,7 @@ from collections import Counter
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 from crawler import config, storage
@@ -54,15 +54,16 @@ def home() -> str:
 
 @app.get("/artifact")
 def artifact(path: str):
-    """Serve a stored artifact (screenshot / image / PDF) by its s3://... URI.
-    Guards against path traversal — only files under the storage dir are served.
-    PDFs/images open inline in the browser (Content-Disposition: inline)."""
-    local = storage.local_path(path).resolve()
-    root = config.STORAGE_DIR.resolve()
-    if root not in local.parents or not local.exists():
+    """Serve a stored artifact (screenshot / image / PDF) by its s3://... URI — read from
+    MinIO when configured, else local disk. Only our storage namespace is served (no
+    traversal). PDFs/images open inline in the browser."""
+    if not path.startswith(config.STORAGE_URI_PREFIX + "/"):
         return JSONResponse(status_code=404, content={"error": "not_found"})
-    # inline so PDFs/images render in the tab instead of downloading
-    return FileResponse(local, headers={"Content-Disposition": "inline"})
+    data = storage.get(path)
+    if data is None:
+        return JSONResponse(status_code=404, content={"error": "not_found"})
+    return Response(content=data, media_type=storage.content_type_for(path, data),
+                    headers={"Content-Disposition": "inline"})
 
 
 @app.get("/raw-html")

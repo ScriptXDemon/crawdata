@@ -23,7 +23,12 @@ _NON_PAGE_EXT = (
 
 
 def _soup(html: str) -> BeautifulSoup:
-    return BeautifulSoup(html, "lxml")
+    try:
+        return BeautifulSoup(html, "lxml")
+    except Exception:
+        # lxml's C parser can choke on hostile/garbled markup — fall back to the
+        # slower but pure-python html.parser, which never crashes on bad input.
+        return BeautifulSoup(html, "html.parser")
 
 
 def title_of(html: str) -> str | None:
@@ -86,12 +91,24 @@ def extract_links_with_text(html: str, base_url: str) -> list[tuple[str, str]]:
     return out
 
 
+# Document extensions treated as downloadable tender attachments (not crawled as pages).
+_ATTACH_EXT = (".pdf", ".doc", ".docx", ".xls", ".xlsx")
+# Gov-portal attachment endpoints that serve a file with no file extension in the URL.
+# Conservative on purpose — the fetch then classifies by Content-Type, so a hinted URL that
+# turns out to be HTML is dropped (only pdf/image bytes are captured).
+_ATTACH_HINTS = ("download.aspx", "getdoc.aspx", "downloadfile", "docdownload", "/getfile")
+
+
 def extract_pdf_links(html: str, base_url: str) -> list[str]:
-    """Absolute links that look like PDFs (tender RFP attachments)."""
+    """Absolute links that look like tender attachments — PDFs/office docs by extension, plus
+    the extensionless Download.aspx?id=… style gov portals use. Content-Type is verified on
+    fetch, so an over-broad hint that returns HTML is harmless (it won't be stored)."""
     out: list[str] = []
     for a in _soup(html).find_all("a", href=True):
         absu = urljoin(base_url, a["href"].strip()).split("#", 1)[0]
-        if absu.lower().split("?", 1)[0].endswith(".pdf"):
+        low = absu.lower()
+        path = low.split("?", 1)[0]
+        if path.endswith(_ATTACH_EXT) or any(h in low for h in _ATTACH_HINTS):
             out.append(absu)
     return list(dict.fromkeys(out))
 

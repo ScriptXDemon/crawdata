@@ -133,9 +133,21 @@ def enrich_assets(job: Job, doc: Document, page: HarvestedPage, fetcher: Fetcher
         from .models import Media
         doc.media = [Media(**m) for m in page.media_candidates[:10]]
 
-    # PDF attachments (tender RFPs / primary docs) — downloaded concurrently.
+    # PDF attachments (tender RFPs / primary docs) — downloaded concurrently, with structured
+    # tables (pdfplumber) merged onto doc.tables so spec grids survive for L2 scoring.
     if "pdf" in job.capture and page.pdf_links:
-        doc.attachments.extend(pdfextract.fetch_attachments(page.pdf_links[:3], fetcher))
+        import os
+
+        from .models import Table
+        max_pdfs = int(os.environ.get("CRAWLER_MAX_PDFS_PER_PAGE", "3"))
+        atts, pdf_tables = pdfextract.fetch_attachments_and_tables(
+            page.pdf_links[:max_pdfs], fetcher)
+        doc.attachments.extend(atts)
+        for t in pdf_tables:
+            try:
+                doc.tables.append(Table(**t))
+            except Exception:
+                pass
     if is_pdf_page:  # the page itself is the PDF
         sp = storage.put(res.body_bytes, kind="doc", ext="pdf")
         doc.attachments.append(Attachment(url=res.url, storage_path=sp, type="pdf",

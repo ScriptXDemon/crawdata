@@ -28,11 +28,3 @@ def parse_date(raw: str | None) -> tuple[str | None, str]:
         return iso, ("exact" if had_day else "approx")
     except Exception:
         return None, "unknown"
-
-
-def parse_date_only(raw: str | None) -> str | None:
-    """ISO date (YYYY-MM-DD)."""
-    iso, prec = parse_date(raw)
-    if iso and prec != "unknown":
-        return iso[:10]
-    return None

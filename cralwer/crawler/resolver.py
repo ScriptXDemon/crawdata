@@ -32,13 +32,6 @@ _COUNTRY_ALIASES: dict[str, list[str]] = {
 }
 
 
-def _alias_pattern(alias: str) -> str:
-    """Regex for one alias: escaped, bounded by non-alphanumeric (so 'BEL'
-    doesn't match inside 'rebel'). Works for aliases with & and spaces."""
-    esc = re.escape(alias)
-    return rf"(?<![A-Za-z0-9]){esc}(?![A-Za-z0-9])"
-
-
 def _confidence(alias: str) -> float:
     """Specificity heuristic: longer / multi-word / punctuated aliases are less
     ambiguous than bare short acronyms."""
@@ -89,7 +82,7 @@ def build_matcher(seed: Seed) -> _Matcher:
 
     for e in seed.entities.values():
         etype = {"competitor": "competitor", "anchor": "anchor",
-                 "partner": "partner"}.get(e.kind, "competitor")
+                 "partner": "partner"}.get(e.kind, "competitor")    
         for surface in (e.name, *e.aliases):
             register(surface, e.id, etype)
     for p in seed.products.values():
@@ -182,7 +175,3 @@ def countries(detected: list[EntityDetected]) -> list[str]:
 
 def tech_domains(detected: list[EntityDetected]) -> list[str]:
     return [d.resolved_id for d in detected if d.type == "tech_domain" and d.resolved_id]
-
-
-def partners(detected: list[EntityDetected]) -> list[str]:
-    return [d.resolved_id for d in detected if d.type == "partner" and d.resolved_id]

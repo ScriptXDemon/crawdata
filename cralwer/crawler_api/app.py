@@ -28,11 +28,9 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from crawler import config
-from crawler.dedup import CrawlHistory
-from crawler.ingest_client import CollectingIngestClient, HttpIngestClient
+from crawler.async_engine import run_batch_async
 from crawler.jobgen import generate as generate_jobs
 from crawler.models import Document, Job
-from crawler.pipeline import run_job
 from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 
@@ -62,39 +60,6 @@ class CrawlRequest(Job):
     l2_ingest_url: str | None = None
 
 
-def _run(job: Job, forward: bool, l2_url: str | None, history: CrawlHistory) -> dict:
-    forwarders = []
-    forwarded_to = []
-    if forward:
-        forwarders.append(HttpIngestClient())
-        forwarded_to.append(config.INGEST_BASE_URL)
-    if l2_url:
-        forwarders.append(HttpIngestClient(base_url=l2_url))
-        forwarded_to.append(l2_url)
-    client = CollectingIngestClient(forwarders=forwarders)
-    result = run_job(job, client, _SEED, history, _MATCHER)
-
-    # One page bundle per kept URL.
-    docs = [c["document"] for c in client.collected]
-    return {
-        "job_id": job.job_id,
-        "summary": {
-            "fetched": result.fetched,
-            "not_modified_304": result.not_modified,
-            "dropped_by_gate": result.dropped_by_gate,
-            "skipped_unchanged": result.skipped_unchanged,
-            "skipped_duplicate": result.skipped_duplicate,
-            "kept": result.kept,
-            "sent": result.sent,
-            "accepted": result.accepted,
-            "rejected": result.rejected,
-            "gate_reasons": result.gate_reasons,
-            "forwarded_to": forwarded_to,
-        },
-        "documents": docs,
-    }
-
-
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "entities": len(_SEED.entities),
@@ -108,6 +73,56 @@ def api_config() -> dict:
     — distinct from the browser-facing URL the operator types for the 'Process in L2' button."""
     import os
     return {"l2_forward_url": os.environ.get("L2_INGEST_URL", "")}
+
+
+@app.get("/v1/metrics")
+def metrics() -> dict:
+    """Live hardware + crawl metrics for the dashboard strip. CPU/RAM are the WSL2-VM view
+    (psutil reads the container's /proc) — i.e. 'is the whole box busy'. batch is coarse for
+    the async pool (per-job counts land only at batch end); the CPU/RAM gauges are the live
+    signal that the pool is working."""
+    import os
+
+    import psutil
+
+    vm = psutil.virtual_memory()
+    with _batch_lock:
+        bs = dict(_batch_status)
+    agg = {"jobs": 0, "fetched": 0, "kept": 0, "sent": 0, "accepted": 0}
+    for r in bs.get("results", []) or []:
+        agg["jobs"] += 1
+        for k in ("fetched", "kept", "sent", "accepted"):
+            agg[k] += int(r.get(k, 0) or 0)
+    async_on = os.environ.get("CRAWLER_ASYNC_ENGINE", "0") == "1"
+    W = int(os.environ.get("CRAWLER_BROWSERS", "8"))
+    T = int(os.environ.get("CRAWLER_TABS_PER_BROWSER", "12"))
+    return {
+        "cpu_percent": psutil.cpu_percent(interval=0.3),   # accurate instantaneous read
+        "cpu_count": psutil.cpu_count(),
+        "ram": {"used_gb": round((vm.total - vm.available) / 1e9, 1),
+                "total_gb": round(vm.total / 1e9, 1), "percent": vm.percent},
+        "pool": {"engine": "async" if async_on else "threadpool",
+                 "browsers": W, "tabs_per_browser": T, "tabs": W * T,
+                 "host_concurrency": int(os.environ.get("CRAWLER_HOST_CONCURRENCY", "3"))},
+        "batch": {"running": bool(bs.get("running")), "total": bs.get("total", 0),
+                  "done": bs.get("done", 0), "current": bs.get("current_job", "")},
+        "totals": agg,
+    }
+
+
+@app.get("/v1/audit")
+def audit(limit: int = 100) -> dict:
+    """Recent crawl-audit rows for careful (gov/mil) hosts — a provable record of polite crawling:
+    what URL, when, as which UA, under which robots decision. Append-only (crawl_audit table)."""
+    from crawler.dedup import CrawlHistory
+    h = CrawlHistory()
+    try:
+        rows = h._conn.execute(
+            "SELECT url, host, fetched_at, ua, robots_decision, status, reason, careful "
+            "FROM crawl_audit ORDER BY id DESC LIMIT ?", (max(1, min(limit, 1000)),)).fetchall()
+        return {"count": len(rows), "rows": [dict(r) for r in rows]}
+    finally:
+        h.close()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -133,70 +148,34 @@ def generate_jobs_endpoint() -> dict:
 
 @app.post("/v1/crawl")
 def crawl(req: CrawlRequest) -> dict:
+    """Single job via async engine (same backend as /v1/crawl/batch)."""
     job = Job(**req.model_dump(exclude={"forward_to_ingest", "l2_ingest_url"}))
-    history = CrawlHistory()
-    try:
-        return _run(job, req.forward_to_ingest, req.l2_ingest_url, history)
-    finally:
-        history.close()
+    results = run_batch_async([job], forward=req.forward_to_ingest,
+                              l2_url=req.l2_ingest_url, seed=_SEED, matcher=_MATCHER)
+    return results[0] if results else {"job_id": job.job_id, "summary": {}, "documents": []}
 
 
 class BatchRequest(BaseModel):
     jobs: list[Job]
     forward_to_ingest: bool = False
     l2_ingest_url: str | None = None
-    # Run this many jobs concurrently. Each job is a different website, so
-    # parallelizing across jobs keeps per-site politeness intact (a single
-    # site's pages still crawl sequentially inside its own job). 1 = serial.
-    parallel: int = 4
-
-
-def _run_one(job: Job, forward: bool, l2_url: str | None) -> dict:
-    """Run a single job with its OWN CrawlHistory — sqlite connections are not
-    shareable across threads, so each worker opens (and closes) its own."""
-    history = CrawlHistory()
-    try:
-        return _run(job, forward, l2_url, history)
-    finally:
-        history.close()
 
 
 @app.post("/v1/crawl/batch")
 def crawl_batch(req: BatchRequest) -> dict:
-    from concurrent.futures import ThreadPoolExecutor
-
+    """Batch crawl via async engine (8 browsers × 12 tabs = 96 concurrent pages)."""
     with _batch_lock:
-        _batch_status["running"] = True
-        _batch_status["total"] = len(req.jobs)
-        _batch_status["done"] = 0
-        _batch_status["current_job"] = req.jobs[0].job_id if req.jobs else ""
-        _batch_status["results"] = []
-    # Preserve input order in the output while running concurrently.
-    results: list[dict | None] = [None] * len(req.jobs)
-    workers = max(1, min(req.parallel, len(req.jobs) or 1))
+        _batch_status.update(running=True, total=len(req.jobs), done=0,
+                             current_job="(async pool)", results=[])
     try:
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = {pool.submit(_run_one, j, req.forward_to_ingest, req.l2_ingest_url): i
-                       for i, j in enumerate(req.jobs)}
-            from concurrent.futures import as_completed
-            for fut in as_completed(futures):
-                i = futures[fut]
-                r = fut.result()
-                results[i] = r
-                with _batch_lock:
-                    _batch_status["done"] += 1
-                    _batch_status["current_job"] = (
-                        "" if _batch_status["done"] >= len(req.jobs) else "…")
-                    _batch_status["results"].append({
-                        "job_id": r["job_id"],
-                        "fetched": r["summary"]["fetched"],
-                        "kept": r["summary"]["kept"],
-                        "sent": r["summary"]["sent"],
-                        "accepted": r["summary"]["accepted"],
-                    })
+        results = run_batch_async(req.jobs, forward=req.forward_to_ingest,
+                                  l2_url=req.l2_ingest_url, seed=_SEED, matcher=_MATCHER)
     finally:
         with _batch_lock:
-            _batch_status["running"] = False
+            _batch_status.update(running=False, done=len(req.jobs),
+                                 results=[{"job_id": r["job_id"], "fetched": r["summary"]["fetched"],
+                                           "kept": r["summary"]["kept"], "sent": r["summary"]["sent"],
+                                           "accepted": r["summary"]["accepted"]} for r in results])
     return {"jobs": len(results), "results": results}
 
 
@@ -265,6 +244,7 @@ class SuggestJobRequest(BaseModel):
     render_js: bool = False
     max_pages: int = 40
     max_depth: int = 2
+    hunt_mode: str | None = None   # "focused" (probe-then-crawl) | "exhaustive"; None = manual budget
 
 
 @app.post("/v1/suggest-job")
@@ -278,12 +258,19 @@ def suggest_job(req: SuggestJobRequest) -> dict:
     pool = _candidate_pool(_SEED, req.target_entity, req.job_type)
     disc = _discover_keywords(req.url, pool, render_js=req.render_js)
     selected = disc["selected_keywords"]
-    job = Job(
+    job_kwargs: dict = dict(
         job_id=f"suggested_{req.job_type}_{(req.target_entity or 'x').lower()}",
         job_type=req.job_type, seed_urls=[req.url],
-        keywords=selected, target_entity=req.target_entity,
-        max_pages=req.max_pages, max_depth=req.max_depth, render_js=req.render_js,
+        keywords=selected, target_entity=req.target_entity, render_js=req.render_js,
     )
+    if req.hunt_mode:
+        # Let the hunt-mode preset own the crawl budget (don't pin max_pages/depth,
+        # or model_fields_set would block the preset from filling them).
+        job_kwargs["hunt_mode"] = req.hunt_mode
+    else:
+        job_kwargs["max_pages"] = req.max_pages
+        job_kwargs["max_depth"] = req.max_depth
+    job = Job(**job_kwargs)
     return {
         "relevant": bool(selected),
         "pool_size": disc["pool_size"],

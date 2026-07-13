@@ -46,9 +46,12 @@ INGEST_API_PREFIX = "/ingest/v1"
 # --- Fetch behaviour -----------------------------------------------------
 # Hard fallbacks used when a field is absent from both the job and the
 # source_registry's global_capture_defaults.
+# Honest identifying UA — an admin who sees it in their logs can reach us. Override the whole
+# string with CRAWLER_USER_AGENT. (Kept brand-neutral on purpose: no product/customer name.)
 FALLBACK_CAPTURE_DEFAULTS = {
     "respect_robots_txt": True,
-    "user_agent": "MalloryBot/1.0 (+contact@kssl-intel.example)",
+    "user_agent": os.environ.get(
+        "CRAWLER_USER_AGENT", "advanceBot/1.0 (+mailto:emperorfoworld99@gmail.com)"),
     "crawl_delay_seconds": 2,
     "max_retries": 2,
     "timeout_seconds": 30,

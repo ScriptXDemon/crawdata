@@ -8,7 +8,6 @@ canonical URL is the dedup key on every ``document``.
 """
 from __future__ import annotations
 
-import hashlib
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
 # Query params that never change page content — stripped during canonicalization.
@@ -56,7 +55,3 @@ def registered_domain(url: str) -> str:
 
 def same_site(a: str, b: str) -> bool:
     return registered_domain(a) == registered_domain(b)
-
-
-def url_hash(canonical: str) -> str:
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

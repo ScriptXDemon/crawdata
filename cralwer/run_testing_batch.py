@@ -19,9 +19,8 @@ os.environ.setdefault("CRAWLER_PREFER_FIXTURES", "1")
 os.environ.setdefault("CRAWLER_ALLOW_NETWORK", "0")
 
 from crawler import config
-from crawler.dedup import CrawlHistory
-from crawler.ingest_client import InProcessIngestClient
-from crawler.pipeline import run_job
+from crawler.async_engine import run_batch_async
+from crawler.ingest_client import InProcessIngestClient, CollectingIngestClient
 from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 from crawler.testing_batch import build as build_batch
@@ -38,8 +37,6 @@ def main() -> int:
 
     seed = load_seed()
     matcher = build_matcher(seed)
-    history = CrawlHistory()
-    client = InProcessIngestClient()
     from ingest_api.app import reset as reset_ledger
     reset_ledger()
 
@@ -47,6 +44,13 @@ def main() -> int:
     print(f"Running {len(jobs)} jobs (offline={os.environ.get('CRAWLER_ALLOW_NETWORK')=='0'})\n")
     print(f"{'job_id':<34} {'type':<8} fetch kept drop sent acc rej")
     print("-" * 78)
+
+    # Run all jobs via async engine (single batch call)
+    try:
+        async_results = run_batch_async(jobs, forward=False, seed=seed, matcher=matcher)
+    except Exception as exc:  # noqa: BLE001
+        print(f"BATCH CRASHED: {exc}")
+        return 1
 
     results = []
     crashed = []
@@ -59,17 +63,14 @@ def main() -> int:
     resolution_total = 0
     resolution_hits = 0
 
-    for job in jobs:
-        try:
-            r = run_job(job, client, seed, history, matcher)
-        except Exception as exc:  # noqa: BLE001
-            crashed.append((job.job_id, str(exc)))
-            print(f"{job.job_id:<34} {job.job_type:<8} CRASHED: {exc}")
-            continue
+    for job, r_dict in zip(jobs, async_results):
+        r = r_dict  # r_dict has structure: {"job_id": ..., "summary": {...}, "documents": [...]}
+        s = r.get("summary", {})
+        docs = r.get("documents", [])
         results.append((job, r))
         # criterion 2 — each job yields ≥1 valid document (main_text + url + hash)
         job_valid = 0
-        for d in r.documents:
+        for d in docs:
             if d.main_text.strip() and d.url and d.content_hash and d.content_hash != "sha256:empty":
                 docs_with_text += 1
                 job_valid += 1
@@ -88,12 +89,10 @@ def main() -> int:
         if job_valid >= 1:
             jobs_with_valid_doc += 1
         # criterion 3 — every job's kept page(s) were accepted as a raw page bundle
-        if r.accepted >= 1:
+        if s.get("accepted", 0) >= 1:
             jobs_with_accepted_bundle += 1
-        print(f"{job.job_id:<34} {job.job_type:<8} {r.fetched:>5} {r.kept:>4} "
-              f"{r.dropped_by_gate:>4} {r.sent:>4} {r.accepted:>3} {r.rejected:>3}")
-
-    history.close()
+        print(f"{job.job_id:<34} {job.job_type:<8} {s.get('fetched', 0):>5} {s.get('kept', 0):>4} "
+              f"{s.get('dropped_by_gate', 0):>4} {s.get('sent', 0):>4} {s.get('accepted', 0):>3} {s.get('rejected', 0):>3}")
 
     # criterion 6 — entity-resolution recall on a known answer key.
     resolution_hits, resolution_total = _resolution_check(results)

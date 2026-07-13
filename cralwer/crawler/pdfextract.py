@@ -34,29 +34,56 @@ def extract_text(pdf_bytes: bytes, max_chars: int = 200_000) -> str | None:
         return None
 
 
-def _store_and_extract(res) -> Attachment | None:
-    if res.error or not res.body_bytes:
-        return None
-    storage_path = storage.put(res.body_bytes, kind="doc", ext="pdf")
-    return Attachment(
-        url=res.url, storage_path=storage_path, type="pdf",
-        extracted_text=extract_text(res.body_bytes),
-    )
-
-
-def fetch_attachment(pdf_url: str, fetcher: Fetcher) -> Attachment | None:
-    """Download a PDF, store it, and extract its plain text. None on hard failure."""
-    return _store_and_extract(fetcher.fetch_asset(pdf_url))
-
-
-def fetch_attachments(pdf_urls: list[str], fetcher: Fetcher) -> list[Attachment]:
-    """Download several PDFs concurrently (fetcher.fetch_assets) then store +
-    extract each. Same result as calling fetch_attachment per URL, just faster;
-    failed downloads are dropped from the list."""
-    results = fetcher.fetch_assets(pdf_urls)
-    out: list[Attachment] = []
-    for res in results:
-        att = _store_and_extract(res)
-        if att:
-            out.append(att)
+def extract_tables(pdf_bytes: bytes, max_tables: int = 20) -> list[dict]:
+    """Structured tables from a (spec-heavy tender) PDF via pdfplumber → list of
+    {title?, rows:[{col:val}]} dicts ready for the Document.tables `Table` model.
+    pypdf's flat text collapses columns; this preserves the spec grid. Empty list if
+    pdfplumber isn't installed or the PDF has no extractable tables."""
+    try:
+        import pdfplumber
+    except Exception:
+        return []
+    out: list[dict] = []
+    try:
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            for page in pdf.pages:
+                for tbl in (page.extract_tables() or []):
+                    if not tbl or len(tbl) < 2:
+                        continue
+                    header = [(c or "").strip() or f"col{i}" for i, c in enumerate(tbl[0])]
+                    rows = []
+                    for r in tbl[1:]:
+                        rows.append({header[i]: (r[i] or "").strip()
+                                     for i in range(min(len(header), len(r)))})
+                    if rows:
+                        out.append({"rows": rows})
+                    if len(out) >= max_tables:
+                        return out
+    except Exception:
+        return out
     return out
+
+
+def _looks_like_pdf(data: bytes) -> bool:
+    """True only if the bytes are actually a PDF. A .pdf link that returned an HTML page
+    (redirect / login wall / 404) is classified 'pdf' by URL extension and reaches here with
+    HTML bytes — storing that as a .pdf gives a broken attachment the viewer can't open."""
+    return b"%PDF" in data[:1024]
+
+
+def fetch_attachments_and_tables(pdf_urls: list[str], fetcher: Fetcher) -> tuple[list[Attachment], list[dict]]:
+    """Download several PDFs concurrently, store each, extract plain text AND structured
+    tables (pdfplumber). Returns (attachments, tables); the caller merges tables onto
+    Document.tables. Bytes that aren't actually a PDF (a .pdf URL that served HTML) are
+    dropped — only real PDFs become attachments."""
+    results = fetcher.fetch_assets(pdf_urls)
+    atts: list[Attachment] = []
+    tables: list[dict] = []
+    for res in results:
+        if res.error or not res.body_bytes or not _looks_like_pdf(res.body_bytes):
+            continue
+        storage_path = storage.put(res.body_bytes, kind="doc", ext="pdf")
+        atts.append(Attachment(url=res.url, storage_path=storage_path, type="pdf",
+                               extracted_text=extract_text(res.body_bytes)))
+        tables.extend(extract_tables(res.body_bytes))
+    return atts, tables

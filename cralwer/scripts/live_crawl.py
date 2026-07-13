@@ -12,11 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # project root 
 os.environ["CRAWLER_ALLOW_NETWORK"] = "1"     # this is a LIVE fetch
 os.environ["CRAWLER_PREFER_FIXTURES"] = "0"   # not a fixture — go straight to the web
 
-from crawler.dedup import CrawlHistory
+from crawler.async_engine import run_batch_async
 from crawler.fetcher import Fetcher
 from crawler.ingest_client import CollectingIngestClient
 from crawler.models import Job
-from crawler.pipeline import run_job
 from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 
@@ -35,18 +34,19 @@ job = Job(
 
 seed = load_seed()
 matcher = build_matcher(seed)
-client = CollectingIngestClient()
-history = CrawlHistory(":memory:")
 
 print(f"LIVE crawling: {URL}\n")
-result = run_job(job, client, seed, history, matcher)
+results = run_batch_async([job], forward=False, seed=seed, matcher=matcher)
+result = results[0] if results else {"summary": {}, "documents": []}
+s = result.get("summary", {})
+docs = result.get("documents", [])
 
 print("HARVEST:")
-print(f"  fetched={result.fetched}  errors={result.errors}  "
-      f"dropped_by_gate={result.dropped_by_gate}  kept={result.kept}")
-print(f"  gate_reasons={result.gate_reasons}")
+print(f"  fetched={s.get('fetched', 0)}  errors={s.get('errors', 0)}  "
+      f"dropped_by_gate={s.get('dropped_by_gate', 0)}  kept={s.get('kept', 0)}")
+print(f"  gate_reasons={s.get('gate_reasons', {})}")
 
-if not result.documents:
+if not docs:
     # Diagnose: fetch directly to see what the site returned.
     print("\nNo document kept — diagnosing raw fetch:")
     f = Fetcher(user_agent=seed.capture_defaults["user_agent"], timeout_s=30, delay_s=0)
@@ -55,7 +55,7 @@ if not result.documents:
           f"bytes={len(r.text_html or '')} robots_ua={seed.capture_defaults['user_agent']}")
     sys.exit(0)
 
-doc = result.documents[0]
+doc = docs[0]
 print("\nDOCUMENT:")
 print(f"  url:           {doc.url}")
 print(f"  title:         {doc.title}")
@@ -73,7 +73,5 @@ print("\n  main_text preview:")
 print(textwrap.fill(doc.main_text[:600], width=92,
                     initial_indent="    ", subsequent_indent="    "))
 
-print(f"\nSENT ({result.sent} page bundle(s)):")
-for c in client.collected:
-    print(f"  - {c['document_id']:20} accepted={c['accepted']} "
-          f"failing_rule={c['failing_rule']}")
+print(f"\nSENT ({s.get('sent', 0)} page bundle(s)):")
+print(f"  - {len(docs)} document(s) retained")

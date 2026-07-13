@@ -44,17 +44,14 @@ os.environ["CRAWLER_SLOW_MO"] = str(args.slow_mo)
 os.environ["CRAWLER_CRAWL_DELAY"] = str(args.delay)
 os.environ["CRAWLER_FORCE_PLAYWRIGHT"] = "1" if args.force_playwright else "0"
 
-from crawler.dedup import CrawlHistory
+from crawler.async_engine import run_batch_async
 from crawler.ingest_client import CollectingIngestClient
 from crawler.models import Job
-from crawler.pipeline import run_job
 from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 
 seed = load_seed()
 matcher = build_matcher(seed)
-client = CollectingIngestClient()
-history = CrawlHistory(":memory:")
 
 job = Job(
     job_id="watch_crawl_01",
@@ -74,17 +71,13 @@ print(f"Watching: {args.url}")
 print(f"  visible_browser={not args.headless}  slow_mo={args.slow_mo}ms  delay={args.delay}s  "
       f"max_pages={args.max_pages}  max_depth={args.max_depth}  "
       f"force_playwright={args.force_playwright}  click_through={args.click_through}\n")
+print("(Note: async engine runs in background; live progress printing not available)\n")
 
-
-def on_fetch(info: dict) -> None:
-    mark = {"ok": "OK ", "304": "304", "err": "ERR"}.get(info["status"], "?  ")
-    print(f"  [{mark}] depth-fetch #{info['fetched']}/{info['max_pages']} "
-          f"(queued={info['enqueued']}): {info['url']}")
-
-
-result = run_job(job, client, seed, history, matcher, on_fetch=on_fetch)
+results = run_batch_async([job], forward=False, seed=seed, matcher=matcher)
+result = results[0] if results else {"summary": {}, "documents": []}
+s = result.get("summary", {})
 
 print("\nPIPELINE:")
-print(f"  fetched={result.fetched}  errors={result.errors}  "
-      f"dropped_by_gate={result.dropped_by_gate}  kept={result.kept}")
-print(f"  gate_reasons={result.gate_reasons}")
+print(f"  fetched={s.get('fetched', 0)}  errors={s.get('errors', 0)}  "
+      f"dropped_by_gate={s.get('dropped_by_gate', 0)}  kept={s.get('kept', 0)}")
+print(f"  gate_reasons={s.get('gate_reasons', {})}")

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 # --- interaction config (§2.1) -------------------------------------------
 
@@ -101,8 +101,39 @@ class Job(BaseModel):
     source_type: Optional[str] = None
     source_region: Optional[str] = None
 
+    # Hunt mode presets — fill only knobs left at default (see _apply_hunt_mode):
+    #   "exhaustive" = deep dig (750 pages, depth 5) for meaty defense-caves;
+    #   "focused"    = probe-then-crawl (small budget, shallow, relevance-pruned).
+    hunt_mode: Optional[Literal["exhaustive", "focused"]] = None
+    # Careful mode ("quiet quiet"): force per-host concurrency 1 + slow delay + no UA disguise
+    # even for non-.gov hosts. None = auto by hostname suffix (CRAWLER_CAREFUL_HOSTS).
+    careful: Optional[bool] = None
+
     # Page interaction steps for JS rendering (§2.1).
     interaction: InteractionConfig | None = None
+
+    @model_validator(mode="after")
+    def _apply_hunt_mode(self) -> "Job":
+        """Expand hunt_mode into concrete knobs, but NEVER override a value the caller set
+        explicitly (model_fields_set) — presets are defaults, not mandates."""
+        if self.hunt_mode is None:
+            return self
+        s = self.model_fields_set
+        if self.hunt_mode == "exhaustive":
+            if "max_pages" not in s:
+                self.max_pages = 750
+            if "max_depth" not in s:
+                self.max_depth = 5
+        else:  # "focused" — probe-then-crawl: small, shallow, relevance-pruned
+            if "max_pages" not in s:
+                self.max_pages = 60
+            if "max_depth" not in s:
+                self.max_depth = 2
+            if "skip_irrelevant_seed_links" not in s:
+                self.skip_irrelevant_seed_links = True
+            if "link_relevance_keywords" not in s and self.keywords:
+                self.link_relevance_keywords = list(self.keywords)
+        return self
 
 
 # --- DOCUMENT sub-objects (§3.2) -----------------------------------------

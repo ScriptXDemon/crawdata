@@ -75,6 +75,8 @@ def run_job(job: Job, ingest_client, seed: Seed | None = None,
     result.fetched = hstats.fetched
     result.not_modified = hstats.not_modified
     result.errors = hstats.errors
+    result.errors_by_reason = hstats.errors_by_reason
+    result.trap_skipped = hstats.trap_skipped
 
     # Same-run content dedup: an SPA that bounces every sub-path back to the
     # same rendered shell (redirect-to-home, or a client route that never
