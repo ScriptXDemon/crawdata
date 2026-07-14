@@ -47,11 +47,9 @@ os.environ["CRAWLER_FORCE_PLAYWRIGHT"] = "1" if args.force_playwright else "0"
 from crawler.async_engine import run_batch_async
 from crawler.ingest_client import CollectingIngestClient
 from crawler.models import Job
-from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 
 seed = load_seed()
-matcher = build_matcher(seed)
 
 job = Job(
     job_id="watch_crawl_01",
@@ -73,7 +71,7 @@ print(f"  visible_browser={not args.headless}  slow_mo={args.slow_mo}ms  delay={
       f"force_playwright={args.force_playwright}  click_through={args.click_through}\n")
 print("(Note: async engine runs in background; live progress printing not available)\n")
 
-results = run_batch_async([job], forward=False, seed=seed, matcher=matcher)
+results = run_batch_async([job], forward=False, seed=seed)
 result = results[0] if results else {"summary": {}, "documents": []}
 s = result.get("summary", {})
 

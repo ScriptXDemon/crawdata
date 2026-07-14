@@ -16,8 +16,8 @@ from .dedup import CrawlHistory, classify
 from .fetcher import Fetcher
 from .harvest import harvest
 from .ingest_client import IngestOutcome
+from .keywords import get_corpus
 from .models import Document, Job
-from .resolver import build_matcher
 from .seed import Seed, load_seed
 
 
@@ -49,11 +49,11 @@ def _capture_defaults(seed: Seed) -> dict:
 
 
 def run_job(job: Job, ingest_client, seed: Seed | None = None,
-            history: CrawlHistory | None = None, matcher=None,
+            history: CrawlHistory | None = None, kp=None,
             on_fetch: Callable[[dict], None] | None = None,
             on_page: Callable[[dict], None] | None = None) -> JobResult:
     seed = seed or load_seed()
-    matcher = matcher or build_matcher(seed)
+    kp = kp if kp is not None else get_corpus()
     own_history = history is None
     history = history or CrawlHistory()
     caps = _capture_defaults(seed)
@@ -84,8 +84,8 @@ def run_job(job: Job, ingest_client, seed: Seed | None = None,
 
     for idx, page in enumerate(pages):
         t_start = time.perf_counter()
-        # Cheap core build (text + entities + metadata) — no assets yet.
-        doc = extract.build_document(job, page, seed, matcher, fetcher, enrich=False)
+        # Cheap core build (text + metadata) — no assets yet.
+        doc = extract.build_document(job, page, seed, fetcher, enrich=False)
         if doc is None:
             result.bump_reason("no_main_text")
             if on_page:
@@ -95,8 +95,7 @@ def run_job(job: Job, ingest_client, seed: Seed | None = None,
             continue
 
         # Stage 2 — mechanical gate.
-        g = gate.evaluate(job, doc.title, doc.main_text, doc.entities_detected,
-                          doc.published_at)
+        g = gate.evaluate(job, doc.title, doc.main_text, doc.published_at, kp)
         result.bump_reason(g.reason)
         if not g.keep:
             result.dropped_by_gate += 1
@@ -158,10 +157,10 @@ def run_job(job: Job, ingest_client, seed: Seed | None = None,
 def run_batch(jobs: list[Job], ingest_client, seed: Seed | None = None,
               history: CrawlHistory | None = None) -> list[JobResult]:
     seed = seed or load_seed()
-    matcher = build_matcher(seed)
+    kp = get_corpus()
     own_history = history is None
     history = history or CrawlHistory()
-    results = [run_job(j, ingest_client, seed, history, matcher) for j in jobs]
+    results = [run_job(j, ingest_client, seed, history, kp) for j in jobs]
     if own_history:
         history.close()
     return results

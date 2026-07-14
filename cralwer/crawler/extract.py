@@ -1,12 +1,11 @@
 """Stage 3 — EXTRACT. Turn a kept page into one ``document`` bundle (§3).
 
 ``build_document`` assembles the source object (clean main_text, content_hash,
-images, PDF attachments, screenshot, tables, entity resolution, time signals).
-``document_tags`` then attaches flat informational tags (stream, detected
-competitor/products/countries/tech domains) derived from what the resolver
-already found — it does NOT construct separately-typed records; deep record
-classification (tender/partnership/geo_footprint/innovation/company_event/
-competitive_signal) is Layer 2's job, operating on the raw text + tags.
+images, PDF attachments, screenshot, tables, time signals). It does NOT resolve
+entities or construct separately-typed records; all deep processing (entity
+resolution, record classification into tender/partnership/geo_footprint/
+innovation/company_event/competitive_signal) is Layer 2's job, operating on the
+raw text handed over here.
 """
 from __future__ import annotations
 
@@ -14,12 +13,11 @@ import re
 import uuid
 
 from . import images as images_mod
-from . import pdfextract, resolver, screenshot, sources, textextract, translate
+from . import pdfextract, screenshot, sources, textextract, translate
 from .extractutil import parse_date
 from .fetcher import Fetcher
 from .harvest import HarvestedPage
 from .models import Document, Job, Table
-from .resolver import _Matcher
 from .seed import Seed
 
 
@@ -44,10 +42,10 @@ def _strip_nav_footer(text: str, max_menu_words: int = 4) -> str:
 
 
 # --- document assembly ---------------------------------------------------
-def build_document(job: Job, page: HarvestedPage, seed: Seed, matcher: _Matcher,
+def build_document(job: Job, page: HarvestedPage, seed: Seed,
                    fetcher: Fetcher, enrich: bool = True) -> Document | None:
     """Assemble the document. With ``enrich=False`` it stops after text +
-    entities + metadata (cheap) so the gate can decide before we spend effort on
+    metadata (cheap) so the gate can decide before we spend effort on
     images/PDF/screenshot; call ``enrich_assets`` afterwards on kept docs."""
     res = page.fetch
     html = res.text_html or ""
@@ -81,7 +79,6 @@ def build_document(job: Job, page: HarvestedPage, seed: Seed, matcher: _Matcher,
     published_iso, precision = parse_date(meta.get("published_raw") or res.published_hint)
 
     src = sources.resolve_source(res.url, seed, job)
-    detected = resolver.resolve(body_text, title, seed, matcher)
     title = _clean_title(title, src)
 
     doc = Document(
@@ -105,10 +102,8 @@ def build_document(job: Job, page: HarvestedPage, seed: Seed, matcher: _Matcher,
         html=html,
         summary=textextract.summary(body_text),
         tables=[Table(**t) for t in tables],
-        entities_detected=detected,
         document_id="doc_" + uuid.uuid4().hex[:12],
     )
-    _apply_detection_tags(job, doc, seed)
 
     if enrich:
         enrich_assets(job, doc, page, fetcher)
@@ -124,9 +119,15 @@ def enrich_assets(job: Job, doc: Document, page: HarvestedPage, fetcher: Fetcher
     from . import storage
     from .models import Attachment, Screenshot
 
+    # Referer + the render's cookies let a WAF-protected asset host (Akamai) see the same
+    # session that loaded the page — replayed on the 403 bypass ladder (curl_cffi/CamoFox).
+    referer = res.final_url or res.url
+    cookies = res.cookies
+
     # Images (kept only for capture types that ask for them).
     if "images" in job.capture and page.image_candidates:
-        doc.images = images_mod.select_and_store(page.image_candidates, fetcher)
+        doc.images = images_mod.select_and_store(page.image_candidates, fetcher,
+                                                 referer=referer, cookies=cookies)
 
     # Media (video/audio) — metadata only, never downloaded (§4).
     if "media" in job.capture and page.media_candidates:
@@ -141,7 +142,7 @@ def enrich_assets(job: Job, doc: Document, page: HarvestedPage, fetcher: Fetcher
         from .models import Table
         max_pdfs = int(os.environ.get("CRAWLER_MAX_PDFS_PER_PAGE", "3"))
         atts, pdf_tables = pdfextract.fetch_attachments_and_tables(
-            page.pdf_links[:max_pdfs], fetcher)
+            page.pdf_links[:max_pdfs], fetcher, referer=referer, cookies=cookies)
         doc.attachments.extend(atts)
         for t in pdf_tables:
             try:
@@ -163,39 +164,6 @@ def enrich_assets(job: Job, doc: Document, page: HarvestedPage, fetcher: Fetcher
             png = screenshot.capture(res.url, html, doc.title, doc.main_text, job.render_js)
         sp = storage.put(png, kind="shot", ext="png")
         doc.screenshot = Screenshot(storage_path=sp, captured_at=res.fetched_at)
-
-
-# --- detection tags (informational, not record classification) -----------
-def _main_competitor(job: Job, detected, seed: Seed) -> str | None:
-    if job.target_entity and job.target_entity in seed.entities:
-        if seed.entities[job.target_entity].kind in ("competitor", "anchor"):
-            return job.target_entity
-    comps = [c for c in resolver.competitors(detected)
-             if seed.entities.get(c) and seed.entities[c].kind != "anchor"]
-    return comps[0] if comps else (resolver.competitors(detected) or [None])[0]
-
-
-def _stream(job: Job, comp: str | None, detected) -> str:
-    if job.job_type == "tender":
-        return "tender"
-    if comp and job.target_entity:
-        return "competitive"
-    if resolver.tech_domains(detected):
-        return "technology"
-    return "market"
-
-
-def _apply_detection_tags(job: Job, doc: Document, seed: Seed) -> None:
-    """Flat, informational summary of doc.entities_detected — reused by L2 as
-    a shortcut. Not a classification of the page into a typed record."""
-    detected = doc.entities_detected
-    comp = _main_competitor(job, detected, seed)
-    doc.stream = _stream(job, comp, detected)
-    doc.detected_competitor = comp
-    doc.detected_products = resolver.products(detected)
-    doc.detected_countries = resolver.countries(detected)
-    doc.detected_tech_domains = resolver.tech_domains(detected)
-    doc.detected_unknown_companies = [d.surface for d in detected if d.type == "unknown_company"]
 
 
 def _clean_title(title: str, source) -> str:

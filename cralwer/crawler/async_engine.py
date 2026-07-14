@@ -15,7 +15,8 @@ atomic, so almost no locks are needed.
 The per-page work replicates pipeline.run_job step-for-step (gate → self-dedup → same-run hash
 dedup → enrich → send), so emitted docs + counters match the sync engine; only the driver changed.
 
-Opt in with ``CRAWLER_ASYNC_ENGINE=1``; ``crawler_api.app`` routes /v1/crawl/batch here.
+This is the sole production engine — ``crawler_api.app`` routes both /v1/crawl and
+/v1/crawl/batch here; the sync ``pipeline.run_job`` survives only for tests.
 """
 from __future__ import annotations
 
@@ -28,7 +29,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-from . import errors, extract, gate, interaction_async, parse
+from . import camofox_client, errors, extract, gate, interaction_async, parse
 from .canonicalize import canonicalize_url
 from .dedup import CrawlHistory, classify
 from .fetcher import (
@@ -36,13 +37,35 @@ from .fetcher import (
 )
 from .harvest import HarvestedPage, _allowed_offsite
 from .ingest_client import CollectingIngestClient, HttpIngestClient
+from .keywords import get_corpus
 from .models import Job
-from .resolver import build_matcher
 from .robots import RobotsCache
 from .seed import Seed, load_seed
 from . import config
 
 log = logging.getLogger("async_engine")
+
+# Cross-thread STOP signal. The batch runs in its own daemon thread (run_batch_async);
+# the API's stop endpoint runs on a different request thread and sets this Event. The
+# engine's drain/worker loops poll it and tear the crawl down gracefully (like the
+# wall-clock timeout). A threading.Event is safe to set from any thread and read on the
+# loop thread without a lock. ponytail: one global flag — there's one shared pool /
+# one batch at a time (the /v1/crawl/batch handler is single-flight), so no per-batch id needed.
+_STOP = threading.Event()
+
+
+def request_stop() -> None:
+    """Signal the running crawl to halt (C1 live + C3 CamoFox both stop — the engine
+    drives all tiers)."""
+    _STOP.set()
+
+
+def clear_stop() -> None:
+    _STOP.clear()
+
+
+def stop_requested() -> bool:
+    return _STOP.is_set()
 
 
 def _env_int(k: str, d: int) -> int:
@@ -232,10 +255,10 @@ class WorkItem:
 class JobCtx:
     """Per-job state carried on every WorkItem. Mutated ONLY on the loop thread."""
 
-    def __init__(self, job: Job, seed: Seed, matcher, forward: bool, l2_url: str | None) -> None:
+    def __init__(self, job: Job, seed: Seed, kp, forward: bool, l2_url: str | None) -> None:
         self.job = job
         self.seed = seed
-        self.matcher = matcher
+        self.kp = kp                    # global keyword-corpus trie (keep-gate)
 
         # Forwarders exactly like crawler_api.app._run: default ingest + optional L2.
         forwarders: list[HttpIngestClient] = []
@@ -261,6 +284,17 @@ class JobCtx:
         self.seen_hashes: set[str] = set()
         self.budget_used = 0
         self.done = False
+
+        # Site-level keyword gating (§A): probe depth 0..probe_depth against the corpus. Pages
+        # in that window are BUFFERED (not sent) until one hits >=1 keyword, which UNLOCKS the
+        # whole site — the buffer is flushed and every page after is kept with no keyword check.
+        # If the window closes with zero hits the buffered pages are discarded and the site is
+        # counted as skipped. Bounds the buffer so a huge fan-out before the first hit can't grow
+        # unbounded. When there's no corpus, the gate fails open (keep-all) and unlock is immediate.
+        self.probe_depth = _env_int("CRAWLER_SITE_PROBE_DEPTH", 2)
+        self.probe_max_buffer = _env_int("CRAWLER_SITE_PROBE_MAX_BUFFER", 200)
+        self.unlocked = (kp is None or len(kp) == 0)   # no corpus → every site is on-topic
+        self.buffer: list = []                          # (doc, hp) tuples awaiting unlock
 
         # counters (mirror pipeline.JobResult → the API summary shape)
         self.fetched = self.kept = self.sent = self.accepted = self.rejected = self.errors = 0
@@ -480,22 +514,35 @@ async def _render_page(tab, url: str, timeout_ms: int, capture: list[str],
     except Exception:
         final_url = nav_url
 
+    # Harvest the render's cookies so a protected asset download (Akamai) can replay the
+    # page session that just passed the WAF. Best-effort; plain data crosses to to_thread.
+    cookies = None
+    try:
+        cookies = await tab.context.cookies()
+    except Exception:
+        cookies = None
+
     return FetchResult(url=url, final_url=final_url, status=status, content_type="text/html",
                        kind="html", text_html=html, inner_text=inner_text, screenshot_png=shot,
-                       tier=1, fetched_at=_now_iso(), reason=reason, retry_after_s=retry_after)
+                       tier=1, fetched_at=_now_iso(), reason=reason, retry_after_s=retry_after,
+                       cookies=cookies)
 
 
 # ── the engine ───────────────────────────────────────────────────────────────
 
 class AsyncEngine:
-    def __init__(self, W: int, T: int, host: HostLimiter, seed: Seed, matcher,
-                 robots: RobotsCache | None = None) -> None:
+    def __init__(self, W: int, T: int, host: HostLimiter, seed: Seed, kp,
+                 robots: RobotsCache | None = None, wayback: bool = False) -> None:
         self.W = W
         self.T = T
         self.host = host
         self.seed = seed
-        self.matcher = matcher
+        self.kp = kp                    # global keyword-corpus trie (keep-gate)
         self.robots = robots
+        # C2 gate: the Wayback archival fallback only runs when the operator turns it
+        # ON (dashboard toggle). OFF => a blocked page is only ever recovered live by
+        # C3 (CamoFox), never from the archive.
+        self.wayback = wayback
         self._pw = None
         self.browsers: list[tuple] = []     # (browser, context)
         self.tabs: list = []
@@ -544,7 +591,7 @@ class AsyncEngine:
     async def run(self, jobs: list[Job], forward: bool, l2_url: str | None) -> list[JobCtx]:
         self.history = CrawlHistory()                       # bound to this (engine) thread
         self.frontier = asyncio.Queue()
-        ctxs = [JobCtx(j, self.seed, self.matcher, forward, l2_url) for j in jobs]
+        ctxs = [JobCtx(j, self.seed, self.kp, forward, l2_url) for j in jobs]
         for c in ctxs:
             for s in c.job.seed_urls:
                 cu = canonicalize_url(s)
@@ -568,6 +615,15 @@ class AsyncEngine:
         for w in workers:
             w.cancel()
         await asyncio.gather(*workers, return_exceptions=True)
+        # Any site that never unlocked (zero corpus hits through the probe window) — discard its
+        # buffered probe pages and count them as dropped, so the summary is truthful.
+        for c in ctxs:
+            if not c.unlocked and c.buffer:
+                c.dropped_by_gate += len(c.buffer)
+                c.bump_reason("site_no_keyword_match")
+                log.info("site_dropped job=%s probe_pages=%d (no corpus hit in depth<=%d)",
+                         c.job.job_id, len(c.buffer), c.probe_depth)
+                c.buffer = []
         self.history.close()
         return ctxs
 
@@ -578,6 +634,9 @@ class AsyncEngine:
         loop = asyncio.get_running_loop()
         while True:
             await asyncio.sleep(0.5)
+            if _STOP.is_set():                      # operator hit STOP → halt now
+                log.warning("stop requested — terminating batch")
+                return
             if (self.frontier.qsize() == 0 and self._inflight_items == 0
                     and self._pending_retries == 0):
                 return
@@ -590,6 +649,8 @@ class AsyncEngine:
             item = await self.frontier.get()
             self._inflight_items += 1
             try:
+                if _STOP.is_set():
+                    continue                # STOP: drop the item unprocessed so the frontier drains fast
                 tab = await self._process(item, tab)
             except Exception:
                 log.exception("worker page failed: %s", getattr(item, "url", "?"))
@@ -633,12 +694,11 @@ class AsyncEngine:
             hp = HarvestedPage(url=url, depth=1, fetch=fr, pdf_links=[],
                                image_candidates=[], media_candidates=[])
             doc = await asyncio.to_thread(extract.build_document, ctx.job, hp, ctx.seed,
-                                          ctx.matcher, ctx.fetcher, False)
+                                          ctx.fetcher, False)
             if doc is None:
                 ctx.bump_reason("no_main_text")
                 continue
-            g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.entities_detected,
-                              doc.published_at)
+            g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.published_at, ctx.kp)
             ctx.bump_reason(g.reason)
             if not g.keep:
                 ctx.dropped_by_gate += 1
@@ -696,12 +756,11 @@ class AsyncEngine:
         hp = HarvestedPage(url=item.url, depth=item.depth, fetch=fr, pdf_links=[],
                            image_candidates=[], media_candidates=[])
         doc = await asyncio.to_thread(extract.build_document, ctx.job, hp, ctx.seed,
-                                      ctx.matcher, ctx.fetcher, False)
+                                      ctx.fetcher, False)
         if doc is None:
             ctx.bump_reason("no_main_text")
             return False
-        g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.entities_detected,
-                          doc.published_at)
+        g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.published_at, ctx.kp)
         ctx.bump_reason(g.reason)
         if not g.keep:
             ctx.dropped_by_gate += 1
@@ -717,6 +776,94 @@ class AsyncEngine:
         ctx.rejected += 0 if outcome.accepted else 1
         log.info("wayback_fallback job=%s url=%s snapshot=%s",
                  ctx.job.job_id, item.url, snap["timestamp"])
+        return True
+
+    async def _try_camofox_fallback(self, item: WorkItem, host: str) -> bool:
+        """Blocked host → C3: stealth-render THIS url through CamoFox and run it through
+        the SAME build_document → gate → dedup → enrich → send path as a live fetch — so
+        a C3 doc captures everything C1 does (html, text, images, screenshot, PDF, media/
+        video links), per the job's capture list. Returns True if a doc was SENT. No-op
+        (False) unless CAMOFOX_ENABLED=1. Budget is already reserved at dequeue."""
+        if not camofox_client.enabled():
+            return False
+        ctx = item.ctx
+        # Stealth render of a heavy page is inherently slower than a normal fetch — give C3
+        # its own generous timeout (not the seed's ~30s httpx budget), tunable via env.
+        timeout_s = _env_float("CRAWLER_CAMOFOX_TIMEOUT_S", 90.0)
+        snap = await asyncio.to_thread(camofox_client.render, item.url, timeout_s)
+        if not snap:
+            # Canonicalization strips www; many gov/mil apexes only serve on www — retry there
+            # (mirrors the main render path's www fallback).
+            www = _with_www(item.url)
+            if www != item.url:
+                snap = await asyncio.to_thread(camofox_client.render, www, timeout_s)
+        if not snap:
+            return False
+
+        final_url = snap.get("final_url") or item.url
+        real_html = (snap.get("html") or "").strip()
+        if real_html:
+            # Real rendered HTML → build_document extracts main_text/title/meta/tables and
+            # enrich_assets pulls images/PDFs/media exactly like a live page.
+            fr = FetchResult(url=item.url, final_url=final_url, status=200,
+                             content_type="text/html", kind="html", text_html=real_html,
+                             screenshot_png=snap.get("screenshot"), tier=1,
+                             fetched_at=_now_iso(), from_fixture=True)
+        else:
+            # No HTML (e.g. no CAMOFOX_API_KEY) → fall back to the aria snapshot as body.
+            wrap = f"<html><head><title>{item.url}</title></head><body></body></html>"
+            fr = FetchResult(url=item.url, final_url=final_url, status=200,
+                             content_type="text/html", kind="html", text_html=wrap,
+                             inner_text=snap["text"], screenshot_png=snap.get("screenshot"),
+                             tier=1, fetched_at=_now_iso(), from_fixture=True)
+
+        # Capture candidates from the rendered HTML, per the job's capture list (mirrors _process).
+        base = final_url
+        pdf_links: list[str] = []
+        image_candidates: list[dict] = []
+        media_candidates: list[dict] = []
+        if fr.is_html() and fr.text_html:
+            try:
+                if "pdf" in ctx.job.capture:
+                    pdf_links = parse.extract_pdf_links(fr.text_html, base)
+                if "images" in ctx.job.capture:
+                    image_candidates = parse.extract_images(fr.text_html, base)
+                if "media" in ctx.job.capture:
+                    media_candidates = parse.extract_media_links(fr.text_html, base)
+            except Exception:
+                ctx.bump_error(errors.PARSE_ERROR)
+        hp = HarvestedPage(url=item.url, depth=item.depth, fetch=fr, pdf_links=pdf_links,
+                           image_candidates=image_candidates, media_candidates=media_candidates)
+
+        # Enqueue child links so a C3-served site keeps crawling into its max_pages budget —
+        # without this, a fully WAF-blocked site (served entirely by CamoFox) stops at the seed.
+        self._enqueue_links(ctx, fr, item.url, item.depth)
+
+        doc = await asyncio.to_thread(extract.build_document, ctx.job, hp, ctx.seed,
+                                      ctx.fetcher, False)
+        if doc is None:
+            ctx.bump_reason("no_main_text")
+            return False
+        g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.published_at, ctx.kp)
+        ctx.bump_reason(g.reason)
+        if not g.keep:
+            ctx.dropped_by_gate += 1
+            return False
+        if doc.content_hash in ctx.seen_hashes:
+            ctx.skipped_duplicate += 1
+            return False
+        ctx.seen_hashes.add(doc.content_hash)
+        ctx.kept += 1
+        # Store the expensive assets (images/PDF/screenshot; media recorded as links) — same
+        # enrich step C1 uses. The screenshot PNG captured above is reused (no re-render).
+        await asyncio.to_thread(extract.enrich_assets, ctx.job, doc, hp, ctx.fetcher)
+        outcome = await asyncio.to_thread(ctx.ingest.send, doc)
+        ctx.sent += 1
+        ctx.accepted += 1 if outcome.accepted else 0
+        ctx.rejected += 0 if outcome.accepted else 1
+        log.info("camofox_fallback job=%s url=%s chars=%d imgs=%d pdfs=%d media=%d",
+                 ctx.job.job_id, item.url, len(doc.main_text),
+                 len(image_candidates), len(pdf_links), len(media_candidates))
         return True
 
     async def _on_failure(self, item: WorkItem, fr: FetchResult, tab, host: str):
@@ -766,6 +913,12 @@ class AsyncEngine:
             # item links instead of the blocked HTML. Only when there's no feed (or
             # it yields nothing) do we tag needs_network_path for the proxy/API plan.
             if status and 400 <= status < 500:
+                # C3 first: CamoFox stealth engine renders the LIVE page with engine-level
+                # fingerprint spoofing — the freshest content if the WAF can be bypassed.
+                # No-op unless CAMOFOX_ENABLED=1, so the ladder falls through when C3 is off.
+                if await self._try_camofox_fallback(item, host):
+                    ctx.bump_error(errors.SERVED_BY_CAMOFOX)   # bypassed the block, not a failure
+                    return None, tab
                 # WAF-free content ladder — try the cheapest/fullest path that lands:
                 # 1st: official JSON API (DVIDS) — sanctioned, freshest, full bodies.
                 api_sent = await self._try_api_fallback(item, host)
@@ -773,8 +926,10 @@ class AsyncEngine:
                     ctx.bump_error(errors.NEEDS_NETWORK_PATH)  # record the block; API was the workaround
                     log.info("api_fallback job=%s host=%s docs=%d", ctx.job.job_id, host, api_sent)
                     return None, tab
-                # 2nd: Wayback Machine — this exact page's real content from archive.org.
-                if await self._try_wayback_fallback(item, host):
+                # 2nd: Wayback Machine (C2) — this exact page's real content from archive.org.
+                # Only when the operator turned C2 ON (dashboard Wayback toggle); otherwise a
+                # block is recovered live by C3 only, never from the archive.
+                if self.wayback and await self._try_wayback_fallback(item, host):
                     ctx.bump_error(errors.SERVED_FROM_ARCHIVE)  # routed around the block, not a failure
                     return None, tab
                 # 3rd: RSS/Atom feed — broader fallback (summaries of the source's items).
@@ -825,6 +980,39 @@ class AsyncEngine:
                  ctx.job.job_id, item.url, status, reason)
         return fr, tab
 
+    def _enqueue_links(self, ctx: "JobCtx", fr: FetchResult, url: str, depth: int) -> None:
+        """Extract child links from a fetched page and enqueue them within the depth/domain
+        budget (loop thread; parse is cheap CPU). Shared by the live C1 path AND the C3 CamoFox
+        fallback — WITHOUT this a site served entirely by C3 would dead-end at the seed page and
+        never reach its max_pages budget, since only the frontier drives the crawl."""
+        base = fr.final_url or url
+        if not (fr.is_html() and fr.text_html and depth < ctx.job.max_depth and ctx.has_budget()):
+            return
+        try:
+            max_qv = _env_int("CRAWLER_MAX_QUERY_VARIANTS", 20)
+            for link in parse.extract_links(fr.text_html, base):
+                cl = canonicalize_url(link)
+                if cl in ctx.seen:
+                    continue
+                if ctx.job.same_domain_only and not _allowed_offsite(cl, url, ctx.seed_domains):
+                    continue
+                # Trap guards: URL-shape (loop/length) + calendar/facet query explosion.
+                if errors.looks_like_trap(cl):
+                    ctx.trap_skipped += 1
+                    continue
+                qp = urlsplit(cl)
+                if qp.query:
+                    key = f"{qp.hostname}{qp.path}"
+                    n = ctx.query_variants.get(key, 0) + 1
+                    if n > max_qv:
+                        ctx.trap_skipped += 1
+                        continue
+                    ctx.query_variants[key] = n
+                ctx.seen.add(cl)
+                self.frontier.put_nowait(WorkItem(cl, depth + 1, ctx))
+        except Exception:
+            ctx.bump_error(errors.PARSE_ERROR)
+
     async def _process(self, item: WorkItem, tab):
         ctx = item.ctx
         url = item.url
@@ -852,6 +1040,18 @@ class AsyncEngine:
             except Exception:
                 robots_decision = "allow"
             if robots_decision == "deny":
+                # robots.txt forbids the live fetch — don't just drop it: route the URL
+                # through C3 (CamoFox), which the operator opted into for exactly these
+                # hosts, then C2 (Wayback) if enabled. Only if both come up empty do we
+                # record the robots block and skip.
+                if await self._try_camofox_fallback(item, host):
+                    ctx.bump_error(errors.SERVED_BY_CAMOFOX)
+                    self._audit(url, host, None, errors.SERVED_BY_CAMOFOX, robots_decision)
+                    return tab
+                if self.wayback and await self._try_wayback_fallback(item, host):
+                    ctx.bump_error(errors.SERVED_FROM_ARCHIVE)
+                    self._audit(url, host, None, errors.SERVED_FROM_ARCHIVE, robots_decision)
+                    return tab
                 ctx.bump_error(errors.ROBOTS)
                 self._audit(url, host, None, errors.ROBOTS, robots_decision)
                 return tab
@@ -876,32 +1076,7 @@ class AsyncEngine:
         self.host_fails[host] = 0        # a success clears the host's breaker count
 
         # Enqueue child links within depth/domain budget (loop thread; parse is cheap CPU).
-        base = fr.final_url or url
-        if fr.is_html() and fr.text_html and item.depth < ctx.job.max_depth and ctx.has_budget():
-            try:
-                max_qv = _env_int("CRAWLER_MAX_QUERY_VARIANTS", 20)
-                for link in parse.extract_links(fr.text_html, base):
-                    cl = canonicalize_url(link)
-                    if cl in ctx.seen:
-                        continue
-                    if ctx.job.same_domain_only and not _allowed_offsite(cl, url, ctx.seed_domains):
-                        continue
-                    # Trap guards: URL-shape (loop/length) + calendar/facet query explosion.
-                    if errors.looks_like_trap(cl):
-                        ctx.trap_skipped += 1
-                        continue
-                    qp = urlsplit(cl)
-                    if qp.query:
-                        key = f"{qp.hostname}{qp.path}"
-                        n = ctx.query_variants.get(key, 0) + 1
-                        if n > max_qv:
-                            ctx.trap_skipped += 1
-                            continue
-                        ctx.query_variants[key] = n
-                    ctx.seen.add(cl)
-                    self.frontier.put_nowait(WorkItem(cl, item.depth + 1, ctx))
-            except Exception:
-                ctx.bump_error(errors.PARSE_ERROR)
+        self._enqueue_links(ctx, fr, url, item.depth)
 
         # Capture candidates → HarvestedPage (mirrors harvest.py:161-166).
         pdf_links: list[str] = []
@@ -922,18 +1097,53 @@ class AsyncEngine:
 
         # build_document (CPU + possible translate) off-loop; plain data only.
         doc = await asyncio.to_thread(extract.build_document, ctx.job, hp, ctx.seed,
-                                      ctx.matcher, ctx.fetcher, False)
+                                      ctx.fetcher, False)
         if doc is None:
             ctx.bump_reason("no_main_text")
             return tab
 
-        g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.entities_detected, doc.published_at)
-        ctx.bump_reason(g.reason)
-        if not g.keep:
+        g = gate.evaluate(ctx.job, doc.title, doc.main_text, doc.published_at, ctx.kp)
+
+        # Site-level gate (§A). Freshness always wins (a stale page is dropped, never buffered).
+        if g.reason == "stale_beyond_freshness_days":
+            ctx.bump_reason(g.reason)
             ctx.dropped_by_gate += 1
             return tab
 
-        # Self-dedup (§7A) — sqlite on the loop thread, no await between get/upsert.
+        if ctx.unlocked:
+            # Site already proven relevant → keep every page, no keyword check.
+            ctx.bump_reason("site_unlocked")
+            await self._finalize(ctx, doc, hp, fr, url)
+            return tab
+
+        if g.keep:
+            # First corpus hit unlocks the whole site: flush the buffered depth-0..N pages,
+            # then keep this one too.
+            ctx.unlocked = True
+            ctx.bump_reason("site_unlock_" + g.reason)
+            log.info("site_unlocked job=%s url=%s buffered=%d",
+                     ctx.job.job_id, url, len(ctx.buffer))
+            await self._flush_buffer(ctx)
+            await self._finalize(ctx, doc, hp, fr, url)
+            return tab
+
+        # Still locked, no hit on this page. Buffer it if we're inside the probe window and
+        # under the buffer cap; otherwise drop it (deep page reached before any shallow match,
+        # or the site looks irrelevant after probe_max_buffer shallow pages with zero hits).
+        if item.depth <= ctx.probe_depth and len(ctx.buffer) < ctx.probe_max_buffer:
+            ctx.buffer.append((doc, hp, fr, url))
+            ctx.bump_reason("site_probing")
+        else:
+            if len(ctx.buffer) >= ctx.probe_max_buffer:
+                log.info("site_probe_buffer_full job=%s cap=%d — dropping further probe pages",
+                         ctx.job.job_id, ctx.probe_max_buffer)
+            ctx.bump_reason("no_keyword_match")
+            ctx.dropped_by_gate += 1
+        return tab
+
+    async def _finalize(self, ctx: "JobCtx", doc, hp, fr, url) -> None:
+        """Dedup → enrich → send tail shared by the live _process path and the buffer flush.
+        Runs entirely on the loop thread except the to_thread enrich/send (plain data only)."""
         stored = self.history.get(url)
         verdict = classify(stored, status=fr.status, content_hash=doc.content_hash)
         self.history.upsert(url, content_hash=doc.content_hash, etag=fr.etag,
@@ -941,10 +1151,10 @@ class AsyncEngine:
                             fetched_at=fr.fetched_at, js_heavy=ctx.job.render_js)
         if verdict == "unchanged":
             ctx.skipped_unchanged += 1
-            return tab
+            return
         if doc.content_hash in ctx.seen_hashes:
             ctx.skipped_duplicate += 1
-            return tab
+            return
         ctx.seen_hashes.add(doc.content_hash)
 
         ctx.kept += 1
@@ -955,7 +1165,13 @@ class AsyncEngine:
             ctx.accepted += 1
         else:
             ctx.rejected += 1
-        return tab
+
+    async def _flush_buffer(self, ctx: "JobCtx") -> None:
+        """Send every buffered probe page (called once, on unlock)."""
+        buffered = ctx.buffer
+        ctx.buffer = []
+        for doc, hp, fr, url in buffered:
+            await self._finalize(ctx, doc, hp, fr, url)
 
     async def _recycle(self, tab):
         """A tab crashed — close it and hand back a fresh page, relaunching a browser if needed."""
@@ -1023,25 +1239,58 @@ class AsyncEngine:
 
 # ── sync bridge (the FastAPI endpoint is sync) ───────────────────────────────
 
+def _adaptive_host_concurrency(jobs: list[Job], total_tabs: int) -> int:
+    """Per-host concurrent-tab cap, scaled to the batch so a SMALL batch still saturates
+    the pool. The pool is always ``total_tabs`` tabs, but each host is capped so 96 tabs
+    never hammer one site — with a fixed low cap (3), a 1-job single-domain crawl leaves
+    ~93 tabs idle. So: spread the pool evenly across the batch's DISTINCT seed hosts, i.e.
+    cap ≈ total_tabs / distinct_hosts, clamped to [floor, ceiling].
+
+    Result: 1 host → cap ~= the whole pool (deep single-domain crawl fans out wide);
+    32 hosts → cap back down to the polite floor. .gov/.mil careful hosts still override
+    to concurrency 1 inside HostLimiter regardless of this cap — politeness there is
+    non-negotiable. Overridable end-to-end with CRAWLER_HOST_CONCURRENCY (explicit set wins).
+    ponytail: distinct SEED hosts, not live frontier hosts — a same_domain_only crawl stays
+    on its seed host, and cross-host batches list their hosts up front, so this is exact
+    for the common case and a safe over-estimate otherwise.
+    """
+    explicit = os.environ.get("CRAWLER_HOST_CONCURRENCY")
+    if explicit:                        # operator pinned it → respect the pin
+        return max(1, int(explicit))
+    hosts = {
+        (urlsplit(u).hostname or "").lower()
+        for j in jobs for u in j.seed_urls if (urlsplit(u).hostname or "")
+    }
+    n = max(1, len(hosts))
+    floor = _env_int("CRAWLER_HOST_CONCURRENCY_FLOOR", 3)
+    ceil = _env_int("CRAWLER_HOST_CONCURRENCY_CEIL", 24)
+    return max(floor, min(ceil, total_tabs // n))
+
+
 def run_batch_async(jobs: list[Job], *, forward: bool, l2_url: str | None,
-                    seed: Seed | None = None, matcher=None) -> list[dict]:
+                    seed: Seed | None = None, kp=None, wayback: bool = False) -> list[dict]:
     """Run the whole batch through ONE shared browser pool. Returns per-job dicts matching
     crawler_api.app._run: {job_id, summary{...}, documents}. Runs in a dedicated thread that
-    owns its event loop, so it never touches FastAPI's anyio threadpool."""
+    owns its event loop, so it never touches FastAPI's anyio threadpool.
+
+    ``wayback`` gates the C2 archival fallback (dashboard toggle) — OFF by default, so a
+    blocked page is only recovered live by C1/C3."""
     seed = seed or load_seed()
-    matcher = matcher or build_matcher(seed)
+    kp = kp if kp is not None else get_corpus()   # global keep-gate corpus (built once)
+    _STOP.clear()                                  # fresh batch — clear any stale stop signal
     box: dict = {}
 
     def _thread() -> None:
         async def _main() -> None:
             caps = seed.capture_defaults
             robots = RobotsCache(user_agent=caps["user_agent"]) if caps.get("respect_robots_txt", True) else None
-            host = HostLimiter(_env_int("CRAWLER_HOST_CONCURRENCY", 3),
+            W = _env_int("CRAWLER_BROWSERS", 8)
+            T = _env_int("CRAWLER_TABS_PER_BROWSER", 12)
+            host_conc = _adaptive_host_concurrency(jobs, W * T)
+            host = HostLimiter(host_conc,
                                _env_float("CRAWLER_HOST_DELAY", 1.0), robots,
                                base_timeout_s=float(caps.get("timeout_seconds", 30)))
-            eng = AsyncEngine(_env_int("CRAWLER_BROWSERS", 8),
-                              _env_int("CRAWLER_TABS_PER_BROWSER", 12),
-                              host, seed, matcher, robots)
+            eng = AsyncEngine(W, T, host, seed, kp, robots, wayback=wayback)
             await eng.start()
             try:
                 ctxs = await eng.run(jobs, forward, l2_url)

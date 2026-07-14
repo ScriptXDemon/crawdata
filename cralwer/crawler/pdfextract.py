@@ -71,12 +71,15 @@ def _looks_like_pdf(data: bytes) -> bool:
     return b"%PDF" in data[:1024]
 
 
-def fetch_attachments_and_tables(pdf_urls: list[str], fetcher: Fetcher) -> tuple[list[Attachment], list[dict]]:
+def fetch_attachments_and_tables(pdf_urls: list[str], fetcher: Fetcher,
+                                 referer: str | None = None,
+                                 cookies: list | None = None) -> tuple[list[Attachment], list[dict]]:
     """Download several PDFs concurrently, store each, extract plain text AND structured
     tables (pdfplumber). Returns (attachments, tables); the caller merges tables onto
     Document.tables. Bytes that aren't actually a PDF (a .pdf URL that served HTML) are
-    dropped — only real PDFs become attachments."""
-    results = fetcher.fetch_assets(pdf_urls)
+    dropped — only real PDFs become attachments. ``referer``/``cookies`` feed the 403
+    bypass ladder for WAF-protected PDF hosts."""
+    results = fetcher.fetch_assets(pdf_urls, referer=referer, cookies=cookies)
     atts: list[Attachment] = []
     tables: list[dict] = []
     for res in results:

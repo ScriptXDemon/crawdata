@@ -16,7 +16,6 @@ from crawler.async_engine import run_batch_async
 from crawler.fetcher import Fetcher
 from crawler.ingest_client import CollectingIngestClient
 from crawler.models import Job
-from crawler.resolver import build_matcher
 from crawler.seed import load_seed
 
 URL = sys.argv[1] if len(sys.argv) > 1 else "https://example.com"
@@ -33,10 +32,9 @@ job = Job(
 )
 
 seed = load_seed()
-matcher = build_matcher(seed)
 
 print(f"LIVE crawling: {URL}\n")
-results = run_batch_async([job], forward=False, seed=seed, matcher=matcher)
+results = run_batch_async([job], forward=False, seed=seed)
 result = results[0] if results else {"summary": {}, "documents": []}
 s = result.get("summary", {})
 docs = result.get("documents", [])
@@ -66,9 +64,6 @@ print(f"  content_hash:  {doc.content_hash[:30]}...")
 print(f"  main_text:     {len(doc.main_text)} chars")
 print(f"  html:          {len(doc.html)} chars")
 print(f"  images kept:   {len(doc.images)}  | screenshot: {bool(doc.screenshot)}")
-print(f"  entities:      {[(e.surface, e.resolved_id, e.type) for e in doc.entities_detected][:8]}")
-print(f"  stream:        {doc.stream}  | competitor: {doc.detected_competitor}")
-print(f"  countries:     {doc.detected_countries}  | tech: {doc.detected_tech_domains}")
 print("\n  main_text preview:")
 print(textwrap.fill(doc.main_text[:600], width=92,
                     initial_indent="    ", subsequent_indent="    "))

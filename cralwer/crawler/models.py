@@ -170,16 +170,6 @@ class Table(BaseModel):
     rows: list[dict] = Field(default_factory=list)
 
 
-class EntityDetected(BaseModel):
-    """One resolved mention (seed alias match). Kept in full detail on the
-    document; ``stream``/``detected_*`` on ``Document`` are flat derived
-    summaries of this list, reused by L2 as a shortcut, not a replacement."""
-    surface: str
-    resolved_id: Optional[str] = None
-    type: str                         # competitor | product | country | tech_domain | unknown_company
-    confidence: float = 0.0
-
-
 class Document(BaseModel):
     url: str                                  # canonical, dedup key, REQUIRED
     content_hash: str                         # sha256 of main_text, REQUIRED
@@ -205,18 +195,9 @@ class Document(BaseModel):
     media: list[Media] = Field(default_factory=list)   # video/audio links (metadata only)
     screenshot: Optional[Screenshot] = None
     tables: list[Table] = Field(default_factory=list)
-    entities_detected: list[EntityDetected] = Field(default_factory=list)
-
-    # Informational detection tags (flat summaries of entities_detected),
-    # for L2's convenience — not a classification of the page into a typed
-    # record. L2 does its own deep processing on main_text/html.
-    stream: Optional[str] = None              # competitive | tender | market | technology
-    detected_competitor: Optional[str] = None
-    detected_products: list[str] = Field(default_factory=list)
-    detected_countries: list[str] = Field(default_factory=list)
-    detected_tech_domains: list[str] = Field(default_factory=list)
-    detected_unknown_companies: list[str] = Field(default_factory=list)
 
     # This bundle's own id (idempotency/logging). There are no sibling
     # records to link to — L1 sends exactly one bundle per kept page.
+    # Entity resolution + record classification are Layer 2's job, run on
+    # main_text/html; L1 no longer ships detection tags.
     document_id: Optional[str] = None

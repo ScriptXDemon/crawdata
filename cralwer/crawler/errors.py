@@ -33,6 +33,9 @@ NEEDS_NETWORK_PATH = "needs_network_path"
 # archived copy instead — a SUCCESS via a WAF-free path, tagged so the dashboard
 # shows "routed around the block" distinctly from a raw fetch.
 SERVED_FROM_ARCHIVE = "served_from_archive"
+# Live host was WAF-blocked but the CamoFox stealth engine (C3) rendered it —
+# a SUCCESS via engine-level fingerprint spoofing, distinct from a raw fetch.
+SERVED_BY_CAMOFOX = "served_by_camofox"
 OTHER = "other"
 
 

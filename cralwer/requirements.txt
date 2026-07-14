@@ -10,6 +10,8 @@ pypdf==5.1.0                  # PDF text extraction (attachments)
 pdfplumber>=0.11              # structured table extraction from spec-heavy tender PDFs
 flashtext==2.7                # fast trie-based keyword matching (entity/product aliases)
 tldextract==5.1.3             # public-suffix-aware eTLD+1 (stable source_id)
+curl_cffi==0.7.4              # Chrome TLS/JA3 impersonation for asset downloads — bypasses Akamai
+                              # "Access Denied" 403s that fingerprint a plain-httpx (Python TLS) GET
 
 # --- Stub Ingest API (§9 acceptance) + test harness ---
 fastapi==0.115.5

@@ -23,7 +23,6 @@ import psutil
 from crawler.models import Job
 from crawler.async_engine import run_batch_async
 from crawler.seed import load_seed
-from crawler.resolver import build_matcher
 
 # Fixed workload: real, reliably-crawlable hosts (trade press = plain HTML + deep enough).
 HOSTS = [
@@ -91,7 +90,6 @@ def main():
     os.environ["CRAWLER_ENGINE_IDLE_S"] = "45"     # don't hang a cell forever
 
     seed = load_seed()
-    matcher = build_matcher(seed)
     jobs = _jobs(max_pages)
     total_cap = len(jobs) * max_pages
 
@@ -112,7 +110,7 @@ def main():
             samp = Sampler()
             samp.start()
             t0 = time.perf_counter()
-            results = run_batch_async(jobs, forward=False, l2_url=None, seed=seed, matcher=matcher)
+            results = run_batch_async(jobs, forward=False, l2_url=None, seed=seed)
             el = time.perf_counter() - t0
             samp.stop()
             fetched = sum(r["summary"]["fetched"] for r in results)

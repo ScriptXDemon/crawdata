@@ -39,6 +39,7 @@ def render() -> str:
   button:disabled { opacity:.5; cursor:not-allowed; }
   button.green { background:#15803d; }
   button.purple { background:#7c3aed; }
+  button.red { background:#b91c1c; }
   .llmwrap { display:flex; align-items:center; gap:4px; background:#1e293b;
              border:1px solid #334155; border-radius:8px; padding:3px 8px; }
   .llmlbl { font-size:12px; color:#94a3b8; margin-right:2px; }
@@ -106,8 +107,12 @@ def render() -> str:
 <div class="toolbar">
   <button onclick="generateJobs()" id="btnGen">&#9889; Generate Jobs from Seed</button>
   <button onclick="runAllJobs()" id="btnRunAll" class="green" disabled>&#9654; Run All Jobs</button>
+  <button onclick="stopCrawl()" id="btnStop" class="red" title="Halt the running crawl — stops both C1 (live render) and C3 (CamoFox). All crawling ceases." disabled>&#9209; Stop Crawling</button>
   <label class="chk"><input type="checkbox" id="freshnessToggle" onchange="updFresh()">
     <span id="freshnessLabel" style="color:#f87171">Freshness filter OFF</span></label>
+  <label class="chk" title="C2 archival engine: when ON, a WAF-blocked page that C1/C3 can't get is recovered from the Wayback Machine. OFF = live only (C1 + C3 CamoFox).">
+    <input type="checkbox" id="waybackToggle" onchange="updWayback()">
+    <span id="waybackLabel" style="color:#f87171">Wayback (C2) OFF</span></label>
   <input type="text" id="l2Url" value=\"""" + DEFAULT_L2_URL + """\" placeholder="L2 Ingest URL" style="width:260px;">
   <button onclick="processL2()" class="purple" title="Trigger L2 to process pending pages into intelligence">&#129504; Process in L2</button>
   <span class="llmwrap" title="Which LLM backend L2 uses — switches live, no restart">
@@ -115,6 +120,11 @@ def render() -> str:
     <button id="llmFarm"  class="seg" onclick="switchLLM('farm')">Farm</button>
     <button id="llmLocal" class="seg" onclick="switchLLM('local')">Local</button>
     <span id="llmDot" class="llmdot" onclick="refreshLLM()"></span>
+  </span>
+  <span class="llmwrap" title="C3 CamoFox stealth engine — the WAF-block fallback (reactive)">
+    <span class="llmlbl">C3 CamoFox:</span>
+    <span id="camoTxt" style="font-size:12px;color:#94a3b8;">…</span>
+    <span id="camoDot" class="llmdot" onclick="refreshCamo()"></span>
   </span>
   <span id="jobCount" style="font-size:13px;color:#64748b;"></span>
 </div>
@@ -151,6 +161,7 @@ async function health() {
   try {
     const d = await (await fetch('/health')).json();
     document.getElementById('statsBar').innerHTML =
+      `<span class="stat">Keywords: <b>${d.keywords}</b></span>` +
       `<span class="stat">Entities: <b>${d.entities}</b></span>` +
       `<span class="stat">Sources: <b>${d.sources}</b></span>`;
   } catch(e) {}
@@ -162,6 +173,14 @@ function updFresh() {
   l.textContent = on ? 'Freshness filter ON' : 'Freshness filter OFF';
   l.style.color = on ? '#cbd5e1' : '#f87171';
 }
+
+function updWayback() {
+  const on = document.getElementById('waybackToggle').checked;
+  const l = document.getElementById('waybackLabel');
+  l.textContent = on ? 'Wayback (C2) ON' : 'Wayback (C2) OFF';
+  l.style.color = on ? '#a7f3d0' : '#f87171';
+}
+function _wayback() { return document.getElementById('waybackToggle').checked; }
 
 function showTab(t) {
   document.getElementById('tabBatch').className = t==='batch'?'tab active':'tab';
@@ -218,7 +237,7 @@ async function runBatch() {
     if (cfg.l2_forward_url) fwdUrl = cfg.l2_forward_url;
   } catch(e) {}
 
-  const body = {jobs, forward_to_ingest: forward};
+  const body = {jobs, forward_to_ingest: forward, wayback: _wayback()};
   if (fwdUrl) body.l2_ingest_url = fwdUrl;
 
   btn.disabled = true;
@@ -273,10 +292,26 @@ async function pollMetrics(){
     document.getElementById('metrics').innerHTML =
       _tile('CPU', cpu+'%', `${m.cpu_count} cores`, cpu) +
       _tile('RAM', r.used_gb+' / '+r.total_gb+' GB', r.percent+'%', r.percent) +
-      _tile('Pool', p.tabs+' tabs', `${p.browsers}&#215;${p.tabs_per_browser} · ${p.engine} · &#8804;${p.host_concurrency}/host`, null) +
+      _tile('Pool', p.tabs+' tabs', `${p.browsers}&#215;${p.tabs_per_browser} · ${p.engine} · ${p.host_concurrency}/host`, null) +
       _tile('Batch', bstat, `${b.done||0}/${b.total||0} done`, null) +
       _tile('Crawled', (t.accepted||0)+' accepted', `${t.fetched||0} fetched · ${t.kept||0} kept · ${t.jobs||0} jobs`, null);
+    // Stop button follows batch state: enabled while running, shows "Stopping…" once signaled.
+    const stopBtn = document.getElementById('btnStop');
+    if (stopBtn) {
+      stopBtn.disabled = !b.running || b.stopping;
+      stopBtn.innerHTML = b.stopping ? '&#9203; Stopping…' : '&#9209; Stop Crawling';
+    }
   }catch(e){}
+}
+
+async function stopCrawl() {
+  const btn = document.getElementById('btnStop');
+  btn.disabled = true; btn.innerHTML = '&#9203; Stopping…';
+  window.stopAll = true;   // also halt the Run-All-Jobs JS loop (each job is a separate crawl)
+  try {
+    await fetch('/v1/crawl/stop', {method:'POST'});
+    // The running batch tears down within a couple of drain ticks; metrics polling flips the UI.
+  } catch(e) { btn.disabled = false; btn.innerHTML = '&#9209; Stop Crawling'; }
 }
 
 // ── L2 brain toggle (farm ⇄ local, live) ──
@@ -305,6 +340,18 @@ async function switchLLM(mode) {
   const dot = document.getElementById('llmDot'); dot.className='llmdot wait';
   try { await (await fetch(_l2() + '/ops/llm/switch?mode='+mode, {method:'POST'})).json(); await refreshLLM(); }
   catch(e) { dot.className='llmdot down'; dot.title='switch failed: '+e.message; }
+}
+
+// ── C3 CamoFox stealth-engine status (WAF fallback) ──
+async function refreshCamo() {
+  const dot = document.getElementById('camoDot'), txt = document.getElementById('camoTxt');
+  try {
+    const d = await (await fetch('/v1/camofox')).json();
+    if (!d.enabled) { dot.className='llmdot'; txt.textContent='off';
+      dot.title='CamoFox disabled (CAMOFOX_ENABLED=0) — ladder falls through to Wayback/feed'; }
+    else if (d.healthy) { dot.className='llmdot up'; txt.textContent='ready'; dot.title='CamoFox up · '+d.url; }
+    else { dot.className='llmdot down'; txt.textContent='down'; dot.title='CamoFox enabled but unreachable · '+d.url; }
+  } catch(e) { dot.className='llmdot down'; txt.textContent='?'; dot.title='camofox status check failed: '+e.message; }
 }
 
 // ── generated jobs (from seed) ──
@@ -341,7 +388,7 @@ async function runOne(i) {
   const el = document.getElementById('res-'+i);
   el.innerHTML = '<div class="status wait">&#9203; Running...</div>';
   try {
-    const body = {...job, forward_to_ingest: true};
+    const body = {...job, forward_to_ingest: true, wayback: _wayback()};
     if (!freshnessOn) body.freshness_days = null;
     if (l2Url) body.l2_ingest_url = l2Url;
     const d = await (await fetch('/v1/crawl', {
@@ -353,7 +400,11 @@ async function runOne(i) {
 
 async function runAllJobs() {
   const btn = document.getElementById('btnRunAll'); btn.disabled = true; btn.innerHTML = '&#9203; Running...';
-  for (let i=0;i<window.jobs.length;i++) await runOne(i);
+  window.stopAll = false;                      // reset the per-loop stop latch
+  for (let i=0;i<window.jobs.length;i++) {
+    if (window.stopAll) break;                 // Stop pressed → don't launch the next job
+    await runOne(i);
+  }
   btn.disabled = false; btn.innerHTML = '&#9654; Run All Jobs';
 }
 
@@ -361,6 +412,8 @@ showTab('batch');
 health();
 refreshLLM();
 setInterval(refreshLLM, 30000);   // passive farm/local liveness so you know when to flip
+refreshCamo();
+setInterval(refreshCamo, 30000);  // C3 CamoFox liveness (WAF fallback)
 pollMetrics();
 setInterval(pollMetrics, 2500);   // live CPU/RAM/pool — watch the box saturate during a batch
 </script>

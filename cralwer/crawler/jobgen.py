@@ -72,8 +72,8 @@ def _candidate_pool(seed: Seed, entity_id: str | None,
     intentionally recall-heavy — the discovery probe (scripts.check_keywords.
     discover_keywords) prunes it to just the terms present on the seed URL.
 
-    Reuses the same seed data the resolver's build_matcher registers, so a
-    selected keyword is always something the system already understands.
+    Reuses the seed's entity/product/tech-domain alias data, so a selected
+    keyword is always something the system already understands.
     tender jobs draw the tender keyword set (already broad by design)."""
     pool: list[str] = []
     if job_type == "tender":

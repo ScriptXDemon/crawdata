@@ -957,5 +957,181 @@
       "pdf",
       "media"
     ]
+  },
+  {
+    "job_id": "bot_defense_gov",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.defense.gov/News/"
+    ],
+    "keywords": [
+      "contract",
+      "missile",
+      "aircraft",
+      "vehicle",
+      "award",
+      "defense",
+      "procurement"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "bot_army_mil",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.army.mil/"
+    ],
+    "keywords": [
+      "soldier",
+      "vehicle",
+      "artillery",
+      "weapon",
+      "contract",
+      "modernization"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "bot_navy_mil",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.navy.mil/"
+    ],
+    "keywords": [
+      "ship",
+      "submarine",
+      "destroyer",
+      "frigate",
+      "missile",
+      "fleet",
+      "contract"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "bot_af_mil",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.af.mil/"
+    ],
+    "keywords": [
+      "aircraft",
+      "fighter",
+      "missile",
+      "drone",
+      "squadron",
+      "contract"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "bot_dvidshub",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.dvidshub.net/"
+    ],
+    "keywords": [
+      "exercise",
+      "deployment",
+      "weapon",
+      "vehicle",
+      "aircraft",
+      "training"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
+  },
+  {
+    "job_id": "bot_nato",
+    "job_type": "news",
+    "seed_urls": [
+      "https://www.nato.int/cps/en/natohq/news.htm"
+    ],
+    "keywords": [
+      "defence",
+      "missile",
+      "exercise",
+      "procurement",
+      "air defence",
+      "battlegroup"
+    ],
+    "target_entity": null,
+    "max_pages": 500,
+    "max_depth": 4,
+    "same_domain_only": true,
+    "render_js": true,
+    "freshness_days": null,
+    "capture": [
+      "html",
+      "text",
+      "images",
+      "screenshot",
+      "pdf",
+      "media"
+    ]
   }
 ]

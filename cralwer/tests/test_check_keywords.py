@@ -1,22 +1,19 @@
 """Tests for scripts/check_keywords.py — the standalone keyword-relevance
-probe, run offline against the shipped fixtures. Every test also proves the
-probe's matching agrees with the existing gate logic (crawler.gate) on the
-same page, since the probe must reuse gate._keyword_hits, not a new
-implementation."""
+probe, run offline against the shipped fixtures. The probe matches a
+caller-supplied keyword list with the SAME word-boundary FlashText matcher the
+gate uses over the global corpus, so its matching never disagrees with the gate
+on the same keywords."""
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from crawler.gate import _keyword_hits, evaluate
+from crawler import keywords as kwmod
+from crawler.gate import evaluate
 from crawler.models import Job
-from crawler.resolver import build_matcher, resolve
-from crawler.seed import load_seed
 from scripts.check_keywords import check_keywords, discover_keywords
 
 LT_URL = "https://idrw.org/lt-k9-vajra-followon/"
-SEED = load_seed()
-MATCHER = build_matcher(SEED)
 
 
 def test_check_keywords_match():
@@ -49,23 +46,20 @@ def test_check_keywords_error_on_unfetchable_url():
     assert result["error"]
 
 
-def test_check_keywords_agrees_with_gate_on_same_page():
+def test_check_keywords_uses_same_matcher_as_gate():
     keywords = ["K9 Vajra", "L&T", "artillery", "howitzer", "submarine"]
     probe = check_keywords(LT_URL, keywords)
 
-    # Compute the same haystack the gate would see and run the SAME function
-    # the probe uses, directly — this is the ground truth.
-    expected_hits = _keyword_hits(f"{probe['_title']}\n{probe['_text']}", keywords)
-    assert probe["matched_keywords"] == expected_hits
+    # The probe reuses the gate's word-boundary FlashText matcher — ground truth.
+    expected = kwmod.find(kwmod.from_list(keywords), probe["_title"], probe["_text"])
+    assert probe["matched_keywords"] == expected
 
-    # Now run the REAL pipeline gate on the identical text and compare.
-    job = Job(job_id="cmp", job_type="news", seed_urls=[LT_URL],
-             keywords=keywords, target_entity="LT")
-    detected = resolve(probe["_text"], probe["_title"], SEED, MATCHER)
-    gate_result = evaluate(job, probe["_title"], probe["_text"], detected, None)
-
-    assert set(probe["matched_keywords"]) == set(gate_result.matched_keywords)
-    assert gate_result.keep is True   # keyword match alone keeps the page now
+    # Feed those same keywords to the gate AS its corpus -> identical hits, page kept.
+    kp = kwmod.from_list(keywords)
+    job = Job(job_id="cmp", job_type="news", seed_urls=[LT_URL], keywords=keywords)
+    g = evaluate(job, probe["_title"], probe["_text"], None, kp)
+    assert g.keep is True
+    assert set(g.matched_keywords) == set(probe["matched_keywords"])
 
 
 def test_discover_keywords_returns_only_pool_members_that_hit():

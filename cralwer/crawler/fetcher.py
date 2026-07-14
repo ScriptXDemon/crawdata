@@ -46,6 +46,8 @@ class FetchResult:
     reason: str | None = None                 # errors.classify_failure output (typed category)
     retry_after_s: float | None = None        # parsed Retry-After (429/503 only)
     from_fixture: bool = False
+    cookies: list | None = None                # cookies harvested from the render context —
+    # replayed on protected asset downloads (Akamai wants the page session's cookies).
 
     def is_html(self) -> bool:
         return self.kind == "html"
@@ -296,18 +298,25 @@ class Fetcher:
                 res.reason = errors.NEEDS_NETWORK_PATH
         return res
 
-    def fetch_asset(self, url: str) -> FetchResult:
+    def fetch_asset(self, url: str, referer: str | None = None,
+                    cookies: list | None = None) -> FetchResult:
         """Download a same-page asset (image / PDF) via httpx only. Uses the
         lighter asset delay and NEVER renders — assets are files, not pages, so
         the JS renderer would only try to page.goto() them and fail on
         "Download is starting". Same robots + fixture handling as fetch()."""
         self._throttle(self.asset_delay_s)
-        return self._fetch_asset_core(url)
+        return self._fetch_asset_core(url, referer, cookies)
 
-    def _fetch_asset_core(self, url: str) -> FetchResult:
+    def _fetch_asset_core(self, url: str, referer: str | None = None,
+                          cookies: list | None = None) -> FetchResult:
         """The un-throttled body of fetch_asset — fixture/robots handling + a
         plain httpx download, no page-load throttle. Used directly by
-        fetch_assets(), where the bounded worker pool is the rate limit."""
+        fetch_assets(), where the bounded worker pool is the rate limit.
+
+        On a 403/401 (WAF fingerprinting the plain-httpx TLS handshake — Akamai
+        "Access Denied"), escalate: (1) curl_cffi with a Chrome TLS/JA3 fingerprint +
+        Referer + the render's cookies, then (2) CamoFox in-context byte fetch. Most
+        assets never touch the ladder; it's lazy on the 403 branch only."""
         canon = canonicalize_url(url)
         if self.prefer_fixtures and fixtures.has(canon):
             return self._from_fixture(canon, None)
@@ -319,23 +328,67 @@ class Fetcher:
             return FetchResult(url=canon, final_url=canon, status=None,
                                fetched_at=_now_iso(), error="blocked_by_robots",
                                reason=errors.ROBOTS)
-        return self._http_fetch(canon, None)
+        res = self._http_fetch(canon, None)
+        if res.status in (401, 403):
+            escalated = self._asset_bypass(canon, referer, cookies)
+            if escalated is not None:
+                return escalated
+        return res
 
-    def fetch_assets(self, urls: list[str]) -> list[FetchResult]:
+    def _asset_bypass(self, url: str, referer: str | None,
+                      cookies: list | None) -> FetchResult | None:
+        """Two-tier bypass for a WAF-blocked asset. Returns a 200 FetchResult with
+        body_bytes on success, or None (caller keeps the original 403)."""
+        # Tier 1 — curl_cffi with a real Chrome fingerprint + page Referer/cookies.
+        try:
+            from curl_cffi import requests as cc
+            headers = {"Accept": "image/avif,image/webp,image/*,*/*;q=0.8"}
+            if referer:
+                headers["Referer"] = referer
+            jar = {c["name"]: c["value"] for c in (cookies or []) if c.get("name")}
+            r = cc.get(url, impersonate="chrome", headers=headers, cookies=jar or None,
+                       timeout=self.timeout_s, allow_redirects=True)
+            if r.status_code < 400 and r.content:
+                ct = r.headers.get("content-type")
+                return FetchResult(url=url, final_url=str(r.url), status=r.status_code,
+                                   content_type=ct, kind=_classify_kind(ct, url),
+                                   body_bytes=r.content, tier=1, fetched_at=_now_iso())
+        except Exception:
+            pass
+        # Tier 2 — CamoFox: fetch the bytes inside the stealth browser session (no-op if
+        # CAMOFOX_ENABLED != 1). The last resort for assets even curl_cffi can't clear.
+        try:
+            from . import camofox_client
+            data = camofox_client.fetch_bytes(url, timeout_s=float(self.timeout_s) + 30)
+            if data:
+                return FetchResult(url=url, final_url=url, status=200,
+                                   content_type=None, kind=_classify_kind(None, url),
+                                   body_bytes=data, tier=1, fetched_at=_now_iso())
+        except Exception:
+            pass
+        return None
+
+    def fetch_assets(self, urls: list[str], referer: str | None = None,
+                     cookies: list | None = None) -> list[FetchResult]:
         """Download several same-page assets (images/PDFs) concurrently, results
         in the SAME order as ``urls``. A bounded pool (CRAWLER_ASSET_WORKERS,
         default 6) IS the rate limit — at most N concurrent requests to the host
         — so no per-asset throttle is applied. Each worker uses its own httpx
         client (no shared state); robots + fixtures still honored per URL. Same
-        bytes as sequential fetch_asset, just faster."""
+        bytes as sequential fetch_asset, just faster.
+
+        ``referer``/``cookies`` (from the page render) are replayed on the 403 bypass
+        ladder so a protected asset host sees the same session that loaded the page."""
         if not urls:
             return []
+        import functools
+        one = functools.partial(self._fetch_asset_core, referer=referer, cookies=cookies)
         workers = int(os.environ.get("CRAWLER_ASSET_WORKERS", "6"))
         if workers <= 1 or len(urls) == 1:
-            return [self._fetch_asset_core(u) for u in urls]
+            return [one(u) for u in urls]
         from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=min(workers, len(urls))) as pool:
-            return list(pool.map(self._fetch_asset_core, urls))
+            return list(pool.map(one, urls))
 
     # -- fixtures --------------------------------------------------------
     def _from_fixture(self, canon: str, conditional: dict | None) -> FetchResult:

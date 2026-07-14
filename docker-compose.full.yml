@@ -110,14 +110,20 @@ services:
       CRAWLER_API_PORT: "8099"
       CRAWLER_ALLOW_NETWORK: "1"
       CRAWLER_PREFER_FIXTURES: "0"
-      # Async multi-tab browser-pool engine — one shared pool across the whole batch, saturates
-      # the box. Tuned from scripts/bench_engine.py: 8 browsers x 12 tabs = 96 concurrent tabs
-      # hit ~86% CPU (sweet spot before RAM pressure on the 33GB WSL2-capped container). Per-host
-      # concurrency 3 keeps 96 tabs from ever hammering one site. Set _ENGINE=0 for the old path.
-      CRAWLER_ASYNC_ENGINE: "1"
+      # Async multi-tab browser-pool engine (the sole engine) — one shared pool across the whole
+      # batch, saturates the box. Tuned from scripts/bench_engine.py: 8 browsers x 12 tabs = 96
+      # concurrent tabs hit ~86% CPU (sweet spot before RAM pressure on the 33GB WSL2-capped
+      # container). Per-host concurrency 3 keeps 96 tabs from ever hammering one site.
       CRAWLER_BROWSERS: "8"
       CRAWLER_TABS_PER_BROWSER: "12"
-      CRAWLER_HOST_CONCURRENCY: "3"
+      # Per-host concurrency is ADAPTIVE by default (do NOT pin CRAWLER_HOST_CONCURRENCY):
+      # the 96-tab pool is spread across the batch's distinct seed hosts, so a 1-job
+      # single-domain crawl fans out to ~ceil tabs on that host instead of idling 93 tabs,
+      # while a 38-host batch drops back to the polite floor. Setting CRAWLER_HOST_CONCURRENCY
+      # pins it to a fixed value (disables adaptation). Floor/ceiling bound the spread;
+      # .gov/.mil careful hosts still force concurrency 1 regardless.
+      CRAWLER_HOST_CONCURRENCY_FLOOR: "3"
+      CRAWLER_HOST_CONCURRENCY_CEIL: "24"
       CRAWLER_HOST_DELAY: "1.0"
       # IP-blocked hosts (war.gov etc.): route Chromium through a RESIDENTIAL/mobile
       # proxy gateway (the provider rotates the exit IP per request). Empty = direct
@@ -128,6 +134,15 @@ services:
       # the sanctioned WAF-free path for war.gov/defense.gov. Empty = API path skipped
       # (Wayback + RSS still cover it). Get a key at https://api.dvidshub.net/docs
       DVIDS_API_KEY: "${DVIDS_API_KEY:-}"
+      # C3 CamoFox stealth engine — the WAF-block fallback. ON by default (the camofox service
+      # is part of this stack); it routes robots-denied + WAF-blocked hosts through the stealth
+      # browser. Bring the service up with `--profile camofox`. When off/unreachable the fallback
+      # ladder cleanly skips to Wayback/feed. Set CAMOFOX_ENABLED=0 to disable.
+      CAMOFOX_ENABLED: "${CAMOFOX_ENABLED:-1}"
+      CAMOFOX_URL: http://camofox:9377
+      # Bearer key for CamoFox's /evaluate (raw-HTML grab → full asset capture). Must match
+      # the key on the camofox service below.
+      CAMOFOX_API_KEY: "${CAMOFOX_API_KEY:-mallory-camofox-key}"
       # A 32-job x 500-page render-everything batch needs more than the 30-min default.
       # 2h wall-clock; the 120s idle watchdog still stops early if the frontier drains.
       CRAWLER_ENGINE_WALL_CLOCK_S: "7200"
@@ -154,6 +169,61 @@ services:
       MINIO_BUCKET: mallory-raw
     ports: ["9090:9090"]
     command: ["python", "run.py", "serve"]
+
+  # ── C3 CamoFox stealth browser (9377) — anti-detection WAF bypass ──
+  # Opt-in: only starts with `docker compose --profile camofox up`. jo-inc/camofox-browser is
+  # a standalone Camoufox (Firefox-fork) server with a REST API on :9377; the crawler calls it on
+  # demand (see crawler/camofox_client.py) when CAMOFOX_ENABLED=1.
+  # Builds from the vendored clone (git clone ...camofox-browser vendor/camofox-browser). The
+  # Camoufox binary + yt-dlp must be fetched into vendor/camofox-browser/dist/ first (the repo's
+  # `make fetch` step) — the Dockerfile bind-mounts dist/ during build.
+  camofox:
+    profiles: ["camofox"]
+    image: ${CAMOFOX_IMAGE:-camofox-browser:local}
+    # Auto-recover: a Node OOM is a SIGABRT that bypasses the JS uncaughtException handler, so
+    # the container just dies. Without this the whole C3 path silently goes "down" mid-batch.
+    restart: unless-stopped
+    # Hard ceiling so a camofox leak can't OOM-cascade and take crawler-api/l2/ingest down with it
+    # (that happened once). 4g > the 2g Node heap, leaving room for the Firefox contexts themselves.
+    mem_limit: 4g
+    build:
+      context: ./vendor/camofox-browser
+      args:
+        ARCH: x86_64
+        CAMOUFOX_VERSION: "135.0.1"
+        CAMOUFOX_RELEASE: beta.24
+    environment:
+      CAMOFOX_PORT: "9377"
+      # Enables the Bearer-gated /evaluate endpoint (raw-HTML grab). Must match crawler-api.
+      CAMOFOX_API_KEY: "${CAMOFOX_API_KEY:-mallory-camofox-key}"
+      # Node heap: the image ships with --max-old-space-size=128 (128 MB) which OOM-crashes
+      # (SIGABRT) under a real batch — full-page screenshots + several live Firefox contexts
+      # blow past it. The CMD reads MAX_OLD_SPACE_SIZE, so raise it to 2 GB with no rebuild.
+      MAX_OLD_SPACE_SIZE: "${CAMOFOX_HEAP_MB:-2048}"
+      # Session/tab caps REJECT (503) rather than evict, so a LOW cap + short idle-TTL is what
+      # actually bounds live contexts. The crawler rotates a small userId pool (CRAWLER_CAMOFOX_POOL,
+      # default 4), so ≤8 sessions is ample headroom; high caps just let leaked contexts pile up.
+      MAX_SESSIONS: "${CAMOFOX_MAX_SESSIONS:-8}"
+      MAX_TABS_GLOBAL: "${CAMOFOX_MAX_TABS:-12}"
+      SESSION_TIMEOUT_MS: "${CAMOFOX_SESSION_TIMEOUT_MS:-180000}"
+      TAB_INACTIVITY_MS: "${CAMOFOX_TAB_INACTIVITY_MS:-120000}"
+      # ── Residential/mobile BACKCONNECT proxy → auto-enables Camoufox geoip (timezone/locale/
+      # geolocation spoofed to the exit IP, coherent per-session fingerprint). WITHOUT a proxy,
+      # geoip is off and every render exits this datacenter IP with an identical SF fingerprint —
+      # a WAF tell. Datacenter proxies DON'T help (same blocklists). Fill these from a residential
+      # provider (Decodo/BrightData/Oxylabs/IPRoyal) to harden C3; empty = direct (current behaviour).
+      PROXY_STRATEGY: "${CAMOFOX_PROXY_STRATEGY:-}"          # set to "backconnect" to enable
+      PROXY_BACKCONNECT_HOST: "${CAMOFOX_PROXY_HOST:-}"
+      PROXY_BACKCONNECT_PORT: "${CAMOFOX_PROXY_PORT:-7000}"
+      PROXY_USERNAME: "${CAMOFOX_PROXY_USER:-}"
+      PROXY_PASSWORD: "${CAMOFOX_PROXY_PASS:-}"
+      PROXY_COUNTRY: "${CAMOFOX_PROXY_COUNTRY:-}"            # e.g. "us"/"in" to fix the geo
+    ports: ["9377:9377"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9377/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # ── React client (5173) — served by nginx, proxies /api + /ops to l2 ──
   client:

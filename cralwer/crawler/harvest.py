@@ -23,11 +23,11 @@ from collections import deque
 from dataclasses import dataclass, field
 from typing import Callable
 
+from . import keywords as kwmod
 from . import parse
 from .canonicalize import canonicalize_url, same_site
 from .dedup import CrawlHistory
 from .fetcher import FetchResult, Fetcher
-from .gate import _keyword_hits
 from .models import Job
 
 
@@ -196,9 +196,8 @@ def _get_strict_domain() -> bool:
 def _prune_seed_links(job: Job, depth: int, res: FetchResult) -> bool:
     """Opt-in (job.skip_irrelevant_seed_links): True if this is a seed
     (depth-0) page with zero keyword hits — meaning its links should not
-    be enqueued. Uses the gate's own bounded matcher (gate._keyword_hits)
-    on title + visible text, so it can never disagree with the gate about
-    what "a keyword hit" means. Biased toward expanding: any hit, or no
+    be enqueued. Uses the same word-boundary FlashText matcher the gate uses,
+    over this job's keyword list. Biased toward expanding: any hit, or no
     keywords set, or a non-HTML/no-flag job -> never prunes.
 
     Uses visible_text (not trafilatura main_text) deliberately — harvest
@@ -209,7 +208,7 @@ def _prune_seed_links(job: Job, depth: int, res: FetchResult) -> bool:
         return False
     title = parse.title_of(res.text_html) or ""
     text = parse.visible_text(res.text_html)
-    return not _keyword_hits(f"{title}\n{text}", job.keywords)
+    return not kwmod.find(kwmod.from_list(job.keywords), title, text)
 
 
 def _link_is_relevant(anchor_text: str, keywords: list[str]) -> bool:

@@ -1,9 +1,10 @@
 """A tiny, dependency-free HTML dashboard for the ingested page bundles.
 
 Reads ``data/output/ingested.ndjson`` (the audit trail every run writes) and
-renders each raw harvested page — clean text, detection tags, resolved
-entities, and viewable artifacts (screenshot / images / PDF) — so the
-crawler's output is browsable in a browser, not just on the CLI.
+renders each raw harvested page — clean text and viewable artifacts (screenshot
+/ images / PDF) — so the crawler's output is browsable in a browser, not just on
+the CLI. Entity resolution and record classification are Layer 2's job now; L1
+ships a raw page bundle, so this view shows source/provenance, not detections.
 """
 from __future__ import annotations
 
@@ -12,11 +13,6 @@ import json
 from urllib.parse import quote
 
 from crawler import config
-
-_STREAM_BADGE = {
-    "competitive": "#2563eb", "tender": "#b45309",
-    "market": "#475569", "technology": "#15803d",
-}
 
 
 def load_records() -> list[dict]:
@@ -69,24 +65,7 @@ def _artifact_img(storage_path: str, label: str) -> str:
 
 def _page_card(item: dict) -> str:
     doc = item["document"]
-    stream = doc.get("stream") or "?"
-    color = _STREAM_BADGE.get(stream, "#475569")
-
-    tags = ""
-    for label, val in (
-        ("competitor", doc.get("detected_competitor")),
-        ("products", ", ".join(doc.get("detected_products") or [])),
-        ("countries", ", ".join(doc.get("detected_countries") or [])),
-        ("tech", ", ".join(doc.get("detected_tech_domains") or [])),
-    ):
-        if val:
-            tags += f'<span class="f"><b>{_esc(label)}</b> {_esc(val)}</span>'
-
-    ents = ""
-    for e in doc.get("entities_detected", [])[:12]:
-        cls = "ent" if e.get("resolved_id") else "ent unk"
-        rid = e.get("resolved_id") or "?"
-        ents += f'<span class="{cls}">{_esc(e["surface"])} → {_esc(rid)}</span>'
+    stype = doc.get("source_type") or "source"
 
     arts = ""
     shot = doc.get("screenshot")
@@ -116,7 +95,7 @@ def _page_card(item: dict) -> str:
     return f"""
     <div class="card">
       <div class="top">
-        <span class="badge" style="background:{color}">{_esc(stream)}</span>
+        <span class="badge">{_esc(stype)}</span>
         <span class="src">{_esc(doc.get('source_id','?'))} · tier {_esc(tier)}</span>
         {'' if doc.get('source_known', True) else '<span class="unverified">unverified</span>'}
         {lang_badge}
@@ -125,21 +104,19 @@ def _page_card(item: dict) -> str:
       <a class="title" href="{_esc(doc.get('url',''))}" target="_blank">{_esc(title)}</a>
       {_raw_metrics(doc)}
       <div class="summary">{_esc(summary)}</div>
-      <div class="fields">{tags}</div>
-      <div class="ents">{ents}</div>
       <div class="arts">{arts}{pdfs}</div>
     </div>"""
 
 
 def render() -> str:
     records = load_records()
-    by_stream: dict[str, int] = {}
+    by_type: dict[str, int] = {}
     by_source: dict[str, int] = {}
     raw_bytes = raw_chars = n_img = n_pdf = n_shot = 0
     for r in records:
         doc = r["document"]
-        stream = doc.get("stream") or "?"
-        by_stream[stream] = by_stream.get(stream, 0) + 1
+        stype = doc.get("source_type") or "?"
+        by_type[stype] = by_type.get(stype, 0) + 1
         sid = doc.get("source_id", "?")
         by_source[sid] = by_source.get(sid, 0) + 1
         raw_bytes += len(doc.get("html") or "")
@@ -153,7 +130,7 @@ def render() -> str:
                  f'<b>{n_img}</b> img · <b>{n_pdf}</b> pdf · <b>{n_shot}</b> screenshots')
 
     chips = "".join(f'<span class="stat">{_esc(k)}: <b>{v}</b></span>'
-                    for k, v in sorted(by_stream.items()))
+                    for k, v in sorted(by_type.items()))
     srcs = "".join(f'<span class="stat src">{_esc(k)}: <b>{v}</b></span>'
                    for k, v in sorted(by_source.items()))
     cards = "".join(_page_card(r) for r in records) or (
@@ -177,7 +154,7 @@ def render() -> str:
            gap:14px; padding:18px 24px; }}
   .card {{ background:#1e293b; border:1px solid #334155; border-radius:10px; padding:14px; }}
   .top {{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }}
-  .badge {{ color:#fff; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:600; }}
+  .badge {{ color:#fff; background:#334155; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:600; }}
   .src {{ font-size:12px; color:#94a3b8; }}
   .lang {{ font-size:11px; background:#3b0764; color:#e9d5ff; padding:1px 7px; border-radius:10px; }}
   .unverified {{ font-size:11px; background:#7c2d12; color:#fed7aa; padding:1px 7px; border-radius:10px; }}

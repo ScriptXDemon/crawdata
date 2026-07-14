@@ -51,7 +51,8 @@ def _is_meaningful(cand: dict) -> bool:
 
 
 def select_and_store(candidates: list[dict], fetcher: Fetcher,
-                     limit: int = 30, download: bool = True) -> list[Image]:
+                     limit: int = 30, download: bool = True,
+                     referer: str | None = None, cookies: list | None = None) -> list[Image]:
     """Filter out junk (logos/icons/tracking pixels), tag role, store up to
     ``limit`` of the rest — a generous safety cap, not a curation size.
 
@@ -79,7 +80,7 @@ def select_and_store(candidates: list[dict], fetcher: Fetcher,
         return [_mk(c, None) for c in selected]
 
     # 2) Concurrent download of exactly the selected URLs (order preserved).
-    results = fetcher.fetch_assets([c["url"] for c in selected])
+    results = fetcher.fetch_assets([c["url"] for c in selected], referer=referer, cookies=cookies)
     kept: list[Image] = []
     for cand, res in zip(selected, results):
         body = getattr(res, "body_bytes", None)

@@ -6,12 +6,7 @@ from crawler.gate import GateResult, evaluate
 from crawler.harvest import _link_is_relevant
 from crawler.models import Job
 from crawler.parse import extract_links_with_text, visible_text
-from crawler.resolver import (build_matcher, competitors, countries, products,
-                              resolve, tech_domains)
-from crawler.seed import load_seed
-
-SEED = load_seed()
-MATCHER = build_matcher(SEED)
+from crawler import keywords as kwmod
 
 
 # --- canonicalize --------------------------------------------------------
@@ -24,41 +19,6 @@ def test_canonicalize_collapses_equivalents():
 def test_same_site():
     assert same_site("https://idrw.org/x", "https://www.idrw.org/y")
     assert not same_site("https://idrw.org/x", "https://janes.com/y")
-
-
-# --- resolver ------------------------------------------------------------
-def test_resolver_resolves_seed_entities():
-    txt = ("Larsen & Toubro won a K9 Vajra order for the Indian Army; "
-           "KNDS offered CAESAR to Nigeria.")
-    det = resolve(txt, "title", SEED, MATCHER)
-    assert "LT" in competitors(det)
-    assert "KNDS" in competitors(det)
-    assert "India" in countries(det)          # via "Indian Army" alias
-    assert "Nigeria" in countries(det)
-    assert "artillery" in tech_domains(det)
-    assert any(p.startswith("P_K9") for p in products(det))
-
-
-def test_resolver_flags_unknown_company():
-    det = resolve("Zorba Defence Systems unveiled a new gun.", "t", SEED, MATCHER)
-    assert any(d.type == "unknown_company" and "Zorba" in d.surface for d in det)
-
-
-def test_resolver_orders_by_first_appearance():
-    # India (Indian Army, early) should precede South Korea (Hanwha, later)
-    txt = ("L&T supplies the Indian Army with K9 guns built with Hanwha of "
-           "South Korea.")
-    det = resolve(txt, "t", SEED, MATCHER)
-    cs = countries(det)
-    assert cs and cs[0] == "India"
-
-
-def test_resolver_clue_word_boosts_confidence():
-    with_clue = resolve("KNDS was awarded a CAESAR contract.", "t", SEED, MATCHER)
-    without_clue = resolve("KNDS makes the CAESAR howitzer.", "t", SEED, MATCHER)
-    conf_with = next(d.confidence for d in with_clue if d.resolved_id == "KNDS")
-    conf_without = next(d.confidence for d in without_clue if d.resolved_id == "KNDS")
-    assert conf_with > conf_without
 
 
 def test_visible_text_strips_nav_footer():
@@ -79,8 +39,10 @@ def _job(**kw):
     return Job(**base)
 
 
-def test_gate_drops_no_keyword():
-    g = evaluate(_job(keywords=["howitzer"]), "Cooking recipes", "no defence here", [], None)
+def test_gate_drops_no_corpus_keyword():
+    # The gate matches the GLOBAL corpus (kp), not job.keywords.
+    kp = kwmod.from_list(["howitzer", "artillery"])
+    g = evaluate(_job(), "Cooking recipes", "no defence here", None, kp)
     assert not g.keep and g.reason == "no_keyword_match"
 
 
@@ -189,16 +151,25 @@ def test_fetch_assets_empty_and_single():
     assert f.fetch_assets([]) == []
 
 
-def test_gate_keeps_keyword_without_entity():
-    # Keyword match alone keeps the page; entity resolution is info-only now.
-    g = evaluate(_job(), "Generic artillery musings", "artillery in general", [], None)
-    assert g.keep and g.reason == "keyword_match_only"
+def test_gate_keeps_on_corpus_hit():
+    kp = kwmod.from_list(["artillery"])
+    g = evaluate(_job(), "Generic artillery musings", "artillery in general", None, kp)
+    assert g.keep and g.reason == "keyword_match"
+    assert "artillery" in g.matched_keywords
 
 
-def test_gate_keeps_tender_on_keyword_alone():
-    g = evaluate(_job(job_type="tender", keywords=["tender", "155mm"]),
-                 "RFP 155mm gun", "a 155mm tender", [], None)
-    assert g.keep and g.reason == "keyword_match_only"
+def test_gate_empty_corpus_fails_open():
+    # A misconfigured/empty corpus must keep every page, not silently drop all.
+    kp = kwmod.from_list([])
+    g = evaluate(_job(), "anything", "no keywords loaded", None, kp)
+    assert g.keep and g.reason == "no_corpus_keep_all"
+
+
+def test_gate_drops_stale_beyond_freshness():
+    kp = kwmod.from_list(["artillery"])
+    g = evaluate(_job(freshness_days=7), "artillery", "artillery news",
+                 "2000-01-01T00:00:00Z", kp)
+    assert not g.keep and g.reason == "stale_beyond_freshness_days"
 
 
 # --- change detection ----------------------------------------------------
