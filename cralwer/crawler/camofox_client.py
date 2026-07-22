@@ -16,10 +16,18 @@ subprocess, no Playwright, no camofox SDK.
 """
 from __future__ import annotations
 
+import base64
 import itertools
+import json
 import logging
 import os
 import threading
+import time
+from dataclasses import dataclass, field
+from typing import Any
+
+from . import captcha as captcha_mod
+from . import captcha_solver
 
 log = logging.getLogger("camofox")
 
@@ -78,6 +86,282 @@ def _headers() -> dict:
     return {"Authorization": f"Bearer {key}"} if key else {}
 
 
+# ── Captcha detection and solving ─────────────────────────────────────────────
+
+@dataclass
+class CaptchaInfo:
+    captcha_type: str | None = None
+    sitekey: str | None = None
+    solved: bool = False
+    solver: str | None = None
+    cost_usd: float | None = None
+    error: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    # How this wall CAN be beaten: token_injectable / wait_only / vendor_task / not_injectable /
+    # self_solving. Drives whether a paid solve is even attempted — see crawler/captcha.py.
+    solvability: str = "none"
+    blocking: bool = False      # the page body is withheld until this clears
+
+
+def _evaluate(c, base: str, user: str, tab_id: str, expr: str):
+    """Run one JS expression in the tab; None if the call failed. Never raises."""
+    try:
+        e = c.post(f"{base}/tabs/{tab_id}/evaluate",
+                   json={"userId": user, "expression": expr}, headers=_headers())
+        if e.status_code >= 400:
+            log.debug("evaluate HTTP %s", e.status_code)
+            return None
+        return e.json().get("result")
+    except Exception as exc:
+        log.debug("evaluate failed: %s", exc)
+        return None
+
+
+def detect_captcha(c, base: str, user: str, tab_id: str) -> CaptchaInfo:
+    """Detect a captcha wall in the current tab.
+
+    One round trip gathers raw DOM evidence; crawler.captcha.classify() decides. The split keeps
+    the decision testable offline — the previous inline version could only be checked by hitting a
+    live site, and it shipped for months returning `recaptcha_v2` on hCaptcha pages and nothing at
+    all on a Cloudflare managed challenge."""
+    ev = _evaluate(c, base, user, tab_id, captcha_mod.EVIDENCE_JS)
+    d = captcha_mod.classify(ev if isinstance(ev, dict) else None)
+    if not d.found:
+        return CaptchaInfo()
+    return CaptchaInfo(captcha_type=d.kind, sitekey=d.sitekey, solvability=d.solvability,
+                       blocking=d.blocking, metadata={"all_kinds": d.all_kinds})
+
+
+def _solve_with_buster(c, base: str, user: str, tab_id: str, timeout_ms: int) -> CaptchaInfo:
+    """Use the CamoFox Buster extension bridge to solve reCAPTCHA."""
+    try:
+        r = c.post(f"{base}/tabs/{tab_id}/solve",
+                   json={"userId": user, "captchaType": "recaptcha", "maxWaitMs": timeout_ms},
+                   headers=_headers())
+        if r.status_code >= 400:
+            return CaptchaInfo(error=f"buster endpoint error {r.status_code}")
+        data = r.json()
+        if data.get("solved"):
+            return CaptchaInfo(captcha_type="recaptcha_v2", solved=True,
+                               solver="buster", metadata=data)
+        return CaptchaInfo(error=data.get("error") or "buster did not solve")
+    except Exception as e:
+        return CaptchaInfo(error=f"buster exception: {e}")
+
+
+def _solve_with_commercial(info: CaptchaInfo, page_url: str) -> CaptchaInfo:
+    solver = captcha_solver.CaptchaSolver.from_env()
+    if info.captcha_type == "recaptcha_v2" and info.sitekey:
+        res = solver.solve_recaptcha_v2(info.sitekey, page_url)
+    elif info.captcha_type == "hcaptcha" and info.sitekey:
+        res = solver.solve_hcaptcha(info.sitekey, page_url)
+    elif info.captcha_type == "turnstile" and info.sitekey:
+        res = solver.solve_turnstile(info.sitekey, page_url)
+    elif info.captcha_type == "datadome":
+        res = solver.solve_datadome(captcha_url=page_url, page_url=page_url)
+    else:
+        return CaptchaInfo(captcha_type=info.captcha_type, sitekey=info.sitekey,
+                           error="no commercial solver task for this captcha type")
+    if res.solved:
+        return CaptchaInfo(captcha_type=info.captcha_type, sitekey=info.sitekey,
+                           solved=True, solver=res.method, cost_usd=res.cost_usd,
+                           metadata={"token": res.token})
+    return CaptchaInfo(captcha_type=info.captcha_type, sitekey=info.sitekey,
+                       error=res.error or "commercial solver failed")
+
+
+def _inject_token(c, base: str, user: str, tab_id: str, info: CaptchaInfo) -> bool:
+    """Write the solver token into the page's response field and fire the site's own callback.
+
+    Pure DOM. The previous version called grecaptcha.setResponse(), hcaptcha.setResponse() and
+    turnstile.setResponse() — none of which exist; all three measured `undefined` on a live page,
+    along with the vendor globals themselves. So every commercial solve that was paid for was then
+    thrown away here.
+
+    Writing the field is only half of it: the site is usually waiting on the callback passed to
+    render(), which lives in ___grecaptcha_cfg.clients and is not reachable from the DOM."""
+    token = (info.metadata or {}).get("token")
+    if not token or not info.captcha_type:
+        return False
+    expr = captcha_mod.injection_js(info.captcha_type, token)
+    if not expr:
+        return False
+    res = _evaluate(c, base, user, tab_id, expr)
+    if not isinstance(res, dict):
+        return False
+    if res.get("error"):
+        log.warning("token injection error type=%s: %s", info.captcha_type, res["error"])
+    fields = res.get("fields") or 0
+    if not fields:
+        log.warning("token injection wrote no response field type=%s", info.captcha_type)
+        return False
+    log.info("token injected type=%s fields=%d callbacks=%s",
+             info.captcha_type, fields, res.get("callbacks"))
+    # Submitting is best-effort: many widgets auto-submit from the callback, and clicking a second
+    # time would double-post. Only submit when no callback fired.
+    if not res.get("callbacks"):
+        _evaluate(c, base, user, tab_id, captcha_mod.SUBMIT_JS)
+    return True
+
+
+def verify_solved(c, base: str, user: str, tab_id: str) -> tuple[bool, dict]:
+    """Did the solve actually work? Judged only on state the SITE controls.
+
+    A filled response field is not evidence: we filled it. Reporting a solve off our own write is
+    the difference between a crawler that knows it is blocked and one that stores challenge pages
+    as documents."""
+    v = _evaluate(c, base, user, tab_id, captcha_mod.VERIFY_JS)
+    return captcha_mod.verified(v), (v if isinstance(v, dict) else {})
+
+
+def solve_captcha(c, base: str, user: str, tab_id: str, page_url: str,
+                  use_buster: bool = True, commercial_fallback: bool = True) -> CaptchaInfo:
+    """Detect a captcha and beat it by whatever means actually applies to that kind.
+
+    Routing by solvability matters for cost as much as correctness. A Cloudflare managed challenge
+    looks superficially like Turnstile — same response input, same script — but its token is minted
+    in-session and validated against the fingerprint and cf_clearance cookie, so a per-sitekey token
+    bought from a solver cannot satisfy it, and the sitekey is not extractable from the DOM anyway.
+    Sending one to a paid solver spends money on a token that provably cannot work. So:
+
+      wait_only     -> the render already waits it out; report it, never pay for it
+      self_solving  -> proof-of-work, finishes on its own; just wait
+      not_injectable-> no DOM sink the site reads (reCAPTCHA v3); report honestly
+      otherwise     -> Buster (free, reCAPTCHA only), then the commercial solver
+
+    A solve is confirmed against the page afterwards — see verify_solved."""
+    info = detect_captcha(c, base, user, tab_id)
+    if not info.captcha_type:
+        return info
+
+    log.info("captcha detected type=%s sitekey=%s solvability=%s blocking=%s url=%s",
+             info.captcha_type, info.sitekey, info.solvability, info.blocking, page_url)
+
+    if info.solvability in ("wait_only", "self_solving"):
+        # _settle already polls these out; if we are here it did not clear inside its budget.
+        # A wait-only wall that never clears is usually the browser's fingerprint being rejected, so
+        # check it before giving up — one extra evaluate on a path that has already failed, and it
+        # turns "captcha not solved" into a specific, fixable cause.
+        info.error = f"{info.captcha_type}: {info.solvability} — no token applies, waited instead"
+        flaws = captcha_mod.fingerprint_flaws(
+            _evaluate(c, base, user, tab_id, captcha_mod.FINGERPRINT_JS))
+        if flaws:
+            info.metadata["fingerprint_flaws"] = flaws
+            info.error += f" | fingerprint rejected: {flaws[0]}"
+            log.warning("c3 fingerprint is incoherent, which is why %s never cleared: %s",
+                        info.captcha_type, "; ".join(flaws))
+        return info
+    if info.solvability == "not_injectable":
+        info.error = f"{info.captcha_type}: no injectable response field on this page"
+        return info
+
+    timeout_ms = _env_int("CAMOFOX_SOLVE_MAX_WAIT_MS", 60000)
+
+    if use_buster and info.captcha_type in ("recaptcha_v2", "recaptcha_v2_invisible"):
+        buster_info = _solve_with_buster(c, base, user, tab_id, timeout_ms)
+        if buster_info.solved:
+            ok, _ = verify_solved(c, base, user, tab_id)
+            if ok:
+                return buster_info
+            info.error = "buster reported solved but the page is still walled"
+        else:
+            info.error = buster_info.error or "buster failed"
+
+    if commercial_fallback:
+        if not info.sitekey and info.captcha_type != "datadome":
+            # Every solver task is keyed on the sitekey. Submitting without one burns an API call
+            # and always fails, so stop here and say why.
+            info.error = f"{info.captcha_type}: no sitekey found; cannot build a solver task"
+            return info
+        commercial_info = _solve_with_commercial(info, page_url)
+        if commercial_info.solved:
+            if not _inject_token(c, base, user, tab_id, commercial_info):
+                commercial_info.solved = False
+                commercial_info.error = "token bought but could not be injected"
+                return commercial_info
+            _settle(c, base, user, tab_id)
+            ok, detail = verify_solved(c, base, user, tab_id)
+            if not ok:
+                # Do NOT report success off our own token write. The cost is still recorded — it
+                # was really spent — but the page is not treated as retrieved.
+                commercial_info.solved = False
+                commercial_info.error = f"token injected but unverified: {detail.get('reasons')}"
+            return commercial_info
+        info.error = commercial_info.error or info.error
+
+    return info
+
+
+def _env_int(k: str, d: int) -> int:
+    try:
+        return int(os.environ.get(k, str(d)))
+    except ValueError:
+        return d
+
+
+# Non-interactive challenge/block markers — if still present after the first settle, wait once more.
+_CHALLENGE_MARKERS = ("just a moment", "challenge-platform", "cf-chl", "checking your browser",
+                      "attention required", "_incapsula_resource", "pardon our interruption",
+                      "please enable js", "captcha-delivery", "verifying you are human", "please verify")
+
+
+def _swallow_post(c, url: str, body: dict) -> None:
+    try:
+        c.post(url, json=body)
+    except Exception:
+        pass
+
+
+def _looks_challenged(c, base: str, user: str, tab_id: str) -> bool:
+    """Best-effort: does the settled DOM still look like a challenge/block interstitial?"""
+    try:
+        e = c.post(f"{base}/tabs/{tab_id}/evaluate",
+                   json={"userId": user,
+                         "expression": "(document.title+' '+(document.body?document.body.innerText:'')).slice(0,600)"},
+                   headers=_headers())
+        if e.status_code < 400:
+            t = (e.json().get("result") or "").lower()
+            return any(m in t for m in _CHALLENGE_MARKERS)
+    except Exception:
+        pass
+    return False
+
+
+def _settle(c, base: str, user: str, tab_id: str) -> None:
+    """Post-navigation settle so C3 captures the REAL page, not a pre-challenge / half-rendered DOM:
+      1. /wait  — networkidle + hydration poll (lets a Cloudflare/Imperva JS challenge auto-solve),
+      2. humanized scroll + a body click — TRUSTED mouse/scroll events for behavioral gates
+         (CamoFox's humanized cursor traces a curved path -> many isTrusted mousemove events),
+      3. if a challenge marker is still present, KEEP waiting until it clears or the budget runs out.
+    All best-effort; never raises. Tunable: CRAWLER_CAMOFOX_SETTLE_MS, CRAWLER_CAMOFOX_BEHAVIOR,
+    CRAWLER_CAMOFOX_CHALLENGE_MS."""
+    settle_ms = _env_int("CRAWLER_CAMOFOX_SETTLE_MS", 8000)
+    try:
+        c.post(f"{base}/tabs/{tab_id}/wait",
+               json={"userId": user, "timeout": settle_ms, "waitForNetwork": True})
+    except Exception:
+        pass
+    if os.environ.get("CRAWLER_CAMOFOX_BEHAVIOR", "1") == "1":
+        _swallow_post(c, f"{base}/tabs/{tab_id}/scroll", {"userId": user, "direction": "down", "amount": 600})
+        _swallow_post(c, f"{base}/tabs/{tab_id}/scroll", {"userId": user, "direction": "down", "amount": 600})
+        _swallow_post(c, f"{base}/tabs/{tab_id}/click", {"userId": user, "selector": "body"})
+        _swallow_post(c, f"{base}/tabs/{tab_id}/scroll", {"userId": user, "direction": "up", "amount": 300})
+    # Cloudflare's managed challenge ("Just a moment...") resolves itself, but not always inside one
+    # extra wait — settle_ms*2 was the whole budget, so a render returned the INTERSTITIAL and the
+    # page was recorded as blocked. Measured on scrapingcourse.com/antibot-challenge: every attempt
+    # came back in ~16.5s with the challenge still up, identical at a 90s or 150s caller timeout,
+    # because the caller's timeout never governed this loop. Poll until it clears or the budget ends.
+    budget_ms = _env_int("CRAWLER_CAMOFOX_CHALLENGE_MS", 45000)
+    waited = 0
+    while waited < budget_ms and _looks_challenged(c, base, user, tab_id):
+        try:
+            c.post(f"{base}/tabs/{tab_id}/wait",
+                   json={"userId": user, "timeout": settle_ms, "waitForNetwork": True})
+        except Exception:
+            break                       # tab/server gone — nothing to wait for
+        waited += settle_ms
+
+
 def health() -> bool:
     """True if the CamoFox server answers /health (only meaningful when enabled)."""
     if not enabled():
@@ -126,7 +410,8 @@ def _snapshot_text(snapshot) -> str:
     return "\n".join(lines)
 
 
-def render(url: str, timeout_s: float = 45.0) -> dict | None:
+def render(url: str, timeout_s: float = 45.0, solve_captchas: bool = False,
+           user: str | None = None, base_url: str | None = None) -> dict | None:
     """Open URL in CamoFox and capture EVERYTHING the page yields, so a C3 doc is
     as rich as a C1 one. Returns {text, html, screenshot, snapshot, final_url} or
     None. Steps (one fresh tab/context):
@@ -140,8 +425,12 @@ def render(url: str, timeout_s: float = 45.0) -> dict | None:
         return None
     import httpx
 
-    base = _base()
-    user = _next_user()             # rotating pool userId (bounded live sessions; see _next_user)
+    # base_url routes this render at a DIFFERENT CamoFox instance — used to escalate to the paid
+    # (proxied) container after the free one is refused. Defaults to the free instance.
+    base = (base_url or _base()).rstrip("/")
+    # A caller-supplied user forces a FRESH CamoFox context (⇒ a fresh proxy session/IP under a
+    # rotating upstream) — used by the C3 fresh-IP retry after an IP-block. Default: rotating pool.
+    user = user or _next_user()     # rotating pool userId (bounded live sessions; see _next_user)
     tab_id = None
     try:
         with httpx.Client(timeout=timeout_s, follow_redirects=True) as c:
@@ -154,6 +443,19 @@ def render(url: str, timeout_s: float = 45.0) -> dict | None:
             tab_id = data.get("tabId") or data.get("id") or data.get("targetId")
             if not tab_id:
                 return None
+            # Settle: let JS challenges auto-solve + drive trusted input for behavioral gates BEFORE
+            # capture (a bare domcontentloaded snapshot grabs the challenge/half-rendered DOM).
+            _settle(c, base, user, tab_id)
+
+            # Optional captcha solving for interactive widgets (reCAPTCHA via Buster,
+            # other widgets via commercial solver). Captured after the first settle so
+            # the widget has loaded; if a solve succeeds, settle again to let the page load.
+            captcha_info: CaptchaInfo = CaptchaInfo()
+            if solve_captchas and os.environ.get("CAMOFOX_SOLVE_RECAPTCHA", "1") == "1":
+                captcha_info = solve_captcha(c, base, user, tab_id, url)
+                if captcha_info.solved:
+                    _settle(c, base, user, tab_id)
+
             # GET snapshot requires ?userId=; the aria snapshot text is in .snapshot.
             s = c.get(f"{base}/tabs/{tab_id}/snapshot", params={"userId": user})
             payload = {}
@@ -175,6 +477,25 @@ def render(url: str, timeout_s: float = 45.0) -> dict | None:
             except Exception:
                 pass
 
+            # The REAL HTTP status. POST /tabs reports only {tabId, url}, so without this every
+            # render looked like a success: a 404 error page was stored as a document, and because
+            # no failure was ever recorded, is_gone() could not fire and the dead URL came back on
+            # every run. Firefox carries the status on the navigation timing entry.
+            status = None
+            try:
+                st = c.post(f"{base}/tabs/{tab_id}/evaluate",
+                            json={"userId": user, "expression":
+                                  "performance.getEntriesByType('navigation')[0].responseStatus"},
+                            headers=_headers())
+                if st.status_code < 400:
+                    v = st.json().get("result")
+                    # 0 means "the browser could not tell us" (cross-origin, cache, no entry) —
+                    # that is unknown, not success, so it stays None rather than becoming a 200.
+                    if isinstance(v, (int, float)) and 100 <= int(v) <= 599:
+                        status = int(v)
+            except Exception:
+                pass
+
             # Full-page screenshot (PNG bytes; no auth).
             shot = None
             try:
@@ -190,8 +511,11 @@ def render(url: str, timeout_s: float = 45.0) -> dict | None:
         if not text.strip() and not html.strip():
             return None                 # nothing usable came back
         page_url = payload.get("url") if isinstance(payload, dict) else None
-        return {"text": text, "html": html, "screenshot": shot,
-                "snapshot": raw, "final_url": page_url or url}
+        result = {"text": text, "html": html, "screenshot": shot,
+                "snapshot": raw, "final_url": page_url or url, "status": status}
+        if solve_captchas:
+            result["captcha_info"] = captcha_info
+        return result
     except Exception:
         log.info("camofox render failed url=%s", url, exc_info=True)
         return None
@@ -202,6 +526,19 @@ def render(url: str, timeout_s: float = 45.0) -> dict | None:
                     c.delete(f"{base}/tabs/{tab_id}", params={"userId": user})
             except Exception:
                 pass
+
+
+def render_with_solver(url: str, timeout_s: float = 90.0,
+                       user: str | None = None,
+                       base_url: str | None = None) -> tuple[dict | None, CaptchaInfo]:
+    """Render a URL through CamoFox with captcha solving enabled. Returns
+    (snapshot_dict, captcha_info). snapshot_dict is None on failure. ``user`` forces a fresh
+    session (fresh proxy IP) — see render()."""
+    snap = render(url, timeout_s=timeout_s, solve_captchas=True, user=user, base_url=base_url)
+    if snap is None:
+        return None, CaptchaInfo()
+    info = snap.pop("captcha_info", None) or CaptchaInfo()
+    return snap, info
 
 
 def fetch_bytes(url: str, timeout_s: float = 45.0) -> bytes | None:
