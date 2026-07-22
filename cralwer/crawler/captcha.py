@@ -153,7 +153,11 @@ EVIDENCE_JS = r"""
   out.mtcaptcha = u('mtcaptcha.com') || has('#mtcaptcha') || has('.mtcaptcha');
   out.friendly  = u('friendlycaptcha') || has('.frc-captcha');
   out.altcha    = has('altcha-widget') || u('altcha');
-  out.keycaptcha = u('keycaptcha.com') || has('#div_for_keycaptcha');
+  // KeyCAPTCHA sets s_s_c_user_id / s_s_c_web_server_sign script vars before the widget mounts;
+  // #div_for_keycaptcha may be empty until then, so key on the config vars too. Measured on
+  // 2captcha's keycaptcha demo, which mounts nothing detectable but carries s_s_c_user_id.
+  out.keycaptcha = u('keycaptcha.com') || has('#div_for_keycaptcha')
+                   || (typeof window.s_s_c_user_id !== 'undefined') || has('[id^="s_s_c_"]');
   out.capy      = u('capy.me') || has('#capy');
   // Classic distorted-text image captcha: an image whose URL says captcha, next to a text input.
   out.image_text = (has('img[src*="captcha" i]') || has('img[id*="captcha" i]'))
@@ -207,10 +211,20 @@ def _present(ev: dict, kind: str) -> bool:
     if kind == "recaptcha_enterprise":
         return bool(g("recaptcha_ent_js"))
     if kind == "recaptcha_v2":
-        return bool(g("recaptcha_widget") or g("recaptcha_frame")
-                    or (g("recaptcha_resp") and not _present(ev, "hcaptcha")))
+        # A v2 page has a real checkbox WIDGET. The google.com/recaptcha frame and the
+        # g-recaptcha-response textarea are BOTH shared with v3 — v3 loads the same frame and
+        # writes the same response field — so keying v2 on those alone tags every v3 page as v2.
+        # That mislabel is not cosmetic: v2 is token_injectable and v3 is not, so it makes the
+        # crawler attempt an injection that provably cannot work. Measured on 2captcha's v3 demo
+        # (recaptcha_widget=False, recaptcha_v3_render=<key>, recaptcha_resp=True).
+        if g("recaptcha_widget"):
+            return True
+        if g("recaptcha_v3_render"):
+            return False                      # it is v3, not v2 — let the v3 branch claim it
+        return bool(g("recaptcha_frame") or (g("recaptcha_resp") and not _present(ev, "hcaptcha")))
     if kind == "recaptcha_v3":
-        return bool(g("recaptcha_v3_render"))
+        # No checkbox, sitekey declared as ?render=<key> in the script URL.
+        return bool(g("recaptcha_v3_render") and not g("recaptcha_widget"))
     if kind == "image_text":
         return bool(g("image_text"))
     if kind == "friendly_captcha":
@@ -494,6 +508,7 @@ _HTTP_SIGNATURES: dict[str, tuple[tuple, tuple, tuple]] = {
     "recaptcha_v2": ((), (), ("g-recaptcha-response", 'class="g-recaptcha"', "g-recaptcha ")),
     "arkose":    ((), (), ("client-api.arkoselabs.com", "cdn.funcaptcha.com/fc")),
     "geetest":   ((), (), ("gcaptcha4.geetest.com", "static.geetest.com")),
+    "keycaptcha": ((), (), ("keycaptcha.com", "s_s_c_user_id", "s_s_c_web_server_sign")),
 }
 
 # A wall only withholds content on these. On a 200 the same marker usually just means the widget is

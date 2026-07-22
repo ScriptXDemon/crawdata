@@ -170,6 +170,37 @@ def t_recaptcha_v3_is_admitted_to_be_unsolvable_here() -> None:
     assert captcha.injection_js("recaptcha_v3", "TOK") == ""
 
 
+# Real capture from 2captcha.com/demo/recaptcha-v3 through CamoFox: no widget, sitekey only in the
+# ?render= script URL, but the shared google.com frame and g-recaptcha-response textarea are both
+# present exactly as on a v2 page.
+RECAPTCHA_V3_DEMO = {
+    "title": "Google reCAPTCHA v3 demo: Sample Form",
+    "recaptcha_widget": False, "recaptcha_frame": True, "recaptcha_resp": True,
+    "recaptcha_js": True, "recaptcha_v3_render": "6Lcyqq8oAAAAAJE7eVJ3aZp_hnJcI6LgGdYD8lge",
+    "sitekey_recaptcha": None,
+}
+
+
+def t_a_v3_page_is_not_misread_as_injectable_v2() -> None:
+    """The single most costly captcha misclassification: v3 shares the google.com frame and the
+    g-recaptcha-response field with v2, so the old detector called it recaptcha_v2 — which is
+    token_injectable. The crawler would then buy and inject a token that v3 has no DOM sink to
+    receive, wasting the spend on every v3 page. It must resolve to v3 / not_injectable."""
+    d = captcha.classify(RECAPTCHA_V3_DEMO)
+    assert d.kind == "recaptcha_v3", f"v3 demo classified as {d.kind!r}"
+    assert d.solvability == "not_injectable"
+    assert d.sitekey == "6Lcyqq8oAAAAAJE7eVJ3aZp_hnJcI6LgGdYD8lge"
+
+
+def t_a_real_v2_widget_still_wins_over_a_v3_script() -> None:
+    """The fix must not overcorrect: a page with an actual .g-recaptcha checkbox is v2 and
+    injectable even if a v3 script is also loaded — the widget is the ground truth."""
+    both = dict(RECAPTCHA_V3_DEMO, recaptcha_widget=True, sitekey_recaptcha="6LeIxAcTAAAAAJcZ")
+    d = captcha.classify(both)
+    assert d.kind == "recaptcha_v2"
+    assert d.solvability == "token_injectable"
+
+
 # ── HTTP-level detection ──────────────────────────────────────────────────────
 
 def t_cloudflare_challenge_is_recognised_from_headers_alone() -> None:

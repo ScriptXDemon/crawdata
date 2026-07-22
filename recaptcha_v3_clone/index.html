@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reCAPTCHA v3 Clone — Protected Form</title>
+  <script src="/score.js" data-mint="/mint"></script>
+  <style>
+    body{font:16px/1.5 system-ui,sans-serif;max-width:34rem;margin:3rem auto;padding:0 1rem}
+    input,textarea{display:block;width:100%;margin:.5rem 0;padding:.6rem;box-sizing:border-box}
+    button{padding:.6rem 1.2rem;cursor:pointer}
+    pre{background:#f4f4f4;padding:1rem;overflow:auto;border-radius:6px}
+    .ok{color:#137333}.bad{color:#c5221f}
+  </style>
+</head>
+<body>
+  <h1>Contact us</h1>
+  <p>Protected by a self-hosted reCAPTCHA v3 clone (invisible scoring).</p>
+  <form id="f">
+    <input name="email" type="email" placeholder="you@example.com" required>
+    <textarea name="msg" rows="4" placeholder="Your message" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+  <pre id="out">Move the mouse, type, then submit…</pre>
+  <script>
+    const SITEKEY = "clone-site-key-123";          // public sitekey
+    const f = document.getElementById("f"), out = document.getElementById("out");
+    f.addEventListener("submit", (e) => {
+      e.preventDefault(); out.textContent = "scoring…";
+      myCaptcha.ready(async () => {
+        try {
+          const token = await myCaptcha.execute(SITEKEY, { action: "submit_contact" });
+          const r = await fetch("/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ captcha_token: token,
+              email: f.email.value, msg: f.msg.value })
+          });
+          const j = await r.json();
+          out.textContent = JSON.stringify(j, null, 2);
+          out.className = j.allowed ? "ok" : "bad";
+        } catch (err) { out.textContent = "error: " + err; }
+      });
+    });
+  </script>
+</body>
+</html>
