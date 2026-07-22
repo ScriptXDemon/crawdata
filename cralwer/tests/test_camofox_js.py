@@ -37,10 +37,12 @@ def parses(expr: str) -> tuple[bool, str]:
 def main() -> None:
     checked = []
 
+    from crawler import camofox_client as cc  # noqa: E402
     for name, expr in (("EVIDENCE_JS", captcha.EVIDENCE_JS),
                        ("SUBMIT_JS", captcha.SUBMIT_JS),
                        ("VERIFY_JS", captcha.VERIFY_JS),
-                       ("FINGERPRINT_JS", captcha.FINGERPRINT_JS)):
+                       ("FINGERPRINT_JS", captcha.FINGERPRINT_JS),
+                       ("_CF_WIDGET_JS", cc._CF_WIDGET_JS)):
         ok, err = parses(expr)
         assert ok, f"{name} emits invalid JS: {err}\n{expr[:400]}"
         checked.append(name)

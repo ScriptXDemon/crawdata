@@ -327,6 +327,51 @@ def _looks_challenged(c, base: str, user: str, tab_id: str) -> bool:
     return False
 
 
+# The Turnstile widget slot: a ~200-500px wide, ~55-90px tall container sitting near the top of the
+# challenge page. Its interior (the checkbox) is a cross-origin challenges.cloudflare.com iframe no
+# selector can reach, but the slot's own box gives us the pixel to aim at.
+# No upper width bound: the challenge container is often full-column-width (~896px measured), not the
+# ~300px of the visible widget — the checkbox still renders at the container's LEFT edge, so we aim at
+# x+30 regardless of width. The distinctive filter is the height band (a Turnstile slot is ~55-95px)
+# near the top of the page. Capping width at ~560 (an earlier mistake) filtered the real slot out and
+# the click never fired.
+_CF_WIDGET_JS = (
+    "(() => { const c=[...document.querySelectorAll('div')].map(e=>{const r=e.getBoundingClientRect();"
+    "return {x:r.x,y:r.y,w:r.width,h:r.height};})"
+    ".filter(b=>b.h>=55&&b.h<=95&&b.w>=180&&b.y>120&&b.y<460); c.sort((a,b)=>a.y-b.y);"
+    "const s=c[0]; return s?{x:Math.round(s.x),y:Math.round(s.y),h:Math.round(s.h)}:null; })()"
+)
+
+
+def _click_turnstile_checkbox(c, base: str, user: str, tab_id: str) -> bool:
+    """Click the Cloudflare "Verify you are human" checkbox by pixel coordinate.
+
+    An interactive Turnstile challenge never self-clears — it waits for a click — and the checkbox
+    lives in a cross-origin iframe that page.locator() cannot address, so a selector click is
+    impossible. A TRUSTED humanized coordinate click on it does clear the challenge (verified live on
+    scrapingcourse.com/antibot-challenge: "You bypassed the Antibot challenge!"). Requires the /click
+    coordinate patch in the CamoFox server; on an unpatched server the /click returns 400 and this is
+    a harmless no-op. Gate: CRAWLER_CAMOFOX_CF_CLICK=0 disables it."""
+    try:
+        e = c.post(f"{base}/tabs/{tab_id}/evaluate",
+                   json={"userId": user, "expression": _CF_WIDGET_JS}, headers=_headers())
+        if e.status_code >= 400:
+            return False
+        slot = e.json().get("result")
+        if not isinstance(slot, dict):
+            return False
+        cx = int(slot["x"]) + 30            # the checkbox sits ~30px in from the widget's left edge
+        cy = int(slot["y"] + slot["h"] / 2)
+        r = c.post(f"{base}/tabs/{tab_id}/click",
+                   json={"userId": user, "coordinates": {"x": cx, "y": cy}})
+        ok = r.status_code < 400 and isinstance(r.json(), dict) and r.json().get("clicked") is True
+        if ok:
+            log.info("clicked turnstile checkbox at (%d,%d)", cx, cy)
+        return ok
+    except Exception:
+        return False
+
+
 def _settle(c, base: str, user: str, tab_id: str) -> None:
     """Post-navigation settle so C3 captures the REAL page, not a pre-challenge / half-rendered DOM:
       1. /wait  — networkidle + hydration poll (lets a Cloudflare/Imperva JS challenge auto-solve),
@@ -352,8 +397,15 @@ def _settle(c, base: str, user: str, tab_id: str) -> None:
     # came back in ~16.5s with the challenge still up, identical at a 90s or 150s caller timeout,
     # because the caller's timeout never governed this loop. Poll until it clears or the budget ends.
     budget_ms = _env_int("CRAWLER_CAMOFOX_CHALLENGE_MS", 45000)
+    cf_click = os.environ.get("CRAWLER_CAMOFOX_CF_CLICK", "1") == "1"
+    clicks = 0
     waited = 0
     while waited < budget_ms and _looks_challenged(c, base, user, tab_id):
+        # A NON-interactive challenge clears on its own; an INTERACTIVE Turnstile ("Verify you are
+        # human") does not — it needs the checkbox clicked. Try that up to twice; a no-op if the
+        # widget isn't found or the server lacks the coordinate-click patch.
+        if cf_click and clicks < 2 and _click_turnstile_checkbox(c, base, user, tab_id):
+            clicks += 1
         try:
             c.post(f"{base}/tabs/{tab_id}/wait",
                    json={"userId": user, "timeout": settle_ms, "waitForNetwork": True})
