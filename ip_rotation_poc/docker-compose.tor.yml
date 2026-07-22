@@ -1,0 +1,37 @@
+# IP-rotation PoC — free Tor egress with a control port for on-demand rotation.
+#
+# Exposes:
+#   :9050  SOCKS5   (curl --socks5-hostname localhost:9050 ...)
+#   :8118  HTTP     (privoxy -> point the crawler's round_robin slot here)
+#   :9051  control  (NEWNYM rotation; see rotate_tor.sh)
+#
+# HONEST VERDICT (measured + researched): Tor exit nodes are DATACENTER IPs on public blocklists, so
+# against reputation walls (Cloudflare/DataDome/Akamai) Tor scores WORSE than our residential IP. Use
+# this only as a FREE geo-probe — to cheaply learn whether a block is geographic (a US exit gets a
+# 200 => geo) or reputation-based (still 403 => you need residential/mobile, see the gluetun/4G path).
+# Also note: the common `dperson/torproxy` image ships an outdated Tor that current consensus rejects
+# ("no exit nodes") — use a maintained base and a fresh torrc as below.
+name: mallory-iprotation-tor
+
+services:
+  tor:
+    image: peterdavehello/tor-socks-proxy:latest   # maintained; bootstraps on the current network
+    command: >
+      sh -c "printf 'SocksPort 0.0.0.0:9050\nControlPort 0.0.0.0:9051\nCookieAuthentication 0\nHashedControlPassword 16:0000000000000000000000000000000000000000000000000000000000\n' > /etc/tor/torrc.custom;
+             cat /etc/tor/torrc.custom;
+             exec tor -f /etc/tor/torrc.custom"
+    ports:
+      - "127.0.0.1:9050:9050"   # SOCKS5
+      - "127.0.0.1:9051:9051"   # control (localhost only — never expose an open control port)
+    restart: unless-stopped
+
+  # privoxy turns the SOCKS-only Tor into an HTTP proxy the crawler's round_robin slot can use.
+  privoxy:
+    image: vimagick/privoxy:latest
+    depends_on: [tor]
+    command: >
+      sh -c "printf 'listen-address 0.0.0.0:8118\nforward-socks5t / tor:9050 .\n' > /etc/privoxy/config;
+             exec privoxy --no-daemon /etc/privoxy/config"
+    ports:
+      - "127.0.0.1:8118:8118"   # HTTP proxy -> CAMOFOX_PROXY_RR_HOST/PORTS or CRAWLER_PROXY_URL
+    restart: unless-stopped
