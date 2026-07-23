@@ -80,6 +80,36 @@ def is_ip_block_page(rendered: str | None) -> bool:
             or sum(m in low for m in _IP_BLOCK_MARKERS) >= 2)
 
 
+# A rendered anti-bot CHALLENGE / CAPTCHA interstitial — distinct from a plain IP block. These are
+# walls a captcha solver or a better browser fingerprint might clear (so they flag as a captcha
+# limitation, not needs_network_path). Distinctive enough that one is proof: none occur in prose.
+# CRITICAL: markers must be ACTIVE-wall signals only — text/scripts that are gone once the challenge
+# is passed. Widget SCRIPT sources (challenges.cloudflare.com/turnstile, hcaptcha.com/, recaptcha/)
+# and the response FIELDS (cf-turnstile-response) stay in the DOM AFTER a pass, so keying on them made
+# is_captcha_wall fire on the very page that proves success — measured on
+# scrapingcourse.com/cloudflare-challenge, whose "You bypassed the Cloudflare challenge!" page still
+# references challenges.cloudflare.com/turnstile and was therefore recorded as needs_captcha_solver.
+# Keep only the interstitial text + the managed-challenge orchestrate path, which are absent post-pass.
+_CAPTCHA_WALL_MARKERS = (
+    "just a moment", "/cdn-cgi/challenge-platform", "cf-chl-",
+    "checking your browser before accessing", "attention required! | cloudflare",
+    "verify you are human", "verifying you are human", "enable javascript and cookies to continue",
+    "px-captcha", "_incapsula_resource", "captcha-delivery.com/captcha",
+    "please complete the security check", "pardon our interruption",
+)
+
+
+def is_captcha_wall(rendered: str | None) -> bool:
+    """True if a rendered body is an anti-bot CHALLENGE / CAPTCHA interstitial (Cloudflare managed
+    challenge, Turnstile, reCAPTCHA/hCaptcha, DataDome, Imperva…). Used so a wall C3 could not clear
+    is flagged as a captcha LIMITATION (resolvable with a solver / better fingerprint) rather than a
+    generic IP block — the operator asked for that distinction, with the URL kept in a log."""
+    if not rendered:
+        return False
+    low = rendered.lower()
+    return any(m in low for m in _CAPTCHA_WALL_MARKERS)
+
+
 def http_reason(status: int) -> str:
     return f"http_{status}"
 

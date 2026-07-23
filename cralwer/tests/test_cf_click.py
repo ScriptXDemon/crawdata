@@ -100,6 +100,26 @@ def t_the_server_patch_is_present_in_both_vendor_copies() -> None:
         assert "curved approach" in src, f"{rel} lost the humanized mouse path"
 
 
+def t_a_passed_cloudflare_page_is_not_recorded_as_a_wall() -> None:
+    """The success page still references challenges.cloudflare.com/turnstile (the widget script stays
+    in the DOM after a pass) and keeps a filled cf-turnstile-response input. Keying is_captcha_wall on
+    those made the crawler record "You bypassed the Cloudflare challenge!" as needs_captcha_solver —
+    the exact page that proves success was filed as a failure. Measured live on
+    scrapingcourse.com/cloudflare-challenge."""
+    from crawler import errors
+    passed = ('<html><head><script src="https://challenges.cloudflare.com/turnstile/v0/api.js">'
+              '</script></head><body>You bypassed the Cloudflare challenge! :D'
+              '<input name="cf-turnstile-response" value="0.xxx"></body></html>')
+    assert errors.is_captcha_wall(passed) is False, "passed page still flagged as an uncleared wall"
+    # ...but an ACTIVE interstitial (title + text + orchestrate path, all gone post-pass) must fire.
+    wall = ('<html><head><title>Just a moment...</title></head><body>Verify you are human. '
+            '/cdn-cgi/challenge-platform/h/g/orchestrate</body></html>')
+    assert errors.is_captcha_wall(wall) is True, "active interstitial no longer detected"
+    # the widget-script markers that persist after a pass must be gone from the marker list
+    for persistent in ("challenges.cloudflare.com/turnstile", "cf-turnstile-response", "hcaptcha.com/"):
+        assert persistent not in errors._CAPTCHA_WALL_MARKERS, f"{persistent!r} still a wall marker"
+
+
 def t_the_settle_loop_actually_calls_the_checkbox_click() -> None:
     """Wiring check: an interactive challenge only clears if _settle drives the click. If a refactor
     dropped the call, Cloudflare would silently regress to unsolved."""
